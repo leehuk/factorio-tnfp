@@ -1,6 +1,8 @@
 local Position = require('__stdlib__/stdlib/area/position')
 local Table = require('__stdlib__/stdlib/utils/table')
 
+require('ptnlib/state_train')
+
 -- ptnlib_direction_iscardinal()
 --   Determines if a given direction is cardinal (N/E/S/W)
 function ptnlib_direction_iscardinal(direction)
@@ -197,8 +199,22 @@ function ptn_find_usable_train(player, target)
 end
 
 function ptn_dispatch(player, target, train)
+    local result = ptnlib_state_train_set(train, 'player', player)
+    if not result then
+        -- error: failed to dispatch
+        return
+    end
+
+    station = ptnlib_state_train_set(train, 'station', target)
+    status = ptnlib_state_train_set(train, 'status', 1)
+
+    local result = ptnlib_state_train_get(train, 'player')
+    if not result then
+        player.print("double fux")
+        return
+    end
+
     local schedule = Table.deep_copy(train.schedule)
-    
     local schedule_found = false
 
     -- Trains must have a schedule, as otherwise PTN wouldnt find them
@@ -276,6 +292,56 @@ function ptn_call(event)
     end
     
 end
+
+function ptn_handle_train_state(event)
+    -- Train states we dont handle
+    if event.train.state == defines.train_state.arrive_signal or event.train.state == defines.train_state.arrive_station then
+        return
+    end
+
+    local player = ptnlib_state_train_get(event.train, 'player')
+    local status = ptnlib_state_train_get(event.train, 'status')
+
+    -- A train we're not tracking
+    if not player or not status then
+        return
+    end
+
+    -- first, handle a train we've just dispatched
+    if status == 1 then
+        -- Successful dispatch
+        if event.train.state == defines.train_state.on_the_path then
+            ptnlib_state_train_set(event.train, 'status', 2)
+            ptnlib_flytext(player, player.position, "PTN Train: Dispatched")
+        end
+    -- A train en route
+    elseif status == 2 then
+        if event.train.state == defines.train_state.on_the_path then
+            ptnlib_flytext(player, player.position, "PTN Train: En route")
+        elseif event.train.state == defines.train_state.wait_signal then
+            ptnlib_flytext(player, player.position, "PTN Train: Held at signals")
+        elseif event.train.state == defines.train_state.wait_station then
+            player.print("train arrived")
+            local station = ptnlib_state_train_get(event.train, 'station')
+            local train = station.get_stopped_train()
+
+            if not train then
+                -- The train arrived at a different station?
+                ptnlib_flytext(player, player.position, "PTN Train: Arrived at different station (?)")
+                return
+            end
+
+            ptnlib_flytext(player, player.position, "PTN Train: Arrived")
+        end
+    end
+
+    --ptnlib_flytext(player, player.position, event.train.state)
+end
+
+-- Event Handling
+-- on_player_driving_changed_state
+script.on_event(defines.events.on_train_changed_state, ptn_handle_train_state)
+-- script.on_event(defines.events.on_train_schedule_changed, ptn_handle_train_schedule)
 
 -- Input Handling
 script.on_event("ptn-call", ptn_call)
