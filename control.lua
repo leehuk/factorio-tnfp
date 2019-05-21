@@ -1,5 +1,3 @@
-local Entity = require('__stdlib__/stdlib/entity/entity')
-local Event = require('__stdlib__/stdlib/event/event')
 local Position = require('__stdlib__/stdlib/area/position')
 local Table = require('__stdlib__/stdlib/utils/table')
 
@@ -280,4 +278,4 @@ function ptn_call(event)
 end
 
 -- Input Handling
-Event.register("ptn-call", ptn_call)
+script.on_event("ptn-call", ptn_call)
