@@ -1,0 +1,11 @@
+{
+    "name": "PlayerTrainNetwork",
+    "title": "Player Train Network",
+    "version": "0.0.1",
+    "factorio_version": "0.17",
+    "date": "2019-05-19",
+    "author": "leeh",
+    "homepage": "",
+    "description": "",
+    "dependencies": ["base", "stdlib >= 1.0.4"]
+  }
