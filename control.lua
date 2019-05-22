@@ -1,7 +1,8 @@
-local Entity = require('__stdlib__/stdlib/entity/entity')
-local Event = require('__stdlib__/stdlib/event/event')
 local Position = require('__stdlib__/stdlib/area/position')
 local Table = require('__stdlib__/stdlib/utils/table')
+
+require('ptnlib/state_player')
+require('ptnlib/state_train')
 
 -- ptnlib_direction_iscardinal()
 --   Determines if a given direction is cardinal (N/E/S/W)
@@ -112,7 +113,7 @@ function ptnlib_flytext(player, position, text)
         text = text,
         flags = { "not-on-map" },
         position = position,
-        time_to_live = 150,
+        time_to_live = 250,
         speed = 0.05
     })
 end
@@ -199,10 +200,20 @@ function ptn_find_usable_train(player, target)
 end
 
 function ptn_dispatch(player, target, train)
-    local schedule = Table.deep_copy(train.schedule)
+    local result = ptnlib_state_train_set(train, 'player', player)
+    if not result then
+        -- error: failed to dispatch
+        return
+    end
     
+    result = ptnlib_state_player_set(player, 'train', train)
+    result = ptnlib_state_train_set(train, 'station', target)
+    result = ptnlib_state_train_set(train, 'status', 1)
+    result = ptnlib_state_train_setstate(train)
+    
+    local schedule = Table.deep_copy(train.schedule)
     local schedule_found = false
-
+    
     -- Trains must have a schedule, as otherwise PTN wouldnt find them
     for i, ent in ipairs(schedule.records) do
         if ent.station == target.backer_name then
@@ -210,36 +221,27 @@ function ptn_dispatch(player, target, train)
             schedule_found = true
         end
     end
-
+    
     if not schedule_found then
         table.insert(schedule.records, {
             station = target.backer_name,
             wait_conditions = {
                 {
-                    type = "passenger_present",
-                    compare_type = "and"
-                },
-                {
-                    type = "inactivity",
-                    compare_type = "and",
-                    ticks = 600
-                },
-                {
                     type="inactivity",
                     compare_type = "or",
-                    ticks = 3000
+                    ticks = 3600
                 }
             }
         })
-
+        
         schedule.current = #schedule.records
     end
-
+    
     train.schedule = schedule
     if train.manual_mode then
         train.manual_mode = false
     end
-
+    
     player.print({"ptn_train_called", player.name, target.backer_name})
 end
 
@@ -276,8 +278,121 @@ function ptn_call(event)
         
         ptn_dispatch(player, target, train)
     end
-    
 end
 
+function ptn_handle_arrival(player, train)
+    ptnlib_state_train_set(train, 'status', 3)
+
+    local settings = settings.get_player_settings(player)
+    
+    -- If we're switching the train to manual mode, we can safely restore its original schedule.
+    if settings['ptn-train-arrival-behaviour'].value == "manual" then
+        train.manual_mode = true
+        
+        local state = ptnlib_state_train_get(train, 'state')
+        if state and state.schedule then
+            train.schedule = Table.deep_copy(state.schedule)
+        end
+    end
+end
+
+function ptn_handle_completion(player, train)
+    local status = ptnlib_state_train_get(train, 'status')
+
+    if not status then
+        return
+    end
+
+    -- Player has boarded the train whilst we're dispatching -- treat that as an arrival.
+    if status == 1 or status == 2 then
+        ptn_handle_arrival(player, train)
+    end
+
+    -- Mark delivery as complete
+    ptnlib_state_train_set(train, 'status', 4)
+end
+
+function ptn_handle_player_vehicle(event)
+    -- Dont track entering non-train vehicles
+    if not event.entity.train then
+        return
+    end
+    
+    -- Entering a vehicle
+    if event.entity then
+        local player = game.players[event.player_index]
+        local train = ptnlib_state_player_get(player, 'train')
+
+        -- Unrelated to PTN
+        if not train then
+            return
+        end
+
+        -- Player has successfully boarded their PTN Train
+        if train.id == event.entity.train.id then
+            player.print("handling completion")
+            ptn_handle_completion(player, train)
+        end
+    end
+end
+
+function ptn_handle_train_state(event)
+    -- Train states we dont handle
+    if event.train.state == defines.train_state.arrive_signal or event.train.state == defines.train_state.arrive_station then
+        return
+    end
+    
+    local player = ptnlib_state_train_get(event.train, 'player')
+    local status = ptnlib_state_train_get(event.train, 'status')
+    
+    -- A train we're not tracking
+    if not player or not status then
+        return
+    end
+    
+    -- first, handle a train we've just dispatched
+    if status == 1 then
+        -- Successful dispatch
+        if event.train.state == defines.train_state.on_the_path then
+            ptnlib_state_train_set(event.train, 'status', 2)
+            ptnlib_flytext(player, player.position, "PTN Train: Dispatched")
+        end
+        -- A train en route
+    elseif status == 2 then
+        if event.train.state == defines.train_state.on_the_path then
+            ptnlib_flytext(player, player.position, "PTN Train: En route")
+        elseif event.train.state == defines.train_state.wait_signal then
+            ptnlib_flytext(player, player.position, "PTN Train: Held at signals")
+        elseif event.train.state == defines.train_state.wait_station then
+            local station = ptnlib_state_train_get(event.train, 'station')
+            local train = station.get_stopped_train()
+            
+            if not train then
+                -- The train arrived at a different station?
+                ptnlib_flytext(player, player.position, "PTN Train: Arrived at different station (?)")
+                return
+            end
+            
+            ptnlib_flytext(player, player.position, "PTN Train: Arrived")
+            ptn_handle_arrival(player, event.train)
+        end
+    end
+    
+    --ptnlib_flytext(player, player.position, event.train.state)
+end
+
+-- Event Handling
+-----------------
+-- Player Events
+script.on_event(defines.events.on_player_driving_changed_state, ptn_handle_player_vehicle)
+--script.on_event(defines.events.on_player_died, ptn_handle_player_exit)
+--script.on_event(defines.events.on_player_kicked, ptn_handle_player_exit)
+--script.on_event(defines.events.on_player_left_game, ptn_handle_player_exit)
+
+-- Train Events
+script.on_event(defines.events.on_train_changed_state, ptn_handle_train_state)
+-- script.on_event(defines.events.on_player_driving_changed_state, ptn_handle_player_vehicle)
+-- script.on_event(defines.events.on_train_schedule_changed, ptn_handle_train_schedule)
+
 -- Input Handling
-Event.register("ptn-call", ptn_call)
+script.on_event("ptn-call", ptn_call)
