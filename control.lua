@@ -112,7 +112,7 @@ function ptnlib_flytext(player, position, text)
         text = text,
         flags = { "not-on-map" },
         position = position,
-        time_to_live = 150,
+        time_to_live = 250,
         speed = 0.05
     })
 end
@@ -205,14 +205,9 @@ function ptn_dispatch(player, target, train)
         return
     end
 
-    station = ptnlib_state_train_set(train, 'station', target)
-    status = ptnlib_state_train_set(train, 'status', 1)
-
-    local result = ptnlib_state_train_get(train, 'player')
-    if not result then
-        player.print("double fux")
-        return
-    end
+    result = ptnlib_state_train_set(train, 'station', target)
+    result = ptnlib_state_train_set(train, 'status', 1)
+    result = ptnlib_state_train_setstate(train)
 
     local schedule = Table.deep_copy(train.schedule)
     local schedule_found = false
@@ -290,7 +285,20 @@ function ptn_call(event)
         
         ptn_dispatch(player, target, train)
     end
-    
+end
+
+function ptn_handle_arrival(player, train)
+    local settings = settings.get_player_settings(player)
+
+    -- If we're switching the train to manual mode, we can safely restore its original schedule.
+    if settings['ptn-train-arrival-behaviour'].value == "manual" then
+        train.manual_mode = true
+
+        local state = ptnlib_state_train_get(train, 'state')
+        if state and state.schedule then
+            train.schedule = Table.deep_copy(state.schedule)
+        end
+    end
 end
 
 function ptn_handle_train_state(event)
@@ -321,7 +329,6 @@ function ptn_handle_train_state(event)
         elseif event.train.state == defines.train_state.wait_signal then
             ptnlib_flytext(player, player.position, "PTN Train: Held at signals")
         elseif event.train.state == defines.train_state.wait_station then
-            player.print("train arrived")
             local station = ptnlib_state_train_get(event.train, 'station')
             local train = station.get_stopped_train()
 
@@ -331,7 +338,9 @@ function ptn_handle_train_state(event)
                 return
             end
 
+            ptnlib_state_train_set(event.train, 'status', 3)
             ptnlib_flytext(player, player.position, "PTN Train: Arrived")
+            ptn_handle_arrival(player, event.train)
         end
     end
 

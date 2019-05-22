@@ -4,8 +4,7 @@ local Table = require('__stdlib__/stdlib/utils/table')
 --   nil = Untracked
 --   1   = Dispatching to player (awaiting confirmation)
 --   2   = Dispatched to player (confirmed)
---   3   = Arrival blocked
---   4   = Arrived at destination
+--   3   = Arrived at destination
 
 -- _ptnlib_state_train_prune()
 --   Prune the state train data of any invalid trains
