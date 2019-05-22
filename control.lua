@@ -218,11 +218,7 @@ end
 
 function ptn_call(event)
     local player = game.players[event.player_index]
-    if not player then
-        player.print({"ptn_error_player", 'unk'})
-        return
-    end
-    
+
     if not player.surface then
         player.print({"ptn_error_location_surface", player.name})
         return
