@@ -227,18 +227,9 @@ function ptn_dispatch(player, target, train)
             station = target.backer_name,
             wait_conditions = {
                 {
-                    type = "passenger_present",
-                    compare_type = "and"
-                },
-                {
-                    type = "inactivity",
-                    compare_type = "and",
-                    ticks = 600
-                },
-                {
                     type="inactivity",
                     compare_type = "or",
-                    ticks = 3000
+                    ticks = 3600
                 }
             }
         })
