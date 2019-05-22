@@ -5,6 +5,7 @@ local Table = require('__stdlib__/stdlib/utils/table')
 --   1   = Dispatching to player (awaiting confirmation)
 --   2   = Dispatched to player (confirmed)
 --   3   = Arrived at destination
+--   4   = Player has boarded
 
 -- _ptnlib_state_train_prune()
 --   Prune the state train data of any invalid trains
