@@ -2,6 +2,7 @@ Position = require('__stdlib__/stdlib/area/position')
 Table = require('__stdlib__/stdlib/utils/table')
 
 require('ptnlib/action')
+require('ptnlib/event')
 require('ptnlib/direction')
 require('ptnlib/state_player')
 require('ptnlib/state_train')
@@ -216,37 +217,6 @@ function ptn_dispatch(player, target, train)
     player.print({"ptn_train_called", player.name, target.backer_name})
 end
 
-function ptn_call(event)
-    local player = game.players[event.player_index]
-
-    if not player.surface then
-        player.print({"ptn_error_location_surface", player.name})
-        return
-    end
-    
-    if not player.position then
-        player.print({"ptn_error_location_position", player.name})
-        return
-    end
-    
-    local target = ptn_find_usable_stop(player)
-    if target then
-        local train = target.get_stopped_train()
-        if train then
-            player.print({"ptn_train_waiting", player.name, target.backer_name})
-            return
-        end
-        
-        local train = ptn_find_usable_train(player, target)
-        if not train then
-            player.print({"ptn_error_train_find", player.name})
-            return
-        end
-        
-        ptn_dispatch(player, target, train)
-    end
-end
-
 function ptn_handle_arrival(player, train)
     ptnlib_state_train_set(train, 'status', 3)
     
@@ -381,10 +351,13 @@ script.on_event(defines.events.on_player_driving_changed_state, ptn_handle_playe
 --script.on_event(defines.events.on_player_kicked, ptn_handle_player_exit)
 --script.on_event(defines.events.on_player_left_game, ptn_handle_player_exit)
 
+-- Shortcut Events
+script.on_event(defines.events.on_lua_shortcut, ptn_handle_shortcut)
+
 -- Train Events
 script.on_event(defines.events.on_train_changed_state, ptn_handle_train_state)
 -- script.on_event(defines.events.on_player_driving_changed_state, ptn_handle_player_vehicle)
 -- script.on_event(defines.events.on_train_schedule_changed, ptn_handle_train_schedule)
 
 -- Input Handling
-script.on_event("ptn-call", ptn_call)
+script.on_event("ptn-handle-request", ptn_handle_request)

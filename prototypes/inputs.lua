@@ -1,7 +1,7 @@
 data:extend({
     {
+        name = "ptn-handle-request",
         type = "custom-input",
-        name = "ptn-call",
         key_sequence = "ALT + P",
         consuming = "none"
     }
