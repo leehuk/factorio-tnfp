@@ -1,5 +1,3 @@
-local Table = require('__stdlib__/stdlib/utils/table')
-
 -- Status Table:
 --   nil = Untracked
 --   1   = Dispatching to player (awaiting confirmation)
@@ -18,6 +16,24 @@ function _ptnlib_state_train_prune()
     for id, data in pairs(global.train_data) do
         if not data or not data.train or not data.train.valid then
             global.train_data[id] = nil
+        end
+    end
+end
+
+-- ptnlib_state_train_delete()
+--   Deletes state information about a LuaTrain, optionally by key
+function ptnlib_state_train_delete(train, key)
+    _ptnlib_state_train_prune()
+
+    -- Accept invalid trains(?) for same reason as invalid players.
+
+    if key then
+        if global.train_data[train.id] then
+            global.train_data[train.id][key] = nil
+        end
+    else
+        if global.train_data[train.id] then
+            global.train_data[train.id] = nil
         end
     end
 end

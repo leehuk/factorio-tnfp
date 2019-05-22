@@ -13,6 +13,26 @@ function _ptnlib_state_player_prune()
     end
 end
 
+-- ptnlib_state_player_delete()
+--   Deletes state information about a LuaPlayer, optionally by key
+function ptnlib_state_player_delete(player, key)
+    _ptnlib_state_player_prune()
+
+    -- Deliberately accept invalid players here(?).
+    -- The idea is they may potentially invalid but hopefully still have their index
+    -- so we can do cleanup work.
+
+    if key then
+        if global.player_data[player.index] then
+            global.player_data[player.index][key] = nil
+        end
+    else
+        if global.player_data[player.index] then
+            global.player_data[player.index] = nil
+        end
+    end
+end
+
 -- ptnlib_state_player_get()
 --   Gets state information about a LuaPlayer by key
 function ptnlib_state_player_get(player, key)

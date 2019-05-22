@@ -1,9 +1,11 @@
-local Position = require('__stdlib__/stdlib/area/position')
-local Table = require('__stdlib__/stdlib/utils/table')
+Position = require('__stdlib__/stdlib/area/position')
+Table = require('__stdlib__/stdlib/utils/table')
 
+require('ptnlib/action')
 require('ptnlib/direction')
 require('ptnlib/state_player')
 require('ptnlib/state_train')
+require('ptnlib/train')
 
 -- ptnlib_stop_isptn()
 --   Validates if a stop is assigned for PTN
@@ -251,32 +253,28 @@ end
 
 function ptn_handle_arrival(player, train)
     ptnlib_state_train_set(train, 'status', 3)
-
+    
     local settings = settings.get_player_settings(player)
     
     -- If we're switching the train to manual mode, we can safely restore its original schedule.
     if settings['ptn-train-arrival-behaviour'].value == "manual" then
         train.manual_mode = true
-        
-        local state = ptnlib_state_train_get(train, 'state')
-        if state and state.schedule then
-            train.schedule = Table.deep_copy(state.schedule)
-        end
+        ptnlib_train_restoreschedule(train)
     end
 end
 
 function ptn_handle_completion(player, train)
     local status = ptnlib_state_train_get(train, 'status')
-
+    
     if not status then
         return
     end
-
+    
     -- Player has boarded the train whilst we're dispatching -- treat that as an arrival.
     if status == 1 or status == 2 then
         ptn_handle_arrival(player, train)
     end
-
+    
     -- Mark delivery as complete
     ptnlib_state_train_set(train, 'status', 4)
 end
@@ -291,12 +289,12 @@ function ptn_handle_player_vehicle(event)
     if event.entity then
         local player = game.players[event.player_index]
         local train = ptnlib_state_player_get(player, 'train')
-
+        
         -- Unrelated to PTN
         if not train then
             return
         end
-
+        
         -- Player has successfully boarded their PTN Train
         if train.id == event.entity.train.id then
             player.print("handling completion")
@@ -306,11 +304,6 @@ function ptn_handle_player_vehicle(event)
 end
 
 function ptn_handle_train_state(event)
-    -- Train states we dont handle
-    if event.train.state == defines.train_state.arrive_signal or event.train.state == defines.train_state.arrive_station then
-        return
-    end
-    
     local player = ptnlib_state_train_get(event.train, 'player')
     local status = ptnlib_state_train_get(event.train, 'status')
     
@@ -319,35 +312,69 @@ function ptn_handle_train_state(event)
         return
     end
     
-    -- first, handle a train we've just dispatched
-    if status == 1 then
-        -- Successful dispatch
-        if event.train.state == defines.train_state.on_the_path then
+    if event.train.state == defines.train_state.on_the_path then
+        -- PTN Train is on the move
+        if status == 1 then
+            -- This was a train awaiting dispatch
             ptnlib_state_train_set(event.train, 'status', 2)
             ptnlib_flytext(player, player.position, "PTN Train: Dispatched")
+        elseif status == 2 then
+            -- This train had stopped for some reason.
+            ptnlib_flytext(player, player.position, "PTN Train: Proceeding")
         end
-        -- A train en route
-    elseif status == 2 then
-        if event.train.state == defines.train_state.on_the_path then
-            ptnlib_flytext(player, player.position, "PTN Train: En route")
-        elseif event.train.state == defines.train_state.wait_signal then
-            ptnlib_flytext(player, player.position, "PTN Train: Held at signals")
-        elseif event.train.state == defines.train_state.wait_station then
-            local station = ptnlib_state_train_get(event.train, 'station')
-            local train = station.get_stopped_train()
-            
+        
+        -- elseif event.train.state == defines.train_state.path_lost then
+        -- Train has lost its path.  Await defines.train_state.no_path
+        -- elseif event.train.state == defines.train_state.no_schedule then
+        -- Train has no schedule.  We'll handle this via the on_schedule_changed event    
+        
+    elseif event.train.state == defines.train_state.no_path then
+        -- Train has no path.
+        -- If we're actively dispatching the train, we need to cancel it and restore its original schedule.
+        if status == 1 or status == 2 then
+            ptnlib_action_cancel(player, event.train, true)
+            ptnlib_flytext(player, player.position, "PTN Train Cancelled: No path to destination")
+        end
+        -- elseif event.train.state == defines.train_state.arrive_signal
+        -- Train has arrived at a signal.
+        
+    elseif event.train.state == defines.train_state.wait_signal then
+        -- Train is now held at signals
+        ptnlib_flytext(player, player.position, "PTN Train: Held at signals")
+        
+        -- elseif event.train.state == defines.train_state.arrive_station then
+        -- Train is arriving at a station, await its actual arrival
+        
+    elseif event.train.state == defines.train_state.wait_station then
+        -- Train has arrived at a station
+        -- If we're dispatching this train to this station, we now need to process its arrival.
+        local station = ptnlib_state_train_get(event.train, 'station')
+        local train = station.get_stopped_train()
+        
+        if status == 1 or status == 2 then
+            -- OK.  The trains arrived at a different station than the one we expected.  Lets just cancel the request.
             if not train then
-                -- The train arrived at a different station?
-                ptnlib_flytext(player, player.position, "PTN Train: Arrived at different station (?)")
+                ptnlib_action_cancel(player, event.train, true)
+                ptnlib_flytext(player, player.position, "PTN Train Cancelled: Arrived at different station (?)")
                 return
             end
             
             ptnlib_flytext(player, player.position, "PTN Train: Arrived")
             ptn_handle_arrival(player, event.train)
         end
+        
+    elseif event.train.state == defines.train_state.manual_control_stop then
+        -- Train has been switched to manual control
+        -- If we're dispatching the train, we need to cancel the request and restore its original schedule
+        if status == 1 or status == 2 then
+            ptnlib_action_cancel(player, event.train, true)
+            ptnlib_flytext(player, player.position, "PTN Train Cancelled: Train switched to manual mode")
+        end
+        
+        -- elseif event.train.state == defines.train_state.manual_control then
+        -- Train is now in manual control.
+        
     end
-    
-    --ptnlib_flytext(player, player.position, event.train.state)
 end
 
 -- Event Handling
