@@ -93,6 +93,8 @@ end
 -- ptn_find_usable_stop()
 --   Finds a suitable PTN location using an existing train stop
 function ptn_find_usable_stop(player)
+    local settings = settings.get_player_settings(player)
+
     -- Order of preference is:
     --   - Any train station with a PTN train stopped
     --   - A PTN station without a train
@@ -103,7 +105,7 @@ function ptn_find_usable_stop(player)
     local valid_stops_std = {}
     
     local entities = player.surface.find_entities_filtered({
-        area = Position.expand_to_area(player.position, 32),
+        area = Position.expand_to_area(player.position, settings['ptn-train-search-radius'].value),
         name = "train-stop"
     })
     
