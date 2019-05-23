@@ -1,9 +1,20 @@
--- Status Table:
---   nil = Untracked
---   1   = Dispatching to player (awaiting confirmation)
---   2   = Dispatched to player (confirmed)
---   3   = Arrived at destination
---   4   = Player has boarded
+--[[
+    State Table:
+        expect_schedulechange      = bool, marker to note we've made a schedule change which we'll see an event handler for
+        player                     = LuaPlayer, player requesting the train.  Cross-referenced by ptn_state_player
+        state                      = hash, stored information about a train we've modified such as schedule
+        station                    = LuaEntity, train station we're dispatching to
+        status                     = int, current dispatching status
+]]
+
+--[[
+    Status Table:
+        nil     = Untracked
+        1       = Dispatching to player (awaiting confirmation)
+        2       = Dispatched to player (confirmed)
+        3       = Arrived at destination
+        4       = Player has boarded
+]]
 
 -- _ptnlib_state_train_prune()
 --   Prune the state train data of any invalid trains
@@ -54,6 +65,19 @@ function ptnlib_state_train_get(train, key)
     return nil
 end
 
+-- ptnlib_state_train_query()
+--   Determines if a given train is being tracked by PTN
+function ptnlib_state_train_query(train)
+    if not train.valid then
+        return false
+    end
+
+    if global.train_data[train.id] then
+        return true
+    end
+
+    return false
+end
 -- ptnlib_state_train_set()
 --   Saves state informationa bout a LuaTrain by key
 function ptnlib_state_train_set(train, key, value)

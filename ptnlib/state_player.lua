@@ -1,3 +1,8 @@
+--[[
+    State Table:
+        train               = LuaTrain, train we're dispatching for the player.  Cross-referenced by ptn_state_train
+]]
+
 -- _ptnlib_state_player_prune()
 --   Prune the state player data of any invalid players
 function _ptnlib_state_player_prune()

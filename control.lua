@@ -210,8 +210,8 @@ function ptn_dispatch(player, target, train)
         
         schedule.current = #schedule.records
     end
-    
-    train.schedule = schedule
+
+    ptn_train_schedule_enact(train, schedule)
     if train.manual_mode then
         train.manual_mode = false
     end
@@ -227,7 +227,7 @@ function ptn_handle_arrival(player, train)
     -- If we're switching the train to manual mode, we can safely restore its original schedule.
     if settings['ptn-train-arrival-behaviour'].value == "manual" then
         train.manual_mode = true
-        ptnlib_train_restoreschedule(train)
+        ptn_train_schedule_restore(train)
     end
 end
 
