@@ -25,7 +25,7 @@ function tnp_action_request_complete(player, train)
     end
 
     -- Delivery is complete
-    tnp_action_cancel(player, train, false)
+    tnp_action_request_cancel(player, train, false)
 end
 
 

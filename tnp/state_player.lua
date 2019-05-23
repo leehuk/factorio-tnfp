@@ -56,7 +56,7 @@ end
 
 -- tnp_state_player_query()
 --   Determines if a given player is being tracked by tnp
-function tnp_state_player_query(train)
+function tnp_state_player_query(player)
     if not player.valid then
         return false
     end
