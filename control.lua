@@ -1,6 +1,8 @@
 Position = require('__stdlib__/stdlib/area/position')
 Table = require('__stdlib__/stdlib/utils/table')
 
+ptndefines = {}
+
 require('ptnlib/action')
 require('ptnlib/event')
 require('ptnlib/direction')
@@ -182,7 +184,7 @@ function ptn_dispatch(player, target, train)
     
     result = ptnlib_state_player_set(player, 'train', train)
     result = ptnlib_state_train_set(train, 'station', target)
-    result = ptnlib_state_train_set(train, 'status', 1)
+    result = ptnlib_state_train_set(train, 'status', ptndefines.train.status.dispatching)
     result = ptnlib_state_train_setstate(train)
     
     local schedule = Table.deep_copy(train.schedule)
@@ -220,7 +222,7 @@ function ptn_dispatch(player, target, train)
 end
 
 function ptn_handle_arrival(player, train)
-    ptnlib_state_train_set(train, 'status', 3)
+    ptnlib_state_train_set(train, 'status', ptndefines.train.status.arrived)
     
     local settings = settings.get_player_settings(player)
     
@@ -239,12 +241,12 @@ function ptn_handle_completion(player, train)
     end
     
     -- Player has boarded the train whilst we're dispatching -- treat that as an arrival.
-    if status == 1 or status == 2 then
+    if status == ptndefines.train.status.dispatching or status == ptndefines.train.status.dispatched then
         ptn_handle_arrival(player, train)
     end
-    
-    -- Mark delivery as complete
-    ptnlib_state_train_set(train, 'status', 4)
+
+    -- Delivery is complete
+    ptnlib_action_cancel(player, train, false)
 end
 
 function ptn_handle_player_vehicle(event)
@@ -282,11 +284,11 @@ function ptn_handle_train_state(event)
     
     if event.train.state == defines.train_state.on_the_path then
         -- PTN Train is on the move
-        if status == 1 then
+        if status == ptndefines.train.status.dispatching then
             -- This was a train awaiting dispatch
-            ptnlib_state_train_set(event.train, 'status', 2)
+            ptnlib_state_train_set(event.train, 'status', ptndefines.train.status.dispatched)
             ptnlib_flytext(player, player.position, "PTN Train: Dispatched")
-        elseif status == 2 then
+        elseif status == ptndefines.train.status.dispatched then
             -- This train had stopped for some reason.
             ptnlib_flytext(player, player.position, "PTN Train: Proceeding")
         end
@@ -299,7 +301,7 @@ function ptn_handle_train_state(event)
     elseif event.train.state == defines.train_state.no_path then
         -- Train has no path.
         -- If we're actively dispatching the train, we need to cancel it and restore its original schedule.
-        if status == 1 or status == 2 then
+        if status == ptndefines.train.status.dispatching or status == ptndefines.train.status.dispatched then
             ptnlib_action_cancel(player, event.train, true)
             ptnlib_flytext(player, player.position, "PTN Train Cancelled: No path to destination")
         end
@@ -319,7 +321,7 @@ function ptn_handle_train_state(event)
         local station = ptnlib_state_train_get(event.train, 'station')
         local train = station.get_stopped_train()
         
-        if status == 1 or status == 2 then
+        if status == ptndefines.train.status.dispatching or status == ptndefines.train.status.dispatched then
             -- OK.  The trains arrived at a different station than the one we expected.  Lets just cancel the request.
             if not train then
                 ptnlib_action_cancel(player, event.train, true)
@@ -334,7 +336,7 @@ function ptn_handle_train_state(event)
     elseif event.train.state == defines.train_state.manual_control_stop then
         -- Train has been switched to manual control
         -- If we're dispatching the train, we need to cancel the request and restore its original schedule
-        if status == 1 or status == 2 then
+        if status == ptndefines.train.status.dispatching or status == ptndefines.train.status.dispatched then
             ptnlib_action_cancel(player, event.train, true)
             ptnlib_flytext(player, player.position, "PTN Train Cancelled: Train switched to manual mode")
         end

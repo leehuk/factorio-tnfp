@@ -7,14 +7,13 @@
         status                     = int, current dispatching status
 ]]
 
---[[
-    Status Table:
-        nil     = Untracked
-        1       = Dispatching to player (awaiting confirmation)
-        2       = Dispatched to player (confirmed)
-        3       = Arrived at destination
-        4       = Player has boarded
-]]
+ptndefines.train = {
+    status = {
+        dispatching         = 1,
+        dispatched          = 2,
+        arrived             = 3
+    }
+}
 
 -- _ptnlib_state_train_prune()
 --   Prune the state train data of any invalid trains
