@@ -360,8 +360,7 @@ script.on_event(defines.events.on_lua_shortcut, ptn_handle_shortcut)
 
 -- Train Events
 script.on_event(defines.events.on_train_changed_state, ptn_handle_train_state)
--- script.on_event(defines.events.on_player_driving_changed_state, ptn_handle_player_vehicle)
--- script.on_event(defines.events.on_train_schedule_changed, ptn_handle_train_schedule)
+script.on_event(defines.events.on_train_schedule_changed, ptn_handle_train_schedulechange)
 
 -- Input Handling
 script.on_event("ptn-handle-request", ptn_handle_request)
