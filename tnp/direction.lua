@@ -1,6 +1,6 @@
--- ptnlib_direction_iscardinal()
+-- tnp_direction_iscardinal()
 --   Determines if a given direction is cardinal (N/E/S/W)
-function ptnlib_direction_iscardinal(direction)
+function tnp_direction_iscardinal(direction)
     if direction == defines.direction.north or direction == defines.direction.east or direction == defines.direction.south or direction == defines.direction.west then
         return true
     end
@@ -8,9 +8,9 @@ function ptnlib_direction_iscardinal(direction)
     return false
 end
 
--- ptnlib_direction_closest()
+-- tnp_direction_closest()
 --   Returns the closest entity from an array
-function ptnlib_direction_closest(player, entities)
+function tnp_direction_closest(player, entities)
     local closest_ent = nil
     local closest_distance = 0
     
