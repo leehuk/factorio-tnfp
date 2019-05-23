@@ -1,16 +1,16 @@
 data:extend({
     {
-        name = "ptn-handle-request",
+        name = "tnp-handle-request",
         type = "shortcut",
         action = "lua",
-        associated_control_input = "ptn-handle-request",
+        associated_control_input = "tnp-handle-request",
         technology_to_unlock = "automated-rail-transportation",
-        order = "p[ptn]-r[request]",
+        order = "p[tnp]-r[request]",
         localised_name = {
-            "shortcut.ptn-handle-request"
+            "shortcut.tnp-handle-request"
         },
         icon = {
-            filename = "__PlayerTrainNetwork__/graphics/icons/shortcut-ptn-32.png",
+            filename = "__TrainNetworkForPlayers__/graphics/icons/shortcut-tnp-32.png",
             priority = "extra-high-no-scale",
             size = 32,
             scale = 1,
@@ -19,7 +19,7 @@ data:extend({
             }
         },
         small_icon = {
-            filename = "__PlayerTrainNetwork__/graphics/icons/shortcut-ptn-24.png",
+            filename = "__TrainNetworkForPlayers__/graphics/icons/shortcut-tnp-24.png",
             priority = "extra-high-no-scale",
             size = 24,
             scale = 1,

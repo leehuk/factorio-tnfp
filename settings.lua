@@ -1,6 +1,6 @@
 data:extend({
     {
-        name = "ptn-train-search-radius",
+        name = "tnp-train-search-radius",
         type = "int-setting",
         setting_type = "runtime-per-user",
         order = "a[search]-r[radius]",
@@ -9,7 +9,7 @@ data:extend({
         maximum_value = 64
     },
     {
-        name = "ptn-train-arrival-behaviour",
+        name = "tnp-train-arrival-behaviour",
         type = "string-setting",
         setting_type = "runtime-per-user",
         order = "f[train]-f[arrival]-a[behaviour]",

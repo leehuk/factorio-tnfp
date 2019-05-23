@@ -1,13 +1,13 @@
 --[[
     State Table:
         expect_schedulechange      = bool, marker to note we've made a schedule change which we'll see an event handler for
-        player                     = LuaPlayer, player requesting the train.  Cross-referenced by ptn_state_player
+        player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         state                      = hash, stored information about a train we've modified such as schedule
         station                    = LuaEntity, train station we're dispatching to
         status                     = int, current dispatching status
 ]]
 
-ptndefines.train = {
+tnpdefines.train = {
     status = {
         dispatching         = 1,
         dispatched          = 2,
@@ -15,9 +15,9 @@ ptndefines.train = {
     }
 }
 
--- _ptnlib_state_train_prune()
+-- _tnp_state_train_prune()
 --   Prune the state train data of any invalid trains
-function _ptnlib_state_train_prune()
+function _tnp_state_train_prune()
     if not global.train_data then
         global.train_data = {}
         return
@@ -30,10 +30,10 @@ function _ptnlib_state_train_prune()
     end
 end
 
--- ptnlib_state_train_delete()
+-- tnp_state_train_delete()
 --   Deletes state information about a LuaTrain, optionally by key
-function ptnlib_state_train_delete(train, key)
-    _ptnlib_state_train_prune()
+function tnp_state_train_delete(train, key)
+    _tnp_state_train_prune()
 
     -- Accept invalid trains(?) for same reason as invalid players.
 
@@ -48,10 +48,10 @@ function ptnlib_state_train_delete(train, key)
     end
 end
 
--- ptnlib_state_train_get()
+-- tnp_state_train_get()
 --   Gets state information about a LuaTrain by key
-function ptnlib_state_train_get(train, key)
-    _ptnlib_state_train_prune()
+function tnp_state_train_get(train, key)
+    _tnp_state_train_prune()
     
     if not train.valid then
         return false
@@ -64,9 +64,9 @@ function ptnlib_state_train_get(train, key)
     return nil
 end
 
--- ptnlib_state_train_query()
---   Determines if a given train is being tracked by PTN
-function ptnlib_state_train_query(train)
+-- tnp_state_train_query()
+--   Determines if a given train is being tracked by TNfP
+function tnp_state_train_query(train)
     if not train.valid then
         return false
     end
@@ -77,10 +77,11 @@ function ptnlib_state_train_query(train)
 
     return false
 end
--- ptnlib_state_train_set()
+
+-- tnp_state_train_set()
 --   Saves state informationa bout a LuaTrain by key
-function ptnlib_state_train_set(train, key, value)
-    _ptnlib_state_train_prune()
+function tnp_state_train_set(train, key, value)
+    _tnp_state_train_prune()
 
     if not train.valid then
         return false
@@ -95,14 +96,14 @@ function ptnlib_state_train_set(train, key, value)
     return true
 end
 
--- ptnlib_state_train_setstate()
+-- tnp_state_train_setstate()
 --   Saves state information about a LuaTrain
-function ptnlib_state_train_setstate(train)
+function tnp_state_train_setstate(train)
     local state = {
         manual_mode = train.manual_mode,
         schedule = Table.deep_copy(train.schedule),
         state = train.state
     }
 
-    return ptnlib_state_train_set(train, 'state', state)
+    return tnp_state_train_set(train, 'state', state)
 end

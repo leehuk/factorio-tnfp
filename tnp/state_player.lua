@@ -1,11 +1,11 @@
 --[[
     State Table:
-        train               = LuaTrain, train we're dispatching for the player.  Cross-referenced by ptn_state_train
+        train               = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
 ]]
 
--- _ptnlib_state_player_prune()
+-- _tnp_state_player_prune()
 --   Prune the state player data of any invalid players
-function _ptnlib_state_player_prune()
+function _tnp_state_player_prune()
     if not global.player_data then
         global.player_data = {}
         return
@@ -18,10 +18,10 @@ function _ptnlib_state_player_prune()
     end
 end
 
--- ptnlib_state_player_delete()
+-- tnp_state_player_delete()
 --   Deletes state information about a LuaPlayer, optionally by key
-function ptnlib_state_player_delete(player, key)
-    _ptnlib_state_player_prune()
+function tnp_state_player_delete(player, key)
+    _tnp_state_player_prune()
 
     -- Deliberately accept invalid players here(?).
     -- The idea is they may potentially invalid but hopefully still have their index
@@ -38,10 +38,10 @@ function ptnlib_state_player_delete(player, key)
     end
 end
 
--- ptnlib_state_player_get()
+-- tnp_state_player_get()
 --   Gets state information about a LuaPlayer by key
-function ptnlib_state_player_get(player, key)
-    _ptnlib_state_player_prune()
+function tnp_state_player_get(player, key)
+    _tnp_state_player_prune()
     
     if not player.valid then
         return false
@@ -54,10 +54,25 @@ function ptnlib_state_player_get(player, key)
     return nil
 end
 
--- ptnlib_state_player_set()
+-- tnp_state_player_query()
+--   Determines if a given player is being tracked by tnp
+function tnp_state_player_query(train)
+    if not player.valid then
+        return false
+    end
+
+    if global.player_data[player.index] then
+        return true
+    end
+
+    return false
+end
+
+
+-- tnp_state_player_set()
 --   Saves state informationa bout a LuaPlayer by key
-function ptnlib_state_player_set(player, key, value)
-    _ptnlib_state_player_prune()
+function tnp_state_player_set(player, key, value)
+    _tnp_state_player_prune()
 
     if not player.valid then
         return false
