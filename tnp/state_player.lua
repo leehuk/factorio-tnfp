@@ -61,6 +61,10 @@ function tnp_state_player_query(train)
         return false
     end
 
+    if not global.player_data then
+        return false
+    end
+
     if global.player_data[player.index] then
         return true
     end

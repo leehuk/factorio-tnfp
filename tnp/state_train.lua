@@ -71,6 +71,10 @@ function tnp_state_train_query(train)
         return false
     end
 
+    if not global.train_data then
+        return false
+    end
+
     if global.train_data[train.id] then
         return true
     end
