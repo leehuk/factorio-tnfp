@@ -54,6 +54,21 @@ function tnp_state_player_get(player, key)
     return nil
 end
 
+-- tnp_state_player_query()
+--   Determines if a given player is being tracked by tnp
+function tnp_state_player_query(train)
+    if not player.valid then
+        return false
+    end
+
+    if global.player_data[player.index] then
+        return true
+    end
+
+    return false
+end
+
+
 -- tnp_state_player_set()
 --   Saves state informationa bout a LuaPlayer by key
 function tnp_state_player_set(player, key, value)

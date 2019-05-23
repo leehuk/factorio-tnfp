@@ -77,6 +77,7 @@ function tnp_state_train_query(train)
 
     return false
 end
+
 -- tnp_state_train_set()
 --   Saves state informationa bout a LuaTrain by key
 function tnp_state_train_set(train, key, value)
