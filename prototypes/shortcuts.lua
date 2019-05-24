@@ -5,6 +5,7 @@ data:extend({
         action = "lua",
         associated_control_input = "tnp-handle-request",
         technology_to_unlock = "automated-rail-transportation",
+        toggleable = true,
         order = "p[tnp]-r[request]",
         localised_name = {
             "shortcut.tnp-handle-request"

@@ -1,6 +1,12 @@
+-- tnp_handle_input()
+--   Handles a request via the custom input
+function tnp_handle_input(event)
+    tnp_handle_request(event, false)
+end
+
 -- tnp_handle_request()
 --   Handles a request for a TNfP Train via input
-function tnp_handle_request(event)
+function tnp_handle_request(event, shortcut)
     local player = game.players[event.player_index]
     
     if not player.surface then
@@ -12,15 +18,28 @@ function tnp_handle_request(event)
         tnp_message(tnpdefines.loglevel.core, player, {"tnp_error_location_position", player.name})
         return
     end
-    
-    tnp_action_request_create(player)
+
+    -- Determine whether we're already handling a request
+    local train = tnp_state_player_get(player, 'train')
+    if train then
+        if shortcut then
+            tnp_action_request_cancel(player, train, true)
+            player.set_shortcut_toggled('tnp-handle-request', false)
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_cancelled"})
+        else
+            tnp_action_request_status(player, train)
+        end
+    else
+        tnp_action_request_create(player)
+        player.set_shortcut_toggled('tnp-handle-request', true)
+    end
 end
 
 -- tnp_handle_shortcut()
 --   Handles a shortcut being pressed
 function tnp_handle_shortcut(event)
     if event.prototype_name == "tnp-handle-request" then
-        tnp_handle_request(event)
+        tnp_handle_request(event, true)
     end
 end
 
@@ -28,14 +47,14 @@ end
 --   Handles a player entering a vehicle
 function tnp_handle_player_vehicle(event)
     local player = game.players[event.player_index]
-    
-    -- Dont track entering non-train vehicles
-    if not event.entity.train then
+
+    -- This player doesnt have a request outstanding
+    if not tnp_state_player_query(player) then
         return
     end
     
-    -- This player doesnt have a request outstanding
-    if not tnp_state_player_query(player) then
+    -- Dont track entering non-train vehicles
+    if not event.entity.train then
         return
     end
     

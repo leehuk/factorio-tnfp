@@ -34,7 +34,6 @@ end
 function tnp_action_request_create(player)
     local target = tnp_stop_find(player)
     if target then
-        -- If the trains in manual mode this wont match, catch that below.
         local train = target.get_stopped_train()
         if train then
             tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
@@ -47,13 +46,13 @@ function tnp_action_request_create(player)
             return
         end
 
-        if tnp_state_train_get(train, 'status') == tnpdefines.train.status.arrived then
-            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
-            return
-        end
-
         tnp_action_train_dispatch(player, target, train)
     end
+end
+
+-- tnp_action_request_status()
+--   Shows the status of a tnp request
+function tnp_action_request_status(player, train)
 end
 
 -- tnp_action_train_arrival()
