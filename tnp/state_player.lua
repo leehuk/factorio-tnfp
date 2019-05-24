@@ -1,6 +1,7 @@
 --[[
-    State Table:
-        train               = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
+State Table:
+    player      = LuaPlayer
+    train       = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
 ]]
 
 -- _tnp_state_player_prune()
@@ -12,7 +13,18 @@ function _tnp_state_player_prune()
     end
 
     for id, data in pairs(global.player_data) do
-        if not data or not data.player or not data.player.valid then
+        if not data or not data.player then
+            global.player_data[id] = nil
+        elseif not data.player.valid then
+            -- The player we're tracking is now invalid.  Check if we need to release their train
+            if data.train then
+                if data.train.valid then
+                    tnp_train_schedule_restore(train)
+                end
+
+                tnp_state_train_delete(train, false)
+            end
+
             global.player_data[id] = nil
         end
     end
@@ -22,11 +34,11 @@ end
 --   Deletes state information about a LuaPlayer, optionally by key
 function tnp_state_player_delete(player, key)
     _tnp_state_player_prune()
-
+    
     -- Deliberately accept invalid players here(?).
     -- The idea is they may potentially invalid but hopefully still have their index
     -- so we can do cleanup work.
-
+    
     if key then
         if global.player_data[player.index] then
             global.player_data[player.index][key] = nil
@@ -60,15 +72,15 @@ function tnp_state_player_query(player)
     if not player.valid then
         return false
     end
-
+    
     if not global.player_data then
         return false
     end
-
+    
     if global.player_data[player.index] then
         return true
     end
-
+    
     return false
 end
 
@@ -77,16 +89,16 @@ end
 --   Saves state informationa bout a LuaPlayer by key
 function tnp_state_player_set(player, key, value)
     _tnp_state_player_prune()
-
+    
     if not player.valid then
         return false
     end
-
+    
     if not global.player_data[player.index] then
         global.player_data[player.index] = {}
         global.player_data[player.index]['player'] = player
     end
-
+    
     global.player_data[player.index][key] = value
     return true
 end
