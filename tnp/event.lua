@@ -4,12 +4,12 @@ function tnp_handle_request(event)
     local player = game.players[event.player_index]
     
     if not player.surface then
-        tnp_message(ptndefines.loglevel.core, player, {"tnp_error_location_surface", player.name})
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_error_location_surface", player.name})
         return
     end
     
     if not player.position then
-        tnp_message(ptndefines.loglevel.core, player, {"tnp_error_location_position", player.name})
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_error_location_position", player.name})
         return
     end
     
