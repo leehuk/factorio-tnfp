@@ -36,13 +36,13 @@ function tnp_action_request_create(player)
     if target then
         local train = target.get_stopped_train()
         if train then
-            player.print({"tnp_train_waiting", player.name, target.backer_name})
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
             return
         end
         
         local train = tnp_train_find(player, target)
         if not train then
-            player.print({"tnp_error_train_find", player.name})
+            tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_invalid"})
             return
         end
         
@@ -55,10 +55,10 @@ end
 function tnp_action_train_arrival(player, train)
     tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
     
-    local settings = settings.get_player_settings(player)
+    local config = settings.get_player_settings(player)
     
     -- If we're switching the train to manual mode, we can safely restore its original schedule.
-    if settings['tnp-train-arrival-behaviour'].value == "manual" then
+    if config['tnp-train-arrival-behaviour'].value == "manual" then
         train.manual_mode = true
         tnp_train_schedule_restore(train)
     end
@@ -108,8 +108,8 @@ function tnp_action_train_dispatch(player, target, train)
     if train.manual_mode then
         train.manual_mode = false
     end
-    
-    player.print({"tnp_train_called", player.name, target.backer_name})
+
+    tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", target.backer_name})
 end
 
 
@@ -126,7 +126,7 @@ function tnp_action_train_schedulechange(train, event_player)
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             -- We were dispatching this train and its not arrived.  Leave the schedule alone as its changed, but cancel the request.
             tnp_action_request_cancel(player, train, false)
-            tnp_message_flytext(player, player.position, "TNfP Train Cancelled: Schedule was changed by " .. event_player.name)
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_cancelled_schedulechange", event_player.name})
         elseif status == tnpdefines.train.status.arrived then
             -- This train already arrived at its station -- so we don't need to do anything other than cancel the pending boarding.
             tnp_action_request_cancel(player, train, false)
@@ -154,10 +154,10 @@ function tnp_action_train_statechange(train, event_player)
         if status == tnpdefines.train.status.dispatching then
             -- This was a train awaiting dispatch
             tnp_state_train_set(train, 'status', tnpdefines.train.status.dispatched)
-            tnp_message_flytext(player, player.position, "TNfP Train: Dispatched")
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_dispatched"})
         elseif status == tnpdefines.train.status.dispatched then
             -- This train had stopped for some reason.
-            tnp_message_flytext(player, player.position, "TNfP Train: Proceeding")
+            tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_onway"})
         end
         
         -- elseif train.state == defines.train_state.path_lost then
@@ -170,14 +170,14 @@ function tnp_action_train_statechange(train, event_player)
         -- If we're actively dispatching the train, we need to cancel it and restore its original schedule.
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             tnp_action_request_cancel(player, train, true)
-            tnp_message_flytext(player, player.position, "TNfP Train Cancelled: No path to destination")
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_cancelled_nopath"})
         end
         -- elseif train.state == defines.train_state.arrive_signal
         -- Train has arrived at a signal.
         
     elseif train.state == defines.train_state.wait_signal then
         -- Train is now held at signals
-        tnp_message_flytext(player, player.position, "TNfP Train: Held at signals")
+        tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_heldsignal"})
         
         -- elseif train.state == defines.train_state.arrive_station then
         -- Train is arriving at a station, await its actual arrival
@@ -192,11 +192,11 @@ function tnp_action_train_statechange(train, event_player)
             -- OK.  The trains arrived at a different station than the one we expected.  Lets just cancel the request.
             if not train then
                 tnp_action_request_cancel(player, train, true)
-                tnp_message_flytext(player, player.position, "TNfP Train Cancelled: Arrived at different station (?)")
+                tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_cancelled_wrongstation"})
                 return
             end
             
-            tnp_message_flytext(player, player.position, "TNfP Train: Arrived")
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived"})
             tnp_action_train_arrival(player, train)
         end
         
@@ -205,7 +205,7 @@ function tnp_action_train_statechange(train, event_player)
         -- If we're dispatching the train, we need to cancel the request and restore its original schedule
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             tnp_action_request_cancel(player, train, true)
-            tnp_message_flytext(player, player.position, "TNfP Train Cancelled: Train switched to manual mode")
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_cancelled_manual", event_player.name})
         end
         
         -- elseif train.state == defines.train_state.manual_control then

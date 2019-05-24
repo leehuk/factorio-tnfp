@@ -16,7 +16,7 @@ end
 -- tnp_stop_find()
 --   Finds a suitable tnp location using an existing train stop
 function tnp_stop_find(player)
-    local settings = settings.get_player_settings(player)
+    local config = settings.get_player_settings(player)
 
     -- Order of preference is:
     --   - Any train station with a TNfP train stopped
@@ -28,7 +28,7 @@ function tnp_stop_find(player)
     local valid_stops_std = {}
     
     local entities = player.surface.find_entities_filtered({
-        area = Position.expand_to_area(player.position, settings['tnp-train-search-radius'].value),
+        area = Position.expand_to_area(player.position, config['tnp-train-search-radius'].value),
         name = "train-stop"
     })
     
@@ -37,17 +37,12 @@ function tnp_stop_find(player)
         if train then
             -- Disallow train stations blocked by non-TNfP trains
             if tnp_train_check(player, train) then
-                tnp_message_flytext(player, ent.position, "Valid TNfP train") 
                 table.insert(valid_stops_train, ent)
-            else
-                tnp_message_flytext(player, ent.position, "Ignoring")
             end
         else
             if tnp_stop_check(ent) then
-                tnp_message_flytext(player, ent.position, "TNfP Train Station: Valid")
                 table.insert(valid_stops_tnp, ent)
             else
-                tnp_message_flytext(player, ent.position, "Train Station: Valid")
                 table.insert(valid_stops_std, ent)
             end
         end

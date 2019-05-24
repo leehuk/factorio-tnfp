@@ -21,7 +21,6 @@ function tnp_train_find(player, target)
     local tnp_trains = tnp_train_getall(player)
 
     if #tnp_trains == 0 then
-        player.print({"tnp_error_train_none", player.name})
         return
     end
     
