@@ -13,6 +13,7 @@ end
 -- tnp_action_request_complete()
 --  Fully completes a tnp request
 function tnp_action_request_complete(player, train)
+    local config = settings.get_player_settings(player)
     local status = tnp_state_train_get(train, 'status')
 
     if not status then
@@ -24,8 +25,15 @@ function tnp_action_request_complete(player, train)
         tnp_action_train_arrival(player, train)
     end
 
-    -- Delivery is complete
-    tnp_action_request_cancel(player, train, false)
+    if config['tnp-train-boarding-behaviour'].value == 'manual' then
+        train.manual_mode = true
+        tnp_action_request_cancel(player, train, false)
+    elseif config['tnp-train-boarding-behaviour'].value == 'stationselect' then
+        -- We do not complete the delivery at this stage -- as we need to await the station select
+        tnp_gui_stationselect(player, train)
+    else
+        tnp_action_request_cancel(player, train, false)
+    end
 end
 
 
@@ -68,6 +76,18 @@ function tnp_action_train_arrival(player, train)
         train.manual_mode = true
         tnp_train_schedule_restore(train)
     end
+end
+
+-- tnp_action_train_depart()
+--   Dispatches a train to a given station index
+function tnp_action_train_depart(player, stationindex)
+    local train = tnp_state_player_get(player, 'train')
+    if train then
+        train.go_to_station(stationindex)
+        train.manual_mode = false
+    end
+
+    tnp_action_request_cancel(player, train, false)
 end
 
 -- tnp_action_train_dispatch()

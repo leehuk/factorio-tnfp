@@ -1,3 +1,16 @@
+-- tnp_handle_gui_click()
+--   Handles a gui click
+function tnp_handle_gui_click(event)
+    local stationindex = tnp_state_gui_get(event.element, 'station')
+
+    if stationindex and event.player_index then
+        local player = game.players[event.player_index]
+
+        tnp_action_train_depart(player, stationindex)
+        tnp_gui_stationselect_destroy(event.element)
+    end
+end
+
 -- tnp_handle_input()
 --   Handles a request via the custom input
 function tnp_handle_input(event)

@@ -6,7 +6,9 @@ tnpdefines = {}
 require('tnp/action')
 require('tnp/event')
 require('tnp/direction')
+require('tnp/gui')
 require('tnp/message')
+require('tnp/state_gui')
 require('tnp/state_player')
 require('tnp/state_train')
 require('tnp/stop')
@@ -24,6 +26,9 @@ script.on_event(defines.events.on_player_driving_changed_state, tnp_handle_playe
 --script.on_event(defines.events.on_player_kicked, tnp_handle_player_exit)
 --script.on_event(defines.events.on_player_left_game, tnp_handle_player_exit)
 
+-- GUI Events
+script.on_event(defines.events.on_gui_click, tnp_handle_gui_click)
+
 -- Shortcut Events
 script.on_event(defines.events.on_lua_shortcut, tnp_handle_shortcut)
 
@@ -32,4 +37,4 @@ script.on_event(defines.events.on_train_changed_state, tnp_handle_train_statecha
 script.on_event(defines.events.on_train_schedule_changed, tnp_handle_train_schedulechange)
 
 -- Input Handling
-script.on_event("tnp-handle-request", tnp_handle_request)
+script.on_event("tnp-handle-request", tnp_handle_input)

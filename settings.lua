@@ -53,10 +53,21 @@ data:extend({
         maximum_value = 300
     },
     {
+        name = "tnp-train-boarding-behaviour",
+        type = "string-setting",
+        setting_type = "runtime-per-user",
+        order = "b[train]-b[boarding]-a[behaviour]",
+        default_value = "stationselect",
+        allowed_values = {
+            "manual",
+            "stationselect"
+        }
+    },
+    {
         name = "tnp-train-boarding-timeout",
         type = "int-setting",
         setting_type = "runtime-per-user",
-        order = "b[train]-b[boarding]-a[timeout]",
+        order = "b[train]-b[boarding]-b[timeout]",
         default_value = 30,
         minimum_value = 0,
         maximum_value = 120
