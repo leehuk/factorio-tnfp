@@ -9,7 +9,7 @@ function tnp_stop_check(stop)
             end
         end
     end
-    
+
     return false
 end
 
@@ -22,16 +22,16 @@ function tnp_stop_find(player)
     --   - Any train station with a TNfP train stopped
     --   - A TNfP station without a train
     --   - A normal station without a train
-    
+
     local valid_stops_train = {}
     local valid_stops_tnp = {}
     local valid_stops_std = {}
-    
+
     local entities = player.surface.find_entities_filtered({
         area = Position.expand_to_area(player.position, config['tnp-train-search-radius'].value),
         name = "train-stop"
     })
-    
+
     for _, ent in pairs(entities) do
         local train = ent.get_stopped_train()
         if train then
@@ -47,7 +47,7 @@ function tnp_stop_find(player)
             end
         end
     end
-    
+
     if #valid_stops_train > 0 then
         return tnp_direction_closest(player, valid_stops_train)
     elseif #valid_stops_tnp > 0 then
@@ -55,7 +55,7 @@ function tnp_stop_find(player)
     elseif #valid_stops_std > 0 then
         return tnp_direction_closest(player, valid_stops_std)
     end
-    
+
     return nil
 end
 
@@ -63,7 +63,7 @@ end
 --   Returns an array of all tnp train stops
 function tnp_stop_getall(player)
     local tnp_stops = {}
-    
+
     local entities = player.surface.find_entities_filtered({
         name = "train-stop"
     })
@@ -72,6 +72,6 @@ function tnp_stop_getall(player)
             table.insert(tnp_stops, ent)
         end
     end
-    
+
     return tnp_stops
 end

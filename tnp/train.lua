@@ -10,7 +10,7 @@ function tnp_train_check(player, train)
             end
         end
     end
-    
+
     return false
 end
 
@@ -23,27 +23,27 @@ function tnp_train_find(player, target)
     if #tnp_trains == 0 then
         return
     end
-    
+
     local tnp_train
     local tnp_train_distance = 0
-    
+
     repeat
         local tnp_cand = tnp_trains[#tnp_trains]
         table.remove(tnp_trains)
-        
+
         if not tnp_cand.front_rail or not tnp_cand.back_rail then
             break
         end
-        
+
         distance = Position.distance(target.position, tnp_cand.front_rail.position)
         if tnp_train and distance >= tnp_train_distance then
             break
         end
-        
+
         tnp_train = tnp_cand
         tnp_train_distance = distance
     until #tnp_trains == 0
-    
+
     return tnp_train
 end
 
@@ -52,9 +52,9 @@ end
 function tnp_train_getall(player)
     local tnp_trains = {}
     local tnp_train_ids = {}
-    
+
     local tnp_stops = tnp_stop_getall(player)
-    for _, ent in pairs(tnp_stops) do        
+    for _, ent in pairs(tnp_stops) do
         local trains = ent.get_train_stop_trains()
         if trains then
             for _, train in pairs(trains) do
@@ -65,7 +65,7 @@ function tnp_train_getall(player)
             end
         end
     end
-    
+
     return tnp_trains
 end
 

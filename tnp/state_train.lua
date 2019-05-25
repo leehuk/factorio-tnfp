@@ -24,7 +24,7 @@ function _tnp_state_train_prune()
         global.train_data = {}
         return
     end
-    
+
     for id, data in pairs(global.train_data) do
         if not data or not data.train then
             global.train_data[id] = nil
@@ -34,10 +34,10 @@ function _tnp_state_train_prune()
                 if data.player.valid then
                     tnp_message(tnpdefines.loglevel.standard, data.player, {"tnp_train_cancelled_invalid"})
                 end
-                
+
                 tnp_state_player_delete(data.player, true)
             end
-            
+
             global.train_data[id] = nil
         end
     end
@@ -47,9 +47,9 @@ end
 --   Deletes state information about a LuaTrain, optionally by key
 function tnp_state_train_delete(train, key)
     _tnp_state_train_prune()
-    
+
     -- Accept invalid trains(?) for same reason as invalid players.
-    
+
     if key then
         if global.train_data[train.id] then
             global.train_data[train.id][key] = nil
@@ -65,15 +65,15 @@ end
 --   Gets state information about a LuaTrain by key
 function tnp_state_train_get(train, key)
     _tnp_state_train_prune()
-    
+
     if not train.valid then
         return false
     end
-    
+
     if global.train_data[train.id] and global.train_data[train.id][key] then
         return global.train_data[train.id][key]
     end
-    
+
     return nil
 end
 
@@ -83,15 +83,15 @@ function tnp_state_train_query(train)
     if not global.train_data then
         return false
     end
-    
+
     if not train.valid then
         return false
     end
-    
+
     if global.train_data[train.id] then
         return true
     end
-    
+
     return false
 end
 
@@ -99,16 +99,16 @@ end
 --   Saves state informationa bout a LuaTrain by key
 function tnp_state_train_set(train, key, value)
     _tnp_state_train_prune()
-    
+
     if not train.valid then
         return false
     end
-    
+
     if not global.train_data[train.id] then
         global.train_data[train.id] = {}
         global.train_data[train.id]['train'] = train
     end
-    
+
     global.train_data[train.id][key] = value
     return true
 end
@@ -121,7 +121,7 @@ function tnp_state_train_setstate(train)
         schedule = Table.deep_copy(train.schedule),
         state = train.state
     }
-    
+
     return tnp_state_train_set(train, 'state', state)
 end
 

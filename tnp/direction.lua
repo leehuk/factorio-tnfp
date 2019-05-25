@@ -4,7 +4,7 @@ function tnp_direction_iscardinal(direction)
     if direction == defines.direction.north or direction == defines.direction.east or direction == defines.direction.south or direction == defines.direction.west then
         return true
     end
-    
+
     return false
 end
 
@@ -13,7 +13,7 @@ end
 function tnp_direction_closest(player, entities)
     local closest_ent = nil
     local closest_distance = 0
-    
+
     for _, ent in pairs(entities) do
         if closest_ent then
             distance = Position.distance(player.position, ent.position)
@@ -26,6 +26,6 @@ function tnp_direction_closest(player, entities)
             closest_distance = Position.distance(player.position, ent.position)
         end
     end
-    
+
     return closest_ent
 end

@@ -25,13 +25,13 @@ function tnp_message(msglevel, player, message, entity)
     local config_msgtarget = settings.global['tnp-message-target'].value
 
     local loglevel = tnpdefines.loglevel.detailed
-    
+
     if config_msglevel == 'core' then
         loglevel = 1
     elseif config_msglevel == 'standard' then
         loglevel = 2
     end
-    
+
     if msglevel > loglevel then
         return
     end
@@ -46,6 +46,6 @@ function tnp_message(msglevel, player, message, entity)
             tnp_message_flytext(player, player.position, message)
         end
     else
-        player.print(message)        
+        player.print(message)
     end
 end

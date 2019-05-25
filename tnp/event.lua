@@ -8,12 +8,12 @@ end
 --   Handles a request for a TNfP Train via input
 function tnp_handle_request(event, shortcut)
     local player = game.players[event.player_index]
-    
+
     if not player.surface then
         tnp_message(tnpdefines.loglevel.core, player, {"tnp_error_location_surface", player.name})
         return
     end
-    
+
     if not player.position then
         tnp_message(tnpdefines.loglevel.core, player, {"tnp_error_location_position", player.name})
         return
@@ -58,12 +58,12 @@ function tnp_handle_player_vehicle(event)
     if not tnp_state_player_query(player) then
         return
     end
-    
+
     -- Dont track entering non-train vehicles
     if not event.entity.train then
         return
     end
-    
+
     local train = tnp_state_player_get(player, 'train')
     -- Player has successfully boarded their tnp train
     if train.id == event.entity.train.id then
@@ -84,7 +84,7 @@ function tnp_handle_train_schedulechange(event)
     if event.player_index and game.players[event.player_index] then
         player = game.players[event.player_index]
     end
-    
+
     tnp_action_train_schedulechange(event.train, player)
 end
 
@@ -94,7 +94,7 @@ function tnp_handle_train_statechange(event)
     -- A train we're not tracking
     if not tnp_state_train_query(event.train) then
         return
-    end    
+    end
 
     tnp_action_train_statechange(event.train)
 end
