@@ -1,4 +1,4 @@
-![TNfP](https://leehuk.github.io/factorio-tnfp/images/tnfp-logo.png)
+![TNfP](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-logo.png)
 ## Train Network for Players (Factorio Mod)
 
 ### About
@@ -19,9 +19,9 @@ TNfP makes your factorio train network work for you, the player.
 1. Set the combinator to output the new 'TNfP Station' virtual signal, found under 'Signals'.
 1. Connect the combinator to the train stop, with either red or green wire.
 
-![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/images/tnfp-screenshot-combinator.jpg)
+![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-combinator.jpg)
 
 Once you connect the combinator the train stop becomes a TNfP Station.  Any train with a TNfP Station anywhere in its schedule
 then becomes a TNfP Train and available for dispatch:
 
-![TNfP Example](https://leehuk.github.io/factorio-tnfp/site/tnfp-screenshot-example.gif)
+![TNfP Example](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-example.gif)
