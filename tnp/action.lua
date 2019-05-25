@@ -1,6 +1,8 @@
 -- tnp_action_request_cancel()
 --   Cancels a tnp request, optionally restoring the trains original schedule
 function tnp_action_request_cancel(player, train, restore_schedule)
+    player.set_shortcut_toggled('tnp-handle-request', false)
+
     tnp_state_player_delete(player, false)
 
     if restore_schedule then
@@ -15,6 +17,8 @@ end
 function tnp_action_request_complete(player, train)
     local config = settings.get_player_settings(player)
     local status = tnp_state_train_get(train, 'status')
+
+    player.set_shortcut_toggled('tnp-handle-request', false)
 
     if not status then
         return
@@ -247,7 +251,7 @@ end
 function tnp_action_timeout()
     local trains = tnp_state_train_timeout()
 
-    if #trains == 0 then
+    if not trains or #trains == 0 then
         return
     end
 
