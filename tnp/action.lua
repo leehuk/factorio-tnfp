@@ -219,11 +219,11 @@ function tnp_action_train_statechange(train, event_player)
         -- Train has arrived at a station
         -- If we're dispatching this train to this station, we now need to process its arrival.
         local station = tnp_state_train_get(train, 'station')
-        local train = station.get_stopped_train()
+        local station_train = station.get_stopped_train()
 
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             -- OK.  The trains arrived at a different station than the one we expected.  Lets just cancel the request.
-            if not train then
+            if not station_train or not station_train.id == train.id then
                 tnp_action_request_cancel(player, train, true)
                 tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_cancelled_wrongstation"})
                 return
