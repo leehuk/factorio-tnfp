@@ -58,10 +58,11 @@ end
 -- tnp_action_train_arrival()
 --   Fulfils a tnp request, restoring schedules and setting modes
 function tnp_action_train_arrival(player, train)
-    tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
-    
     local config = settings.get_player_settings(player)
-    
+
+    tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
+    tnp_state_train_set(train, 'timeout', config['tnp-train-boarding-timeout'].value)
+
     -- If we're switching the train to manual mode, we can safely restore its original schedule.
     if config['tnp-train-arrival-behaviour'].value == "manual" then
         train.manual_mode = true
@@ -72,6 +73,8 @@ end
 -- tnp_action_train_dispatch()
 --   Dispatches a train
 function tnp_action_train_dispatch(player, target, train)
+    local config = settings.get_player_settings(player)
+
     local result = tnp_state_train_set(train, 'player', player)
     if not result then
         -- error: failed to dispatch
@@ -81,6 +84,7 @@ function tnp_action_train_dispatch(player, target, train)
     result = tnp_state_player_set(player, 'train', train)
     result = tnp_state_train_set(train, 'station', target)
     result = tnp_state_train_set(train, 'status', tnpdefines.train.status.dispatching)
+    result = tnp_state_train_set(train, 'timeout', config['tnp-train-arrival-timeout'].value)
     result = tnp_state_train_setstate(train)
     
     local schedule = Table.deep_copy(train.schedule)
@@ -153,7 +157,7 @@ end
 function tnp_action_train_statechange(train, event_player)
     local player = tnp_state_train_get(train, 'player')
     local status = tnp_state_train_get(train, 'status')
-
+    
     if train.state == defines.train_state.on_the_path then
         -- TNfP Train is on the moveevent
         if status == tnpdefines.train.status.dispatching then
@@ -215,5 +219,31 @@ function tnp_action_train_statechange(train, event_player)
         
         -- elseif train.state == defines.train_state.manual_control then
         -- Train is now in manual control.
+    end
+end
+
+-- tnp_action_timeout()
+--   Loops through trains and applies any timeout actions
+function tnp_action_timeout()
+    local trains = tnp_state_train_timeout()
+
+    if #trains == 0 then
+        return
+    end
+
+    for _, train in pairs(trains) do
+        local player = tnp_state_train_get(train, 'player')
+        local status = tnp_state_train_get(train, 'status')
+
+        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
+            -- Train is currently dispatching
+            tnp_action_request_cancel(player, train, true)
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_cancelled_timeout_arrival"})
+
+        elseif status == tnpdefines.train.status.arrived then
+            -- Train has arrived and awaiting boarding
+            tnp_action_request_cancel(player, train, true)
+            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_cancelled_timeout_boarding"})
+        end
     end
 end

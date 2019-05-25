@@ -14,6 +14,10 @@ require('tnp/train')
 
 -- Event Handling
 -----------------
+
+-- Timer Events
+script.on_nth_tick(60, tnp_handle_tick_timeout)
+
 -- Player Events
 script.on_event(defines.events.on_player_driving_changed_state, tnp_handle_player_vehicle)
 --script.on_event(defines.events.on_player_died, tnp_handle_player_exit)

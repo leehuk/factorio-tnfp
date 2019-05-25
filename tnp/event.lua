@@ -43,6 +43,12 @@ function tnp_handle_shortcut(event)
     end
 end
 
+-- tnp_handle_tick_timeout()
+--   Handle a per-second event to timeout train deliveries
+function tnp_handle_tick_timeout(event)
+    tnp_action_timeout()
+end
+
 -- tnp_handle_player_vehicle()
 --   Handles a player entering a vehicle
 function tnp_handle_player_vehicle(event)

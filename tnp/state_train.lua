@@ -1,11 +1,12 @@
 --[[
 State Table:
-    expect_schedulechange      = bool, marker to note we've made a schedule change which we'll see an event handler for
-    player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
-    state                      = hash, stored information about a train we've modified such as schedule
-    station                    = LuaEntity, train station we're dispatching to
-    status                     = int, current dispatching status
-    train                      = LuaTrain, the train we're tracking
+expect_schedulechange      = bool, marker to note we've made a schedule change which we'll see an event handler for
+player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
+state                      = hash, stored information about a train we've modified such as schedule
+station                    = LuaEntity, train station we're dispatching to
+status                     = int, current dispatching status
+timeout                    = int, timeout before cancelling
+train                      = LuaTrain, the train we're tracking
 ]]
 
 tnpdefines.train = {
@@ -33,7 +34,7 @@ function _tnp_state_train_prune()
                 if data.player.valid then
                     tnp_message(tnpdefines.loglevel.standard, data.player, {"tnp_train_cancelled_invalid"})
                 end
-
+                
                 tnp_state_player_delete(data.player, true)
             end
             
@@ -79,11 +80,11 @@ end
 -- tnp_state_train_query()
 --   Determines if a given train is being tracked by TNfP
 function tnp_state_train_query(train)
-    if not train.valid then
+    if not global.train_data then
         return false
     end
     
-    if not global.train_data then
+    if not train.valid then
         return false
     end
     
@@ -122,4 +123,30 @@ function tnp_state_train_setstate(train)
     }
     
     return tnp_state_train_set(train, 'state', state)
+end
+
+-- tnp_state_train_timeout()
+--   Drops timeouts on all trains and returns a list of any now expired requests
+function tnp_state_train_timeout()
+    if not global.train_data then
+        return
+    end
+
+    local trains = {}
+
+    for id, data in pairs(global.train_data) do
+        if not data or not data.train then
+            global.train_data[id] = nil
+        end
+
+        -- Exclude any trains pending a prune, or without a timeout
+        if data.train.valid and data.timeout >= 0 then
+            data.timeout = data.timeout - 1
+            if data.timeout <= 0 then
+                table.insert(trains, data.train)
+            end
+        end
+    end
+
+    return trains
 end
