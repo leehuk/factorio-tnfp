@@ -24,4 +24,4 @@ TNfP makes your factorio train network work for you, the player.
 Once you connect the combinator the train stop becomes a TNfP Station.  Any train with a TNfP Station anywhere in its schedule
 then becomes a TNfP Train and available for dispatch:
 
-![TNfP Example](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-example.gif)
+[Example GIF](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-example.gif)
