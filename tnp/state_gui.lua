@@ -12,7 +12,7 @@ function _tnp_state_gui_prune()
     end
 
     for id, ent in pairs(global.gui_data) do
-        if not ent.valid then
+        if not ent.element.valid then
             global.gui_data[id] = nil
         end
     end
