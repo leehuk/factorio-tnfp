@@ -15,20 +15,20 @@ function tnp_gui_stationselect(player, train)
     end
 
     local gui_top = player.gui.center.add({
-        name = "tpn-gui-stationselect-top",
-        caption = "TPN Station Select",
+        name = "tnp-gui-stationselect-top",
+        caption = "TNfP Station Select",
         type = "frame",
         direction = "vertical"
     })
 
     local gui_scroll = gui_top.add({
-        name = "tpn-gui-stationselect-scroller",
+        name = "tnp-gui-stationselect-scroller",
         type = "scroll-pane",
         horizontal_scroll_policy = "auto-and-reserve-space"
     })
 
     local gui_table = gui_scroll.add({
-        name = "tpn-gui-stationselect-table",
+        name = "tnp-gui-stationselect-table",
         type = "table",
         column_count = 1,
         draw_vertical_lines = true
@@ -36,7 +36,7 @@ function tnp_gui_stationselect(player, train)
 
     for i, ent in ipairs(train.schedule.records) do
         local gui_button = gui_table.add({
-            name = "tpn-gui-stationselect-" .. i,
+            name = "tnp-gui-stationselect-" .. i,
             type = "button",
             caption = ent.station
         })
