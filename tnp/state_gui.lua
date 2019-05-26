@@ -21,11 +21,15 @@ end
 -- tnp_state_gui_delete()
 --   Deletes state information about a LuaGuiElement
 function tnp_state_gui_delete(element)
-    if not global.gui_data then
-        return
-    end
+    _tnp_state_gui_prune()
 
-    global.gui_data[element.index] = nil
+    if global.gui_data and global.gui_data[element.index] then
+        if key then
+            global.gui_data[element.index][key] = nil
+        else
+            global.gui_data[element.index] = nil
+        end
+    end
 end
 
 -- tnp_state_gui_get()
@@ -33,11 +37,11 @@ end
 function tnp_state_gui_get(element, key)
     _tnp_state_gui_prune()
 
-    if not global.gui_data then
-        return nil
+    if not element.valid then
+        return false
     end
 
-    if global.gui_data[element.index] then
+    if global.gui_data and global.gui_data[element.index] and global.gui_data[element.index][key] then
         return global.gui_data[element.index][key]
     end
 
@@ -49,6 +53,10 @@ end
 function tnp_state_gui_set(element, key, value)
     _tnp_state_gui_prune()
 
+    if not element.valid then
+        return false
+    end
+
     if not global.gui_data then
         global.gui_data = {}
     end
@@ -59,4 +67,5 @@ function tnp_state_gui_set(element, key, value)
     end
 
     global.gui_data[element.index][key] = value
+    return true
 end

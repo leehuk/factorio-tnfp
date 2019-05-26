@@ -1,5 +1,6 @@
 --[[
 State Table:
+    gui         = LuaGuiElement, root gui element we're tracking
     player      = LuaPlayer
     train       = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
 ]]
@@ -8,7 +9,6 @@ State Table:
 --   Prune the state player data of any invalid players
 function _tnp_state_player_prune()
     if not global.player_data then
-        global.player_data = {}
         return
     end
 
@@ -18,13 +18,16 @@ function _tnp_state_player_prune()
         elseif not data.player.valid then
             -- The player we're tracking is now invalid.  Check if we need to release their train
             if data.train then
-                if data.train.valid then
-                    tnp_train_schedule_restore(train)
-                end
-
-                tnp_state_train_delete(train, false)
+                tnp_action_request_cancel(nil, data.train, true)
             end
 
+            -- Any gui elements should now be automatically invalid, so trigger a prune there
+            if data.gui then
+                _ptn_state_gui_prune()
+            end
+
+            global.player_data[id] = nil
+        elseif not data.gui and not data.player then
             global.player_data[id] = nil
         end
     end
@@ -35,16 +38,19 @@ end
 function tnp_state_player_delete(player, key)
     _tnp_state_player_prune()
 
-    -- Deliberately accept invalid players here(?).
-    -- The idea is they may potentially invalid but hopefully still have their index
-    -- so we can do cleanup work.
+    if not player.valid then
+        return
+    end
 
-    if key then
-        if global.player_data[player.index] then
+    if global.player_data and global.player_data[player.index] then
+        if key then
             global.player_data[player.index][key] = nil
-        end
-    else
-        if global.player_data[player.index] then
+
+            -- If we're no longer tracking either a gui or train, clear the entire object.
+            if not global.player_data[player.index]['gui'] and not global.player_data[player.index]['train'] then
+                global.player_data[player.index] = nil
+            end
+        else
             global.player_data[player.index] = nil
         end
     end
@@ -59,7 +65,7 @@ function tnp_state_player_get(player, key)
         return false
     end
 
-    if global.player_data[player.index] and global.player_data[player.index][key] then
+    if global.player_data and global.player_data[player.index] and global.player_data[player.index][key] then
         return global.player_data[player.index][key]
     end
 
@@ -73,11 +79,7 @@ function tnp_state_player_query(player)
         return false
     end
 
-    if not global.player_data then
-        return false
-    end
-
-    if global.player_data[player.index] then
+    if global.player_data and global.player_data[player.index] then
         return true
     end
 
@@ -92,6 +94,10 @@ function tnp_state_player_set(player, key, value)
 
     if not player.valid then
         return false
+    end
+
+    if not global.player_data then
+        global.player_data = {}
     end
 
     if not global.player_data[player.index] then

@@ -22,6 +22,10 @@ end
 function tnp_handle_request(event, shortcut)
     local player = game.players[event.player_index]
 
+    if not player.valid then
+        return
+    end
+
     if not player.surface then
         tnp_message(tnpdefines.loglevel.core, player, {"tnp_error_location_surface", player.name})
         return
@@ -36,10 +40,9 @@ function tnp_handle_request(event, shortcut)
     local train = tnp_state_player_get(player, 'train')
     if train then
         if shortcut then
-            tnp_action_request_cancel(player, train, true)
-            player.set_shortcut_toggled('tnp-handle-request', false)
-            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_cancelled"})
+            tnp_action_request_cancel(player, train, true, {"tnp_train_cancelled"})
         else
+            --- !!!: TODO
             tnp_action_request_status(player, train)
         end
     else
@@ -63,7 +66,7 @@ function tnp_handle_tick_timeout(event)
 end
 
 -- tnp_handle_player_vehicle()
---   Handles a player entering a vehicle
+--   Handles a player entering or exiting a vehicle
 function tnp_handle_player_vehicle(event)
     local player = game.players[event.player_index]
 

@@ -21,7 +21,6 @@ tnpdefines.train = {
 --   Prune the state train data of any invalid trains
 function _tnp_state_train_prune()
     if not global.train_data then
-        global.train_data = {}
         return
     end
 
@@ -31,11 +30,7 @@ function _tnp_state_train_prune()
         elseif not data.train.valid then
             -- The train we were tracking is invalid, but we still have a player reference.  Notify them
             if data.player then
-                if data.player.valid then
-                    tnp_message(tnpdefines.loglevel.standard, data.player, {"tnp_train_cancelled_invalid"})
-                end
-
-                tnp_state_player_delete(data.player, true)
+                tnp_action_request_cancel(player, nil, false, {"tnp_train_cancelled_invalid"})
             end
 
             global.train_data[id] = nil
@@ -48,14 +43,14 @@ end
 function tnp_state_train_delete(train, key)
     _tnp_state_train_prune()
 
-    -- Accept invalid trains(?) for same reason as invalid players.
+    if not train.valid then
+        return
+    end
 
-    if key then
-        if global.train_data[train.id] then
+    if global.train_data and global.train_data[train.id] then
+        if key then
             global.train_data[train.id][key] = nil
-        end
-    else
-        if global.train_data[train.id] then
+        else
             global.train_data[train.id] = nil
         end
     end
@@ -70,7 +65,7 @@ function tnp_state_train_get(train, key)
         return false
     end
 
-    if global.train_data[train.id] and global.train_data[train.id][key] then
+    if global.train_data and global.train_data[train.id] and global.train_data[train.id][key] then
         return global.train_data[train.id][key]
     end
 
@@ -80,15 +75,11 @@ end
 -- tnp_state_train_query()
 --   Determines if a given train is being tracked by TNfP
 function tnp_state_train_query(train)
-    if not global.train_data then
-        return false
-    end
-
     if not train.valid then
         return false
     end
 
-    if global.train_data[train.id] then
+    if global.train_data and global.train_data[train.id] then
         return true
     end
 
@@ -102,6 +93,10 @@ function tnp_state_train_set(train, key, value)
 
     if not train.valid then
         return false
+    end
+
+    if not global.train_data then
+        global.train_data = {}
     end
 
     if not global.train_data[train.id] then
@@ -128,6 +123,8 @@ end
 -- tnp_state_train_timeout()
 --   Drops timeouts on all trains and returns a list of any now expired requests
 function tnp_state_train_timeout()
+    _tnp_state_train_prune()
+
     if not global.train_data then
         return
     end
@@ -135,12 +132,8 @@ function tnp_state_train_timeout()
     local trains = {}
 
     for id, data in pairs(global.train_data) do
-        if not data or not data.train then
-            global.train_data[id] = nil
-        end
-
         -- Exclude any trains pending a prune, or without a timeout
-        if data.train.valid and data.timeout >= 0 then
+        if data.timeout >= 0 then
             data.timeout = data.timeout - 1
             if data.timeout <= 0 then
                 table.insert(trains, data.train)
