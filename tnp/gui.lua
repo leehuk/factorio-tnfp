@@ -1,10 +1,3 @@
--- tnp_gui_stationselect_destroy()
---   Destroys a station select gui
-function tnp_gui_stationselect_destroy(button)
-    button.parent.parent.parent.destroy()
-    _tnp_state_gui_prune()
-end
-
 -- tnp_gui_stationselect()
 --   Draws the station select gui
 function tnp_gui_stationselect(player, train)
@@ -20,6 +13,8 @@ function tnp_gui_stationselect(player, train)
         type = "frame",
         direction = "vertical"
     })
+
+    tnp_state_player_set(player, 'gui', gui_top)
 
     local gui_scroll = gui_top.add({
         name = "tnp-gui-stationselect-scroller",
@@ -41,6 +36,18 @@ function tnp_gui_stationselect(player, train)
             caption = ent.station
         })
 
-        tnp_state_gui_set(gui_button, 'station', i)
+        tnp_state_gui_set(gui_button, player, 'station', i)
     end
+end
+
+-- tnp_gui_stationselect_close()
+--   Destroys a station select gui
+function tnp_gui_stationselect_close(player)
+    local gui = tnp_state_player_get(player, 'gui')
+    if gui and gui.valid then
+        gui.destroy()
+    end
+
+    tnp_state_player_delete(player, 'gui')
+    _tnp_state_gui_prune()
 end

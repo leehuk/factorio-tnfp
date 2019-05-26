@@ -84,7 +84,7 @@ end
 
 -- tnp_action_train_depart()
 --   Dispatches a train to a given station index
-function tnp_action_train_depart(player, train, stationindex)
+function tnp_action_train_depart(train, stationindex)
     if train.valid then
         train.go_to_station(stationindex)
     end

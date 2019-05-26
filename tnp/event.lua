@@ -1,13 +1,16 @@
 -- tnp_handle_gui_click()
 --   Handles a gui click
 function tnp_handle_gui_click(event)
-    local stationindex = tnp_state_gui_get(event.element, 'station')
+    local player = game.players[event.player_index]
+    local stationindex = tnp_state_gui_get(event.element, player, 'station')
 
-    if stationindex and event.player_index then
-        local player = game.players[event.player_index]
+    if stationindex then
+        -- Validate the player is on a train
+        if player.vehicle and player.vehicle.train then
+            tnp_action_train_depart(player.vehicle.train, stationindex)
+        end
 
-        tnp_action_train_depart(player, stationindex)
-        tnp_gui_stationselect_destroy(event.element)
+        tnp_gui_stationselect_close(player)
     end
 end
 
@@ -81,10 +84,19 @@ function tnp_handle_player_vehicle(event)
         return
     end
 
-    local train = tnp_state_player_get(player, 'train')
-    -- Player has successfully boarded their tnp train
-    if train.id == event.entity.train.id then
-        tnp_action_request_complete(player, train)
+    if player.vehicle then
+        local train = tnp_state_player_get(player, 'train')
+        -- Player has successfully boarded their tnp train
+        if train.id == event.entity.train.id then
+            tnp_action_request_complete(player, train)
+        end
+    else
+        -- Player has exited a train.
+        -- Close the station select screen if its open.
+        local gui = tnp_state_player_get(player, 'gui')
+        if gui and gui.valid then
+            tnp_gui_stationselect_close(player)
+        end
     end
 end
 

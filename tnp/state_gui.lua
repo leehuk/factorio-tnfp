@@ -1,6 +1,8 @@
 --[[
     State Table:
         element         = LuaGuiElement
+        name            = string, name of button
+        player          = LuaPlayer, reference to player.
         station         = int, if this is a station gui its the station index
 ]]
 
@@ -13,6 +15,8 @@ function _tnp_state_gui_prune()
 
     for id, ent in pairs(global.gui_data) do
         if not ent.element.valid then
+            global.gui_data[id] = nil
+        elseif not ent.player or not ent.player.valid then
             global.gui_data[id] = nil
         end
     end
@@ -34,7 +38,7 @@ end
 
 -- tnp_state_gui_get()
 --   Gets state information about a LuaGuiElement
-function tnp_state_gui_get(element, key)
+function tnp_state_gui_get(element, player, key)
     _tnp_state_gui_prune()
 
     if not element.valid then
@@ -50,10 +54,10 @@ end
 
 -- tnp_state_gui_set()
 --   Sets state information about a LuiGuiElement
-function tnp_state_gui_set(element, key, value)
+function tnp_state_gui_set(element, player, key, value)
     _tnp_state_gui_prune()
 
-    if not element.valid then
+    if not element.valid or not player.valid then
         return false
     end
 
@@ -64,6 +68,7 @@ function tnp_state_gui_set(element, key, value)
     if not global.gui_data[element.index] then
         global.gui_data[element.index] = {}
         global.gui_data[element.index]['element'] = element
+        global.gui_data[element.index]['player'] = player
     end
 
     global.gui_data[element.index][key] = value
