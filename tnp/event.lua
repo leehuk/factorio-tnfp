@@ -100,8 +100,12 @@ function tnp_handle_player_vehicle(event)
 
     if player.vehicle then
         local train = tnp_state_player_get(player, 'train')
-        -- Player has successfully boarded their tnp train
-        if train.id == event.entity.train.id then
+        if not train or not train.valid then
+            -- The train we were tracking is now invalid, and will have a limbo schedule unfortunately.
+            tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_cancelled_invalid"})
+            tnp_action_request_cancel(player, nil, nil)
+        elseif train.id == event.entity.train.id then
+            -- Player has successfully boarded their tnp train
             tnp_action_request_complete(player, train)
         end
     else
