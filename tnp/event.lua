@@ -2,9 +2,12 @@
 --   Handles a gui click
 function tnp_handle_gui_click(event)
     local player = game.players[event.player_index]
+    local close = tnp_state_gui_get(event.element, player, 'close')
     local stationindex = tnp_state_gui_get(event.element, player, 'station')
 
-    if stationindex then
+    if close then
+        tnp_gui_stationselect_close(player)
+    elseif stationindex then
         -- Validate the player is on a train
         if player.vehicle and player.vehicle.train then
             tnp_action_train_depart(player.vehicle.train, stationindex)

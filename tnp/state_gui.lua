@@ -1,5 +1,6 @@
 --[[
     State Table:
+        close           = boolean, if this button closes the gui
         element         = LuaGuiElement
         name            = string, name of button
         player          = LuaPlayer, reference to player.
