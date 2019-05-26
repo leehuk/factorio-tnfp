@@ -24,7 +24,7 @@ function _tnp_state_player_prune()
 
             -- Any gui elements should now be automatically invalid, so trigger a prune there
             if data.gui then
-                _ptn_state_gui_prune()
+                _tnp_state_gui_prune()
             end
 
             global.player_data[id] = nil
