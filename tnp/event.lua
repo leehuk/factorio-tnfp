@@ -1,19 +1,30 @@
+-- tnp_handle_gui_check()
+--   Handles a gui checkbox/radiobutton being selected
+function tnp_handle_gui_check(event)
+    local player = game.players[event.player_index]
+
+    if event.element.name == "tnp-stationlist-stationtypetnfp" or event.element.name == "tnp-stationlist-stationtypetrain" or event.element.name == "tnp-stationlist-stationtypeall" then
+        tnp_gui_stationlist_switch(player, event.element)
+    end
+end
+
 -- tnp_handle_gui_click()
 --   Handles a gui click
 function tnp_handle_gui_click(event)
     local player = game.players[event.player_index]
-    local close = tnp_state_gui_get(event.element, player, 'close')
-    local stationindex = tnp_state_gui_get(event.element, player, 'station')
 
-    if close then
-        tnp_gui_stationselect_close(player)
-    elseif stationindex then
+    if event.element.name == "tnp-stationlist-headingbuttonclose" then
+        tnp_gui_stationlist_close(player)
+    elseif string.find(event.element.name, "tnp-stationlist-dest", 1, true) ~= nil then
+        -- Pull state information *before* we trash it
+        local station = tnp_state_gui_get(event.element, player, 'station')
+
+        tnp_gui_stationlist_close(player)
+
         -- Validate the player is on a train
-        if player.vehicle and player.vehicle.train then
-            tnp_action_train_depart(player.vehicle.train, stationindex)
+        if station and player.vehicle and player.vehicle.train then
+            tnp_action_train_dispatchonward(player, station, player.vehicle.train)
         end
-
-        tnp_gui_stationselect_close(player)
     end
 end
 
@@ -98,7 +109,7 @@ function tnp_handle_player_vehicle(event)
         -- Close the station select screen if its open.
         local gui = tnp_state_player_get(player, 'gui')
         if gui and gui.valid then
-            tnp_gui_stationselect_close(player)
+            tnp_gui_stationlist_close(player)
         end
     end
 end

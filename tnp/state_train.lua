@@ -13,7 +13,8 @@ tnpdefines.train = {
     status = {
         dispatching         = 1,
         dispatched          = 2,
-        arrived             = 3
+        arrived             = 3,
+        onward              = 4
     }
 }
 
@@ -121,7 +122,7 @@ function tnp_state_train_timeout()
 
     for id, data in pairs(global.train_data) do
         -- Exclude any trains pending a prune, or without a timeout
-        if data.timeout >= 0 then
+        if data.timeout and data.timeout >= 0 then
             data.timeout = data.timeout - 1
             if data.timeout <= 0 then
                 table.insert(trains, data.train)

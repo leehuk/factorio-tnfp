@@ -27,6 +27,7 @@ script.on_event(defines.events.on_player_driving_changed_state, tnp_handle_playe
 --script.on_event(defines.events.on_player_left_game, tnp_handle_player_exit)
 
 -- GUI Events
+script.on_event(defines.events.on_gui_checked_state_changed, tnp_handle_gui_check)
 script.on_event(defines.events.on_gui_click, tnp_handle_gui_click)
 
 -- Shortcut Events
