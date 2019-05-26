@@ -49,7 +49,7 @@ function tnp_action_request_create(player)
     if target then
         local train = target.get_stopped_train()
         if train then
-            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
+            tnp_action_train_assign(player, target, train)
             return
         end
 
@@ -80,6 +80,21 @@ function tnp_action_train_arrival(player, train)
     if config['tnp-train-arrival-behaviour'].value == "manual" then
         tnp_train_enact(train, true, nil, true, nil)
     end
+end
+
+-- tnp_action_train_assign()
+--   Assigns a parked train to a player
+function tnp_action_train_assign(player, target, train)
+    local config = settings.get_player_settings(player)
+
+    tnp_state_train_set(train, 'player', player)
+    tnp_state_player_set(player, 'train', train)
+
+    tnp_state_train_set(train, 'station', target)
+    tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
+    tnp_state_train_set(train, 'timeout', config['tnp-train-boarding-timeout'].value)
+
+    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
 end
 
 -- tnp_action_train_depart()
