@@ -18,6 +18,7 @@ function _tnp_state_player_prune()
         elseif not data.player.valid then
             -- The player we're tracking is now invalid.  Check if we need to release their train
             if data.train then
+                tnp_train_enact(data.train, true, nil, nil, false)
                 tnp_action_request_cancel(nil, data.train, true)
             end
 

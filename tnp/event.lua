@@ -40,7 +40,8 @@ function tnp_handle_request(event, shortcut)
     local train = tnp_state_player_get(player, 'train')
     if train then
         if shortcut then
-            tnp_action_request_cancel(player, train, true, {"tnp_train_cancelled"})
+            tnp_train_enact(train, true, nil, nil, false)
+            tnp_action_request_cancel(player, train, {"tnp_train_cancelled"})
         else
             --- !!!: TODO
             tnp_action_request_status(player, train)

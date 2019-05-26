@@ -14,6 +14,34 @@ function tnp_train_check(player, train)
     return false
 end
 
+-- tnp_train_enact()
+--   Helper function to enact a schedule change and manual mode, including required markers
+function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manual_mode_post)
+    if not train.valid then
+        return
+    end
+
+    if schedule_lookup then
+        local info = tnp_state_train_get(train, 'info')
+        if info and info.schedule then
+            schedule = info.schedule
+        end
+    end
+
+    if manual_mode_pre == false or manual_mode_pre == true then
+        train.manual_mode = manual_mode_pre
+    end
+
+    if schedule then
+        tnp_state_train_set(train, 'expect_schedulechange', true)
+        train.schedule = Table.deep_copy(schedule)
+    end
+
+    if manual_mode_post == false or manual_mode_post == true then
+        train.manual_mode = manual_mode_post
+    end
+end
+
 -- tnp_train_find()
 --   Finds a train usable by tnp
 function tnp_train_find(player, target)
@@ -69,21 +97,14 @@ function tnp_train_getall(player)
     return tnp_trains
 end
 
--- tnp_train_schedule_enact()
---   Helper function to enact a schedule change, including required markers
-function tnp_train_schedule_enact(train, schedule)
-    tnp_state_train_set(train, 'expect_schedulechange', true)
-    train.schedule = Table.deep_copy(schedule)
-end
+-- tnp_train_info_save()
+--   Collates a trains information for save state, such as manual_mode and schedule
+function tnp_train_info_save(train)
+    local info = {
+        manual_mode = train.manual_mode,
+        schedule = Table.deep_copy(train.schedule),
+        state = train.state
+    }
 
--- tnp_train_schedule_restore()
---   Attempts to restore a trains schedule to saved state
-function tnp_train_schedule_restore(train)
-    local state = tnp_state_train_get(train, 'state')
-    if state and state.schedule then
-        tnp_train_schedule_enact(train, state.schedule)
-        return true
-    end
-
-    return false
+    return tnp_state_train_set(train, 'info', info)
 end
