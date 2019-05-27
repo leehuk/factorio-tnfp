@@ -2,27 +2,28 @@
 ## Train Network for Players (Factorio Mod)
 
 ### About
-TNfP makes your factorio train network work for you, the player.
+Provides support functionality for a personal train network, dispatching trains to your location and
+taking you onward.
 
 ### Important Note
-**This mod is currently experimental.**  It's in early development and there's a reasonable amount of
-complexity and state tracking required for the base level of functionality.  With the limited personal
-testing in solo mode its had it may be unstable and it may crash.  Bug reports via
-[github.com](https://github.com/leehuk/factorio-tnfp/) are preferred, with the crash log.
+**This mod is currently experimental.**  This is the early testing phase, so it may crash.  Bug reports via
+[github.com](https://github.com/leehuk/factorio-tnfp/) are preferred, with the crash log and version
+information about both factorio and the mod.
 
-**This mod is not recommended in multiplayer mode yet.**  There's work to be done handling players becoming
-invalid etc so I expect crashes in multiplayer mode -- though the core codes mostly there.  Its a
-challenge for me to test though so if you're interested let me know, particularly if theres a possibility
-of doing some live debugging/fixing one evening in a Western EU timezone.
+**Thie mod in multiplayer mode is highly experimental.**  There's work to be done adding the hooks to handle
+players becoming invalid before its multiplayer safe so here be dragons.
 
 ### Features
+* Build and designate a TNfP network via a simple combinator signal.
+* Dispatch personal trains to any train stop nearby.
+* Dispatch either via an input hotkey or the shortcut bar.
+* Station selection dialog when you board a train to take you onward.
 * Controllable behaviour and timeouts for dispatching and arrivals.
-* Dispatch a personal train to any train stop nearby.
-* Call trains via either an input hotkey or via the shortcut bar.
-* Display a station selection dialog when you board the train.
+* Controllable levels of notifications.
 
-### How It Works
-1. Ensure you've researched trains and train stops, and you have a train stop thats only intended for player use.
+### Setup Guide
+1. Ensure you've researched trains and train stops.
+1. Ensure you have a train stop thats only intended for player use, with a train assigned to stop there.
 1. Craft a Constant Combinator and place it near your personal train stop.
 1. Set the combinator to output the new 'TNfP Station' virtual signal, found under 'Signals'.
 1. Connect the combinator to the train stop, with either red or green wire.
@@ -30,10 +31,17 @@ of doing some live debugging/fixing one evening in a Western EU timezone.
 ![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-combinator.jpg)
 
 Once you connect the combinator the train stop becomes a TNfP Station.  Any train with a TNfP Station anywhere in its schedule
-then becomes a TNfP Train and available for dispatch:
+then becomes a TNfP Train and available for dispatch.
 
-[Example GIF](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-example.gif)
+### Dispatching Trains
+
+Trains can be dispatched either via the default hotkey (ALT-P) or via the shortcut bar.
+![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-shortcutbar.jpg)
+
+Once the train arrives and you board, it can optionally display a station selection dialog.
+
+![TNfP Station Select](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-stationselect.jpg)
 
 ## Roadmap
-There's a fair amount of functionality I'd like to add, particularly around temporary stations and further
-boarding options but for now the focus is ensuring the mods stable.
+For now the focus is ensuring the mods stable and working on multiplayer support.  Feature wise, the focus
+is on ensuring flexibility around TNfP and how its used.
