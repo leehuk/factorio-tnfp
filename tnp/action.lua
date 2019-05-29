@@ -73,13 +73,8 @@ end
 function tnp_action_train_arrival(player, train)
     local config = settings.get_player_settings(player)
 
+    tnp_state_train_delete(train, 'timeout')
     tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
-    tnp_state_train_set(train, 'timeout', config['tnp-train-boarding-timeout'].value)
-
-    -- If we're switching the train to manual mode, we can safely restore its original schedule.
-    if config['tnp-train-arrival-behaviour'].value == "manual" then
-        tnp_train_enact(train, true, nil, true, nil)
-    end
 end
 
 -- tnp_action_train_assign()
@@ -91,8 +86,7 @@ function tnp_action_train_assign(player, target, train)
     tnp_state_player_set(player, 'train', train)
 
     tnp_state_train_set(train, 'station', target)
-    tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
-    tnp_state_train_set(train, 'timeout', config['tnp-train-boarding-timeout'].value)
+    tnp_action_train_arrival(player, train)
 
     tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
 end
@@ -118,9 +112,9 @@ function tnp_action_train_dispatch(player, target, train)
             station = target.backer_name,
             wait_conditions = {
                 {
-                    type="inactivity",
+                    type="time",
                     compare_type = "or",
-                    ticks = 3600
+                    ticks = config['tnp-train-boarding-timeout'].value*60
                 }
             }
         })
@@ -204,6 +198,9 @@ function tnp_action_train_statechange(train)
         elseif status == tnpdefines.train.status.dispatched then
             -- This train had stopped for some reason.
             tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_onway"})
+        elseif status == tnpdefines.train.status.arrived then
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_timeout_boarding"})
         end
 
         -- elseif train.state == defines.train_state.path_lost then
@@ -217,6 +214,11 @@ function tnp_action_train_statechange(train)
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             tnp_train_enact(train, true, nil, nil, false)
             tnp_action_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
+
+        -- Train has no path, but we need to restore the schedule anyway.
+        elseif status == tnpdefines.train.status.arrived then
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_timeout_boarding"})
 
         elseif status == tnpdefines.train.status.onward then
             tnp_train_enact(train, true, nil, nil, nil)
@@ -255,16 +257,19 @@ function tnp_action_train_statechange(train)
             tnp_action_request_cancel(player, train, {"tnp_train_arrived"})
         end
 
-    elseif train.state == defines.train_state.manual_control_stop then
-        -- Train has been switched to manual control
-        -- If we're dispatching the train, we need to cancel the request and restore its original schedule
+    elseif train.state == defines.train_state.manual_control_stop or train.state == defines.train_state.manual_control then
+        -- Train has been switched to manual control.  Handle these together, as if a train is already stopped
+        -- we wont see defines.train_state.manual_control_stop.
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched or status == tnpdefines.train.status.onward then
+            -- If we're dispatching the train, we need to cancel the request and restore its original schedule
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_manual"})
+
+        elseif status == tnpdefines.train.status.arrived then
+            -- Train had arrived, but we still need to restore the schedule.
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_action_request_cancel(player, train, {"tnp_train_cancelled_manual"})
         end
-
-        -- elseif train.state == defines.train_state.manual_control then
-        -- Train is now in manual control.
     end
 end
 

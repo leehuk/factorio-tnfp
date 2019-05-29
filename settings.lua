@@ -34,16 +34,6 @@ data:extend({
         maximum_value = 64
     },
     {
-        name = "tnp-train-arrival-behaviour",
-        type = "string-setting",
-        setting_type = "runtime-per-user",
-        order = "b[train]-a[arrival]-a[behaviour]",
-        default_value = "manual",
-        allowed_values = {
-            "manual"
-        }
-    },
-    {
         name = "tnp-train-arrival-timeout",
         type = "int-setting",
         setting_type = "runtime-per-user",
@@ -68,8 +58,8 @@ data:extend({
         type = "int-setting",
         setting_type = "runtime-per-user",
         order = "b[train]-b[boarding]-b[timeout]",
-        default_value = 30,
-        minimum_value = 0,
+        default_value = 15,
+        minimum_value = 1,
         maximum_value = 120
     }
 })
