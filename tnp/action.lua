@@ -280,6 +280,14 @@ function tnp_action_train_statechange(train)
     elseif train.state == defines.train_state.manual_control_stop or train.state == defines.train_state.manual_control then
         -- Train has been switched to manual control.  Handle these together, as if a train is already stopped
         -- we wont see defines.train_state.manual_control_stop.
+
+        -- Check to see if we made this change ourselves
+        local expect = tnp_state_train_get(train, 'expect_manualmode')
+        if expect then
+            tnp_state_train_set(train, 'expect_manualmode', false)
+            return
+        end
+
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched or status == tnpdefines.train.status.redispatched then
             -- If we're dispatching the train, we need to cancel the request and restore its original schedule
             tnp_train_enact(train, true, nil, nil, nil)

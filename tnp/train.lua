@@ -29,7 +29,10 @@ function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manu
     end
 
     if manual_mode_pre == false or manual_mode_pre == true then
-        train.manual_mode = manual_mode_pre
+        if train.manual_mode ~= manual_mode_pre then
+            tnp_state_train_set(train, 'expect_manualmode', true)
+            train.manual_mode = manual_mode_pre
+        end
     end
 
     if schedule then
@@ -38,7 +41,10 @@ function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manu
     end
 
     if manual_mode_post == false or manual_mode_post == true then
-        train.manual_mode = manual_mode_post
+        if manual_mode_post ~= train.manual_mode then
+            tnp_state_train_set(train, 'expect_manualmode', true)
+            train.manual_mode = manual_mode_post
+        end
     end
 end
 

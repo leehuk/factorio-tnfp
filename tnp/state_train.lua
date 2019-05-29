@@ -1,6 +1,7 @@
 --[[
     State Table:
-        expect_schedulechange      = bool, marker to note we've made a schedule change which we'll see an event handler for
+        expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
+        expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
         player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         station                    = LuaEntity, train station we're dispatching to
