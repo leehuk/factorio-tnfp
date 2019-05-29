@@ -5,7 +5,7 @@
         player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         station                    = LuaEntity, train station we're dispatching to
         status                     = int, current dispatching status
-        timeout                    = int, timeout before cancelling
+        timeout                    = int, arrival timeout before cancelling the request
         train                      = LuaTrain, the train we're tracking
 ]]
 

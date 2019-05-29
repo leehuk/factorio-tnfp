@@ -282,7 +282,7 @@ function tnp_action_train_statechange(train)
 end
 
 -- tnp_action_timeout()
---   Loops through trains and applies any timeout actions
+--   Loops through trains and applies any timeout actions for dispatched trains.
 function tnp_action_timeout()
     local trains = tnp_state_train_timeout()
 
@@ -295,14 +295,8 @@ function tnp_action_timeout()
         local status = tnp_state_train_get(train, 'status')
 
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
-            -- Train is currently dispatching
             tnp_train_enact(train, true, nil, nil, false)
             tnp_action_request_cancel(player, train, {"tnp_train_cancelled_timeout_arrival"})
-
-        elseif status == tnpdefines.train.status.arrived then
-            -- Train has arrived and awaiting boarding, send it back on its way.
-            tnp_train_enact(train, true, nil, nil, false)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_timeout_boarding"})
         end
     end
 end
