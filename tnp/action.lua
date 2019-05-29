@@ -110,18 +110,10 @@ function tnp_action_train_dispatch(player, target, train)
     tnp_state_train_set(train, 'timeout', config['tnp-train-arrival-timeout'].value)
     tnp_train_info_save(train)
 
-    local schedule = Table.deep_copy(train.schedule)
-    local schedule_found = false
+    local schedule = tnp_train_schedule_copy(train)
+    local schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
 
-    -- Trains must have a schedule, as otherwise TNfP wouldnt find them
-    for i, ent in ipairs(schedule.records) do
-        if ent.station == target.backer_name then
-            schedule.current = i
-            schedule_found = true
-        end
-    end
-
-    if not schedule_found then
+    if schedule_found == false then
         table.insert(schedule.records, {
             station = target.backer_name,
             wait_conditions = {
@@ -134,6 +126,8 @@ function tnp_action_train_dispatch(player, target, train)
         })
 
         schedule.current = #schedule.records
+    else
+        schedule.current = schedule_found
     end
 
     tnp_train_enact(train, false, schedule, nil, false)
@@ -151,21 +145,12 @@ function tnp_action_train_dispatchonward(player, target, train)
 
     tnp_state_train_set(train, 'station', target)
     tnp_state_train_set(train, 'status', tnpdefines.train.status.onward)
+    tnp_train_info_save(train)
 
-    local schedule = Table.deep_copy(train.schedule)
-    local schedule_found = false
+    local schedule = tnp_train_schedule_copy(train)
+    local schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
 
-    -- Trains must have a schedule, as otherwise TNfP wouldnt find them
-    for i, ent in ipairs(schedule.records) do
-        if ent.station == target.backer_name then
-            schedule.current = i
-            schedule_found = true
-        end
-    end
-
-    if not schedule_found then
-        tnp_train_info_save(train)
-
+    if schedule_found == false then
         table.insert(schedule.records, {
             station = target.backer_name,
             wait_conditions = {
@@ -178,6 +163,8 @@ function tnp_action_train_dispatchonward(player, target, train)
         })
 
         schedule.current = #schedule.records
+    else
+        schedule.current = schedule_found
     end
 
     tnp_train_enact(train, false, schedule, nil, false)

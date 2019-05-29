@@ -86,7 +86,7 @@ function tnp_train_getall(player)
         local trains = ent.get_train_stop_trains()
         if trains then
             for _, train in pairs(trains) do
-                if not tnp_train_ids[train.id] then
+                if train.valid and not tnp_train_ids[train.id] then
                     table.insert(tnp_trains, train)
                     tnp_train_ids[train.id] = true
                 end
@@ -99,12 +99,69 @@ end
 
 -- tnp_train_info_save()
 --   Collates a trains information for save state, such as manual_mode and schedule
+--
+-- inputs       - train, LuaTrain.  Must be valid.
+-- outputs      - boolean.  Whether state was successfully saved.
 function tnp_train_info_save(train)
     local info = {
         manual_mode = train.manual_mode,
-        schedule = Table.deep_copy(train.schedule),
+        schedule = tnp_train_schedule_copy(train),
         state = train.state
     }
 
     return tnp_state_train_set(train, 'info', info)
+end
+
+-- tnp_train_schedule_check()
+-- Checks a train schedule to see if it has a given station, returning its position if so
+--
+-- inputs       - schedule, hash(TrainSchedule).  Schedule to search.
+--              - stationname, string.  Station name to search for.
+-- outputs      - uint, station index.  When stationname is found in schedule.
+--              - boolean false.  When stationname is not found in schedule.
+function tnp_train_schedule_check(schedule, stationname)
+    if not schedule or not schedule.records or #schedule.records == 0 then
+        return false
+    end
+
+    for i, ent in ipairs(schedule.records) do
+        if ent.station == stationname then
+            return i
+        end
+    end
+
+    return false
+end
+
+-- tnp_train_schedule_copy()
+--   Copys a trains schedule, removing any temporary stations.
+--
+-- inputs:      train, LuaTrain. Must be valid.
+-- outputs:     hash(TrainSchedule).
+function tnp_train_schedule_copy(train)
+    schedule = {}
+    schedule.records = {}
+
+    if not train.schedule or not train.schedule.records or #train.schedule.records == 0 then
+        return schedule
+    end
+
+    for _, record in pairs(train.schedule.records) do
+        -- Temporary stations to locations end up invalid when copied, so discard them
+        if not record.temporary or record.temporary == false then
+            table.insert(schedule.records, {
+                station = record.station,
+                wait_conditions = Table.deep_copy(record.wait_conditions)
+            })
+        end
+    end
+
+    -- As we may have removed temporary stations, check the current station is still in bounds
+    if train.schedule.current <= #schedule.records then
+        schedule.current = train.schedule.current
+    else
+        schedule.current = 1
+    end
+
+    return schedule
 end

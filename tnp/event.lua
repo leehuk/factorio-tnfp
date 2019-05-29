@@ -22,7 +22,7 @@ function tnp_handle_gui_click(event)
         tnp_gui_stationlist_close(player)
 
         -- Validate the player is on a train
-        if station and player.vehicle and player.vehicle.train then
+        if station and player.vehicle and player.vehicle.train and player.vehicle.train.valid then
             tnp_action_train_dispatchonward(player, station, player.vehicle.train)
         end
     end
