@@ -236,12 +236,20 @@ function tnp_action_train_statechange(train)
 
     elseif train.state == defines.train_state.wait_station then
         -- Train has arrived at a station
-        -- If we're dispatching this train to this station, we now need to process its arrival.
-        local station = tnp_state_train_get(train, 'station')
-        local station_train = station.get_stopped_train()
 
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
-            -- OK.  The trains arrived at a different station than the one we expected.  Lets just cancel the request.
+            -- This is an arrival to a station, after we've dispatched it.
+            local station = tnp_state_train_get(train, 'station')
+
+            -- The station we were dispatching to is no longer valid
+            if not station or not station.valid then
+                tnp_train_enact(train, true, nil, nil, nil)
+                tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
+                return
+            end
+
+            -- Our train has arrived at a different station.
+            local station_train = station.get_stopped_train()
             if not station_train or not station_train.id == train.id then
                 tnp_train_enact(train, true, nil, nil, false)
                 tnp_action_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
