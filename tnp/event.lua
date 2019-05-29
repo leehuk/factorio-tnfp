@@ -23,7 +23,7 @@ function tnp_handle_gui_click(event)
 
         -- Validate the player is on a train
         if station and player.vehicle and player.vehicle.train and player.vehicle.train.valid then
-            tnp_action_train_dispatchonward(player, station, player.vehicle.train)
+            tnp_action_train_redispatch(player, station, player.vehicle.train)
         end
     end
 end
@@ -106,7 +106,7 @@ function tnp_handle_player_vehicle(event)
             tnp_action_request_cancel(player, nil, nil)
         elseif train.id == event.entity.train.id then
             -- Player has successfully boarded their tnp train
-            tnp_action_request_complete(player, train)
+            tnp_action_request_board(player, train)
         end
     else
         -- Player has exited a train.

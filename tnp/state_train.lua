@@ -14,7 +14,8 @@ tnpdefines.train = {
         dispatching         = 1,
         dispatched          = 2,
         arrived             = 3,
-        onward              = 4
+        redispatched        = 4,
+        rearrived           = 5
     }
 }
 
