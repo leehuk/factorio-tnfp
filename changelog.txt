@@ -1,5 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 2019-05-30
+  Changes:
+    - Omit temporary stations when copying schedules, as they don't copy correctly
+    - Remove arrival behaviour, as boarding timeout is now applied as a wait condition.
+    - Handle stations we are dispatching to becoming invalid.
+    - Improve redispatching for an onward journey so the default waitcondition is the passenger
+      is no longer present.  We also now complete correctly if the player gets off the train.
+    - Add handling of trains switched to manual mode when they're not moving.
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2019-05-25
-- initial release
+  Changes:
+    - initial release
 ---------------------------------------------------------------------------------------------------

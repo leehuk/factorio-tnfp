@@ -1,11 +1,12 @@
 --[[
     State Table:
-        expect_schedulechange      = bool, marker to note we've made a schedule change which we'll see an event handler for
+        expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
+        expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
         player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         station                    = LuaEntity, train station we're dispatching to
         status                     = int, current dispatching status
-        timeout                    = int, timeout before cancelling
+        timeout                    = int, arrival timeout before cancelling the request
         train                      = LuaTrain, the train we're tracking
 ]]
 
@@ -14,7 +15,8 @@ tnpdefines.train = {
         dispatching         = 1,
         dispatched          = 2,
         arrived             = 3,
-        onward              = 4
+        redispatched        = 4,
+        rearrived           = 5
     }
 }
 
