@@ -47,7 +47,7 @@ function tnp_action_request_create(player)
     local target = tnp_stop_find(player)
     if target then
         local train = target.get_stopped_train()
-        if train then
+        if train and train.valid then
             tnp_action_train_assign(player, target, train)
             return
         end

@@ -28,6 +28,10 @@ end
 function tnp_state_gui_delete(element)
     _tnp_state_gui_prune()
 
+    if not element.valid then
+        return
+    end
+
     if global.gui_data and global.gui_data[element.index] then
         if key then
             global.gui_data[element.index][key] = nil
@@ -42,7 +46,7 @@ end
 function tnp_state_gui_get(element, player, key)
     _tnp_state_gui_prune()
 
-    if not element.valid then
+    if not element.valid or not player.valid then
         return false
     end
 

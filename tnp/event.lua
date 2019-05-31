@@ -3,6 +3,10 @@
 function tnp_handle_gui_check(event)
     local player = game.players[event.player_index]
 
+    if not player.valid then
+        return
+    end
+
     if event.element.name == "tnp-stationlist-stationtypetnfp" or event.element.name == "tnp-stationlist-stationtypetrain" or event.element.name == "tnp-stationlist-stationtypeall" then
         tnp_gui_stationlist_switch(player, event.element)
     end
@@ -12,6 +16,10 @@ end
 --   Handles a gui click
 function tnp_handle_gui_click(event)
     local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
 
     if event.element.name == "tnp-stationlist-headingbuttonclose" then
         tnp_gui_stationlist_close(player)
@@ -87,6 +95,10 @@ end
 --   Handles a player entering or exiting a vehicle
 function tnp_handle_player_vehicle(event)
     local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
 
     -- This player doesnt have a request outstanding
     if not tnp_state_player_query(player) then

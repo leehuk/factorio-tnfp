@@ -182,6 +182,11 @@ end
 -- tnp_gui_stationlist_close()
 --   Destroys a station select gui
 function tnp_gui_stationlist_close(player)
+    if not player.valid then
+        _tnp_state_gui_prune()
+        return
+    end
+
     local gui = tnp_state_player_get(player, 'gui')
     if gui and gui.valid then
         gui.destroy()
