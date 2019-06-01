@@ -116,7 +116,11 @@ function tnp_handle_player_vehicle(event)
             -- The train we were tracking is now invalid, and will have a limbo schedule unfortunately.
             tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_cancelled_invalid"})
             tnp_action_request_cancel(player, nil, nil)
-        elseif train.id == event.entity.train.id then
+        elseif train.id ~= event.entity.train.id then
+            -- Player has boarded a different train.  Send the other train away (optional?)
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_wrongtrain"})
+        else
             -- Player has successfully boarded their tnp train
             tnp_action_request_board(player, train)
         end
