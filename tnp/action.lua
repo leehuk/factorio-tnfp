@@ -4,6 +4,7 @@ function tnp_action_request_cancel(player, train, message)
     if player then
         if player.valid then
             player.set_shortcut_toggled('tnp-handle-request', false)
+            tnp_gui_stationlist_close(player)
 
             if message then
                 tnp_message(tnpdefines.loglevel.standard, player, message)
@@ -131,7 +132,9 @@ function tnp_action_train_assign(player, target, train)
     tnp_state_train_set(train, 'station', target)
     tnp_action_train_arrival(player, train)
 
-    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
+    if target then
+        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
+    end
 end
 
 -- tnp_action_train_dispatch()
