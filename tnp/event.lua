@@ -172,6 +172,10 @@ end
 -- tnp_handle_train_statechange()
 --   Handles a trains state being changed
 function tnp_handle_train_statechange(event)
+    if not event.train.valid then
+        return
+    end
+
     -- A train we're not tracking
     if not tnp_state_train_query(event.train) then
         return

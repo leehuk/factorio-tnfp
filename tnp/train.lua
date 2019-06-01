@@ -1,6 +1,10 @@
 -- tnp_train_check()
 --   Determines if a given train is one allocated to TNfP
 function tnp_train_check(player, train)
+    if not train.valid then
+        return nil
+    end
+
     -- Train schedules are not entity references but string based stop names, so go the long way round.
     local tnp_trains = tnp_train_getall(player)
     if tnp_trains then

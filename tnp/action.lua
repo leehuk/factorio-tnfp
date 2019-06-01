@@ -92,6 +92,10 @@ function tnp_action_stationselect_redispatch(player, gui)
         return
     end
 
+    if not train or not train.valid then
+        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalid"})
+    end
+
     -- Lets just revalidate the player is on a valid train
     if not player.vehicle or not player.vehicle.train or not player.vehicle.train.valid then
         tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
@@ -219,6 +223,7 @@ function tnp_action_train_schedulechange(train, event_player)
 
         -- This is either another mod changing schedules of a train we're using, or our tracking is off.
         -- For now, do nothing -- though we should be able to verify its still going where we expect it to.
+        -- !!!: TODO
     end
 end
 -- tnp_action_train_statechange()
@@ -226,6 +231,11 @@ end
 function tnp_action_train_statechange(train)
     local player = tnp_state_train_get(train, 'player')
     local status = tnp_state_train_get(train, 'status')
+
+    if not player or not player.valid then
+        tnp_action_request_cancel(player, train, nil)
+        return
+    end
 
     if train.state == defines.train_state.on_the_path then
         -- TNfP Train is on the move event
@@ -299,7 +309,7 @@ function tnp_action_train_statechange(train)
 
             -- Our train has arrived at a different station.
             local station_train = station.get_stopped_train()
-            if not station_train or not station_train.id == train.id then
+            if not station_train or not station_train.valid or not station_train.id == train.id then
                 tnp_train_enact(train, true, nil, nil, false)
                 tnp_action_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
                 return
