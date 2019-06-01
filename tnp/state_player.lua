@@ -12,25 +12,40 @@ function _tnp_state_player_prune()
         return
     end
 
+    local count = 0
+
     for id, data in pairs(global.player_data) do
-        if not data or not data.player then
-            global.player_data[id] = nil
-        elseif not data.player.valid then
-            -- The player we're tracking is now invalid.  Check if we need to release their train
-            if data.train then
-                tnp_train_enact(data.train, true, nil, nil, false)
-                tnp_action_request_cancel(nil, data.train, true)
-            end
+        count = count + 1
 
-            -- Any gui elements should now be automatically invalid, so trigger a prune there
-            if data.gui then
-                _tnp_state_gui_prune()
+        if not data then
+            global.player_data[id] = nil
+        elseif not data.player or not data.player.valid then
+            global.player_data[id] = nil
+        else
+            if data.train and data.gui then
+                if not data.train.valid and not data.gui.valid then
+                    global.player_data[id] = nil
+                elseif not data.train.valid then
+                    global.player_data[id]['train'] = nil
+                elseif not data.gui.valid then
+                    global.player_data[id]['gui'] = nil
+                end
+            elseif data.train then
+                if not data.train.valid then
+                    global.player_data[id] = nil
+                end
+            elseif data.gui then
+                if not data.gui.valid then
+                    global.player_data[id] = nil
+                end
+            else
+                global.player_data[id] = nil
             end
-
-            global.player_data[id] = nil
-        elseif not data.gui and not data.player then
-            global.player_data[id] = nil
         end
+    end
+
+    if count == 0 then
+        global.player_data = nil
     end
 end
 

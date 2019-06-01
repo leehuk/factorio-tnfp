@@ -4,7 +4,7 @@
         element         = LuaGuiElement
         name            = string, name of button
         player          = LuaPlayer, reference to player.
-        station         = int, if this is a station gui its the station index
+        station         = LuaElement, if this is a station gui its the station element
 ]]
 
 -- _tnp_state_gui_prune()
@@ -14,12 +14,20 @@ function _tnp_state_gui_prune()
         return
     end
 
+    local count = 0
+
     for id, ent in pairs(global.gui_data) do
+        count = count + 1
+
         if not ent.element.valid then
             global.gui_data[id] = nil
         elseif not ent.player or not ent.player.valid then
             global.gui_data[id] = nil
         end
+    end
+
+    if count == 0 then
+        global.gui_data = nil
     end
 end
 

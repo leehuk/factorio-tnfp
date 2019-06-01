@@ -82,6 +82,14 @@ function tnp_handle_shortcut(event)
     end
 end
 
+-- tnp_handle_tick_prune()
+--   Triggers a period prune of invalid data
+function tnp_handle_tick_prune(event)
+    _tnp_state_gui_prune()
+    _tnp_state_player_prune()
+    _tnp_state_train_prune()
+end
+
 -- tnp_handle_tick_timeout()
 --   Handle a per-second event to timeout train deliveries
 function tnp_handle_tick_timeout(event)

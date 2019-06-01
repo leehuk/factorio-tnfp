@@ -27,17 +27,31 @@ function _tnp_state_train_prune()
         return
     end
 
+    local count = 0
+
     for id, data in pairs(global.train_data) do
-        if not data or not data.train then
+        count = count + 1
+
+        if not data then
+            global.train_data[id] = nil
+        elseif not data.train then
             global.train_data[id] = nil
         elseif not data.train.valid then
             -- The train we were tracking is invalid, but we still have a player reference.  Notify them
-            if data.player then
+            if data.player and data.player.valid then
                 tnp_action_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
             end
 
             global.train_data[id] = nil
+        elseif not data.player or not data.player.valid then
+            -- The player we were tracking is invalid -- but the trains ok.  Cancel any dispatching.
+            tnp_train_enact(train, true, nil, nil, false)
+            global.train_data[id] = nil
         end
+    end
+
+    if count == 0 then
+        global.train_data = nil
     end
 end
 
@@ -114,8 +128,6 @@ end
 -- tnp_state_train_timeout()
 --   Drops timeouts on all trains and returns a list of any now expired requests
 function tnp_state_train_timeout()
-    _tnp_state_train_prune()
-
     if not global.train_data then
         return
     end
@@ -124,7 +136,7 @@ function tnp_state_train_timeout()
 
     for id, data in pairs(global.train_data) do
         -- Exclude any trains pending a prune, or without a timeout
-        if data.timeout and data.timeout >= 0 then
+        if data.train.valid and data.timeout and data.timeout >= 0 then
             data.timeout = data.timeout - 1
             if data.timeout <= 0 then
                 table.insert(trains, data.train)
