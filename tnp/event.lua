@@ -71,7 +71,9 @@ function tnp_handle_request(event, shortcut)
         --- !!!: TODO
         tnp_action_request_status(player, train)
     else
-        -- The player is already on a train.
+        -- We're not handling a request.
+
+        -- The player is already on a train though.
         if player.vehicle and player.vehicle.train then
             local train = player.vehicle.train
 

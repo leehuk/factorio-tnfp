@@ -79,6 +79,12 @@ function tnp_train_find(player, target)
             break
         end
 
+        -- Do not scheduled trains other players are the passenger of
+        if tnp_cand.passengers and #tnp_cand.passengers > 0 then
+            player.print("train has passengers" .. #tnp_cand.passengers)
+            break
+        end
+
         distance = Position.distance(target.position, tnp_cand.front_rail.position)
         if tnp_train and distance >= tnp_train_distance then
             break
