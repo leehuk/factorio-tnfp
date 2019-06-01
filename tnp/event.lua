@@ -138,7 +138,7 @@ function tnp_handle_player_vehicle(event)
             local status = tnp_state_train_get(train, 'status')
             if status and status == tnpdefines.train.status.redispatched then
                 tnp_train_enact(train, true, nil, nil, nil)
-                tnp_action_request_cancel(player, train, nil)
+                tnp_action_request_cancel(player, train, {"tnp_train_complete"})
             end
         end
     end
