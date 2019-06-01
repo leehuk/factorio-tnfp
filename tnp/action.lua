@@ -330,7 +330,10 @@ function tnp_action_train_statechange(train)
         -- Check to see if we made this change ourselves
         local expect = tnp_state_train_get(train, 'expect_manualmode')
         if expect then
-            tnp_state_train_set(train, 'expect_manualmode', false)
+            -- if the train is stopping, do not clear the expectation as we will see both manual_control_stop and manual_control
+            if train.state == defines.train_state.manual_control then
+                tnp_state_train_set(train, 'expect_manualmode', false)
+            end
             return
         end
 
