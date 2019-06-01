@@ -1,6 +1,10 @@
 -- tnp_train_check()
 --   Determines if a given train is one allocated to TNfP
 function tnp_train_check(player, train)
+    if not train.valid then
+        return nil
+    end
+
     -- Train schedules are not entity references but string based stop names, so go the long way round.
     local tnp_trains = tnp_train_getall(player)
     if tnp_trains then
@@ -55,10 +59,10 @@ function tnp_train_find(player, target)
     local tnp_trains = tnp_train_getall(player)
 
     if #tnp_trains == 0 then
-        return
+        return nil
     end
 
-    local tnp_train
+    local tnp_train = nil
     local tnp_train_distance = 0
 
     repeat
@@ -66,6 +70,18 @@ function tnp_train_find(player, target)
         table.remove(tnp_trains)
 
         if not tnp_cand.front_rail or not tnp_cand.back_rail then
+            break
+        end
+
+        -- Do not schedule trains assigned to other players
+        local scheduled_player = tnp_state_train_get(tnp_cand, 'player')
+        if scheduled_player and (not scheduled_player.valid or scheduled_player.index ~= player.index) then
+            break
+        end
+
+        -- Do not scheduled trains other players are the passenger of
+        if tnp_cand.passengers and #tnp_cand.passengers > 0 then
+            player.print("train has passengers" .. #tnp_cand.passengers)
             break
         end
 

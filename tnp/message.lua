@@ -24,6 +24,10 @@ function tnp_message(msglevel, player, message, entity)
     local config_msglevel = settings.global['tnp-message-level'].value
     local config_msgtarget = settings.global['tnp-message-target'].value
 
+    if not player.valid then
+        return
+    end
+
     local loglevel = tnpdefines.loglevel.detailed
 
     if config_msglevel == 'core' then

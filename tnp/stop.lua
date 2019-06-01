@@ -33,17 +33,19 @@ function tnp_stop_find(player)
     })
 
     for _, ent in pairs(entities) do
-        local train = ent.get_stopped_train()
-        if train then
-            -- Disallow train stations blocked by non-TNfP trains
-            if tnp_train_check(player, train) then
-                table.insert(valid_stops_train, ent)
-            end
-        else
-            if tnp_stop_check(ent) then
-                table.insert(valid_stops_tnp, ent)
+        if ent.valid then
+            local train = ent.get_stopped_train()
+            if train then
+                -- Disallow train stations blocked by non-TNfP trains
+                if tnp_train_check(player, train) then
+                    table.insert(valid_stops_train, ent)
+                end
             else
-                table.insert(valid_stops_std, ent)
+                if tnp_stop_check(ent) then
+                    table.insert(valid_stops_tnp, ent)
+                else
+                    table.insert(valid_stops_std, ent)
+                end
             end
         end
     end

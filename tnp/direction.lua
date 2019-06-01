@@ -15,15 +15,17 @@ function tnp_direction_closest(player, entities)
     local closest_distance = 0
 
     for _, ent in pairs(entities) do
-        if closest_ent then
-            distance = Position.distance(player.position, ent.position)
-            if distance < closest_distance then
+        if ent.valid then
+            if closest_ent then
+                distance = Position.distance(player.position, ent.position)
+                if distance < closest_distance then
+                    closest_ent = ent
+                    closest_distance = distance
+                end
+            else
                 closest_ent = ent
-                closest_distance = distance
+                closest_distance = Position.distance(player.position, ent.position)
             end
-        else
-            closest_ent = ent
-            closest_distance = Position.distance(player.position, ent.position)
         end
     end
 

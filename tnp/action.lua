@@ -4,6 +4,7 @@ function tnp_action_request_cancel(player, train, message)
     if player then
         if player.valid then
             player.set_shortcut_toggled('tnp-handle-request', false)
+            tnp_gui_stationlist_close(player)
 
             if message then
                 tnp_message(tnpdefines.loglevel.standard, player, message)
@@ -47,24 +48,65 @@ function tnp_action_request_create(player)
     local target = tnp_stop_find(player)
     if target then
         local train = target.get_stopped_train()
-        if train then
+        if train and train.valid then
             tnp_action_train_assign(player, target, train)
-            return
+            return true
         end
 
         local train = tnp_train_find(player, target)
         if not train then
             tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_invalid"})
-            return
+            return false
         end
 
         tnp_action_train_dispatch(player, target, train)
+        return true
+    else
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
+        return false
     end
 end
 
 -- tnp_action_request_status()
 --   Shows the status of a tnp request
 function tnp_action_request_status(player, train)
+end
+
+-- tnp_action_stationselect_cancel()
+--   Actions the stationselect dialog being cancelled
+function tnp_action_stationselect_cancel(player)
+    local train = tnp_state_player_get(player, 'train')
+
+    tnp_gui_stationlist_close(player)
+
+    -- We're still tracking a request at this point we need to cancel, though theres no
+    -- schedule to amend.
+    tnp_action_request_cancel(player, train, nil)
+end
+
+-- tnp_action_stationselect_redispatch()
+--   Actions a stationselect request to redispatch
+function tnp_action_stationselect_redispatch(player, gui)
+    local station = tnp_state_gui_get(gui, player, 'station')
+    local train = tnp_state_player_get(player, 'train')
+
+    tnp_gui_stationlist_close(player)
+
+    if not station or not station.valid then
+        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
+        return
+    end
+
+    if not train or not train.valid then
+        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalid"})
+    end
+
+    -- Lets just revalidate the player is on a valid train
+    if not player.vehicle or not player.vehicle.train or not player.vehicle.train.valid then
+        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+    end
+
+    tnp_action_train_redispatch(player, station, player.vehicle.train)
 end
 
 -- tnp_action_train_arrival()
@@ -77,6 +119,9 @@ end
 -- tnp_action_train_rearrival()
 --   Partially fulfils a tnp request, marking a train as successfully arrived after redispatch.
 function tnp_action_train_rearrival(player, train)
+    -- From the players perspective the request is now complete so we need to cancel that side,
+    -- but we must leave the train active as we cant reset its schedule until the player disembarks.
+    tnp_action_request_cancel(player, nil, {"tnp_train_arrived"})
     tnp_state_train_set(train, 'status', tnpdefines.train.status.rearrived)
 end
 
@@ -91,7 +136,9 @@ function tnp_action_train_assign(player, target, train)
     tnp_state_train_set(train, 'station', target)
     tnp_action_train_arrival(player, train)
 
-    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
+    if target then
+        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
+    end
 end
 
 -- tnp_action_train_dispatch()
@@ -183,6 +230,7 @@ function tnp_action_train_schedulechange(train, event_player)
 
         -- This is either another mod changing schedules of a train we're using, or our tracking is off.
         -- For now, do nothing -- though we should be able to verify its still going where we expect it to.
+        -- !!!: TODO
     end
 end
 -- tnp_action_train_statechange()
@@ -190,6 +238,11 @@ end
 function tnp_action_train_statechange(train)
     local player = tnp_state_train_get(train, 'player')
     local status = tnp_state_train_get(train, 'status')
+
+    if not player or not player.valid then
+        tnp_action_request_cancel(player, train, nil)
+        return
+    end
 
     if train.state == defines.train_state.on_the_path then
         -- TNfP Train is on the move event
@@ -263,7 +316,7 @@ function tnp_action_train_statechange(train)
 
             -- Our train has arrived at a different station.
             local station_train = station.get_stopped_train()
-            if not station_train or not station_train.id == train.id then
+            if not station_train or not station_train.valid or not station_train.id == train.id then
                 tnp_train_enact(train, true, nil, nil, false)
                 tnp_action_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
                 return
@@ -284,7 +337,10 @@ function tnp_action_train_statechange(train)
         -- Check to see if we made this change ourselves
         local expect = tnp_state_train_get(train, 'expect_manualmode')
         if expect then
-            tnp_state_train_set(train, 'expect_manualmode', false)
+            -- if the train is stopping, do not clear the expectation as we will see both manual_control_stop and manual_control
+            if train.state == defines.train_state.manual_control then
+                tnp_state_train_set(train, 'expect_manualmode', false)
+            end
             return
         end
 

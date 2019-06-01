@@ -5,16 +5,17 @@
 Provides support functionality for a personal train network, dispatching trains to your location and
 taking you onward.
 
-### Important Note
-**This mod is currently experimental.**  This is the early testing phase, so it may crash.  Bug reports via
-[github.com](https://github.com/leehuk/factorio-tnfp/) are preferred, with the crash log and version
-information about both factorio and the mod.
+This mod can be safely added and removed to a new or existing playthrough.
 
-**Thie mod in multiplayer mode is highly experimental.**  There's work to be done adding the hooks to handle
-players becoming invalid before its multiplayer safe so here be dragons.
+### Important Notes
+**This mod is currently beta.**  This mod should be mostly stable, though there is the possibility of it
+causing a crash.  Bug reports via [github.com](https://github.com/leehuk/factorio-tnfp/) are preferred,
+with the crash log and version information about both factorio and the mod.
+
+Multiplayer mode should work without any major issues, though has not been tested.
 
 ### Features
-* Build and designate a TNfP network via a simple combinator signal.
+* Build and designate a TNfP network via a single combinator signal.
 * Dispatch personal trains to any train stop nearby.
 * Dispatch either via an input hotkey or the shortcut bar.
 * Station selection dialog when you board a train to take you onward.
@@ -30,18 +31,27 @@ players becoming invalid before its multiplayer safe so here be dragons.
 
 ![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-combinator.jpg)
 
-Once you connect the combinator the train stop becomes a TNfP Station.  Any train with a TNfP Station anywhere in its schedule
-then becomes a TNfP Train and available for dispatch.
+Once you connect the combinator the train stop becomes a TNfP Station.  If a train has a TNfP Station
+anywhere in its schedule then it becomes a TNfP Train and available for dispatch.
 
 ### Dispatching Trains
 
 Trains can be dispatched either via the default hotkey (ALT-P) or via the shortcut bar.
 ![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-shortcutbar.jpg)
 
+When dispatching trains, TNfP will prioritise as follows:
+1. A TNfP train the player is currently in.
+1. A TNfP train stop with an unallocated train already waiting.
+1. A TNfP train stop.
+1. A standard train stop, if it is not blocked by another train.
+
+If TNfP needs to dispatch a train to a player, it will dispatch the closest valid and unallocated train
+based on straight line distance.
+
 Once the train arrives and you board, it can optionally display a station selection dialog.
 
 ![TNfP Station Select](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-stationselect.jpg)
 
 ## Roadmap
-For now the focus is ensuring the mods stable and working on multiplayer support.  Feature wise, the focus
-is on ensuring flexibility around TNfP and how its used.
+For now the focus is ensuring the mods stable and deciding how to handle a status query when a request is in
+progress (i.e. pressing the shortcut again), before potentially looking at dynamically creating temporary stops.

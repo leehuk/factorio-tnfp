@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.0
+Date: 2019-06-01
+  Changes:
+    - TNfP is now beta rather than experimental.
+    - Add support for requesting a train when already on a TNfP train which will then skip straight
+      to redispatching.
+    - Improve validity and error checking, particularly around driving state, stations and train
+      statuses.
+    - Initial multiplayer support.  We will now periodically clear requests for trains and players
+      that become invalid, as well as avoid double dispatching trains or trains with passengers.
+    - Add some additional log messages to make errors and completion clearer.
+---------------------------------------------------------------------------------------------------
 Version: 0.2.0
 Date: 2019-05-30
   Changes:
