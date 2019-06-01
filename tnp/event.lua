@@ -77,10 +77,15 @@ function tnp_handle_request(event, shortcut)
 
             if tnp_train_check(player, train) then
                 local status = tnp_state_train_get(train, 'status')
+                local train_player = tnp_state_train_get(train, 'player')
 
-                -- This is a special case, where a train has already been redispatched and we're waiting for the
-                -- player to disembark.  We need to reset the schedule before we reassign.
-                if status and status == tnpdefines.train.status.rearrived then
+                if train_player and (not train_player.valid or train_player.index ~= player.index) then
+                    -- Special case where the train the players on now was assigned to another player.  This player wins.
+                    tnp_train_enact(train, true, nil, false, nil)
+                    tnp_action_request_cancel(train_player, train, {"tnp_train_cancelled_stolen", player.name})
+                elseif status and status == tnpdefines.train.status.rearrived then
+                    -- Another special case where the train has already been redispatched and we're waiting for the
+                    -- player to disembark.  We need to reset the schedule before we reassign.
                     tnp_train_enact(train, true, nil, false, nil)
                 end
 
@@ -131,6 +136,17 @@ function tnp_handle_player_vehicle(event)
 
     -- This player doesnt have a request outstanding
     if not tnp_state_player_query(player) then
+        -- Check whether they've stolen a tnp assigned train
+        if event.entity and event.entity.train and tnp_state_train_query(event.entity.train) then
+            local train = event.entity.train
+            local train_player = tnp_state_train_get(train, 'player')
+
+            if train_player and (not train_player.valid or train_player.index ~= player.index) then
+                tnp_train_enact(train, true, nil, nil, nil)
+                tnp_action_request_cancel(train_player, train, {"tnp_train_cancelled_stolen", player.name})
+            end
+        end
+
         return
     end
 
