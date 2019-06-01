@@ -110,6 +110,9 @@ end
 -- tnp_action_train_rearrival()
 --   Partially fulfils a tnp request, marking a train as successfully arrived after redispatch.
 function tnp_action_train_rearrival(player, train)
+    -- From the players perspective the request is now complete so we need to cancel that side,
+    -- but we must leave the train active as we cant reset its schedule until the player disembarks.
+    tnp_action_request_cancel(player, nil, {"tnp_train_arrived"})
     tnp_state_train_set(train, 'status', tnpdefines.train.status.rearrived)
 end
 

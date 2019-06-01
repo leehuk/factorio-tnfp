@@ -124,7 +124,8 @@ function tnp_handle_player_vehicle(event)
             tnp_gui_stationlist_close(player)
         end
 
-        -- Check if we were redispatching for this player
+        -- Check if we were redispatching for this player.  We dont need to handle a rearrival situation
+        -- here, as thats covered by the trains wait condition of no passenger present.
         local train = tnp_state_player_get(player, 'train')
         if train and train.valid then
             local status = tnp_state_train_get(train, 'status')
