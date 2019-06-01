@@ -73,6 +73,12 @@ function tnp_train_find(player, target)
             break
         end
 
+        -- Do not schedule trains assigned to other players
+        local scheduled_player = tnp_state_train_get(tnp_cand, 'player')
+        if scheduled_player and (not scheduled_player.valid or scheduled_player.index ~= player.index) then
+            break
+        end
+
         distance = Position.distance(target.position, tnp_cand.front_rail.position)
         if tnp_train and distance >= tnp_train_distance then
             break
