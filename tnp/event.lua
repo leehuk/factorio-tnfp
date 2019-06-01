@@ -99,8 +99,10 @@ function tnp_handle_request(event, shortcut)
                 tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_nontnp"})
             end
         else
-            tnp_action_request_create(player)
-            player.set_shortcut_toggled('tnp-handle-request', true)
+            local result = tnp_action_request_create(player)
+            if result then
+                player.set_shortcut_toggled('tnp-handle-request', true)
+            end
         end
     end
 end

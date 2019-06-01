@@ -50,16 +50,20 @@ function tnp_action_request_create(player)
         local train = target.get_stopped_train()
         if train and train.valid then
             tnp_action_train_assign(player, target, train)
-            return
+            return true
         end
 
         local train = tnp_train_find(player, target)
         if not train then
             tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_invalid"})
-            return
+            return false
         end
 
         tnp_action_train_dispatch(player, target, train)
+        return true
+    else
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
+        return false
     end
 end
 

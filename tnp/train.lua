@@ -59,10 +59,10 @@ function tnp_train_find(player, target)
     local tnp_trains = tnp_train_getall(player)
 
     if #tnp_trains == 0 then
-        return
+        return nil
     end
 
-    local tnp_train
+    local tnp_train = nil
     local tnp_train_distance = 0
 
     repeat
