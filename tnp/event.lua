@@ -22,17 +22,9 @@ function tnp_handle_gui_click(event)
     end
 
     if event.element.name == "tnp-stationlist-headingbuttonclose" then
-        tnp_gui_stationlist_close(player)
+        tnp_action_stationselect_cancel(player)
     elseif string.find(event.element.name, "tnp-stationlist-dest", 1, true) ~= nil then
-        -- Pull state information *before* we trash it
-        local station = tnp_state_gui_get(event.element, player, 'station')
-
-        tnp_gui_stationlist_close(player)
-
-        -- Validate the player is on a train
-        if station and player.vehicle and player.vehicle.train and player.vehicle.train.valid then
-            tnp_action_train_redispatch(player, station, player.vehicle.train)
-        end
+        tnp_action_stationselect_redispatch(player, event.element)
     end
 end
 

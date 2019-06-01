@@ -67,6 +67,39 @@ end
 function tnp_action_request_status(player, train)
 end
 
+-- tnp_action_stationselect_cancel()
+--   Actions the stationselect dialog being cancelled
+function tnp_action_stationselect_cancel(player)
+    local train = tnp_state_player_get(player, 'train')
+
+    tnp_gui_stationlist_close(player)
+
+    -- We're still tracking a request at this point we need to cancel, though theres no
+    -- schedule to amend.
+    tnp_action_request_cancel(player, train, nil)
+end
+
+-- tnp_action_stationselect_redispatch()
+--   Actions a stationselect request to redispatch
+function tnp_action_stationselect_redispatch(player, gui)
+    local station = tnp_state_gui_get(gui, player, 'station')
+    local train = tnp_state_player_get(player, 'train')
+
+    tnp_gui_stationlist_close(player)
+
+    if not station or not station.valid then
+        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
+        return
+    end
+
+    -- Lets just revalidate the player is on a valid train
+    if not player.vehicle or not player.vehicle.train or not player.vehicle.train.valid then
+        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+    end
+
+    tnp_action_train_redispatch(player, station, player.vehicle.train)
+end
+
 -- tnp_action_train_arrival()
 --   Partially fulfils a tnp request, marking a train as successfully arrived.
 function tnp_action_train_arrival(player, train)
