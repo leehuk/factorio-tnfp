@@ -31,7 +31,23 @@ end
 -- tnp_handle_input()
 --   Handles a request via the custom input
 function tnp_handle_input(event)
-    tnp_handle_request(event, false)
+    if event.input_name == "tnp-handle-request" then
+        tnp_handle_request(event, false)
+    elseif event.input_name == "tnp-handle-railtool" then
+        tnp_handle_railtool(event, false)
+    end
+end
+
+-- tnp_handle_railtool()
+--   Handles a request to provide a railtool
+function tnp_handle_railtool(event, shortcut)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    tnp_action_railtool(player)
 end
 
 -- tnp_handle_request()
@@ -84,6 +100,8 @@ end
 function tnp_handle_shortcut(event)
     if event.prototype_name == "tnp-handle-request" then
         tnp_handle_request(event, true)
+    elseif event.prototype_name == "tnp-handle-railtool" then
+        tnp_handle_railtool(event, true)
     end
 end
 

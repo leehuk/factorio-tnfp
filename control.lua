@@ -44,4 +44,5 @@ script.on_event(defines.events.on_train_schedule_changed, tnp_handle_train_sched
 script.on_event(defines.events.on_player_selected_area, tnp_handle_selectiontool)
 
 -- Input Handling
+script.on_event("tnp-handle-railtool", tnp_handle_input)
 script.on_event("tnp-handle-request", tnp_handle_input)

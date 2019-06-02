@@ -1,3 +1,8 @@
+-- tnp_action_railtool()
+--   Provides the given player with a railtool
+function tnp_action_railtool(player)
+end
+
 -- tnp_action_player_board()
 --  Handles actions from a player boarding a requested tnp train.
 function tnp_action_player_board(player, train)
