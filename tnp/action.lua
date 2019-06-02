@@ -1,38 +1,3 @@
--- tnp_action_railtool()
---   Provides the given player with a railtool
-function tnp_action_railtool(player)
-    -- Player already has a railtool in hand.
-    if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
-        return
-    end
-
-    if not player.clean_cursor() then
-        tpn_message_flytext(player, player.position, {"tnp_railtool_error_clear"})
-        return
-    end
-
-    -- If the player has a railtool in their inventory, throw that one away
-    local inventory = player.get_main_inventory()
-    if inventory then
-        local railtool = inventory.find_item_stack("tnp-railtool")
-        if railtool then
-            if not player.cursor_stack.swap_stack(railtool) then
-                tnp_message_flytext(player, player.position, {"tnp_railtool_error_swap"})
-            end
-
-            return
-        end
-    end
-
-	local result = player.cursor_stack.set_stack({
-        name = "tnp-railtool",
-        count = 1
-    })
-    if not result then
-        tnp_message_flytext(player, player.position, {"tnp_railtool_error_provide"})
-    end
-end
-
 -- tnp_action_player_board()
 --  Handles actions from a player boarding a requested tnp train.
 function tnp_action_player_board(player, train)
@@ -95,6 +60,11 @@ function tnp_action_player_request_boarded(player, train)
     tnp_action_player_board(player, train)
 end
 
+-- tnp_action_player_railtool()
+--   Actions an area selection
+function tnp_action_player_railtool(player, entities)
+end
+
 -- tnp_action_player_vehicle()
 --   Handles actions from a player entering/exiting a vehicle
 function tnp_action_player_vehicle(player, vehicle)
@@ -154,9 +124,39 @@ function tnp_action_player_vehicle(player, vehicle)
     end
 end
 
--- tnp_action_selectiontool()
---   Actions an area selection
-function tnp_action_selectiontool(player, entities)
+-- tnp_action_railtool()
+--   Provides the given player with a railtool
+function tnp_action_railtool(player)
+    -- Player already has a railtool in hand.
+    if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
+        return
+    end
+
+    if not player.clean_cursor() then
+        tpn_message_flytext(player, player.position, {"tnp_railtool_error_clear"})
+        return
+    end
+
+    -- If the player has a railtool in their inventory, throw that one away
+    local inventory = player.get_main_inventory()
+    if inventory then
+        local railtool = inventory.find_item_stack("tnp-railtool")
+        if railtool then
+            if not player.cursor_stack.swap_stack(railtool) then
+                tnp_message_flytext(player, player.position, {"tnp_railtool_error_swap"})
+            end
+
+            return
+        end
+    end
+
+	local result = player.cursor_stack.set_stack({
+        name = "tnp-railtool",
+        count = 1
+    })
+    if not result then
+        tnp_message_flytext(player, player.position, {"tnp_railtool_error_provide"})
+    end
 end
 
 -- tnp_action_stationselect_cancel()

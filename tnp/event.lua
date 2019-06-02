@@ -99,7 +99,7 @@ function tnp_handle_selectiontool(event)
     end
 
     if event.item == "tnp-railtool" then
-        tnp_action_selectiontool(player, event.entities)
+        tnp_action_player_railtool(player, event.entities)
     end
 end
 
