@@ -9,8 +9,8 @@ This mod can be safely added and removed to a new or existing playthrough.
 
 ### Important Notes
 **This mod is currently beta.**  This mod should be mostly stable, though there is the possibility of it
-causing a crash.  Bug reports via [github.com](https://github.com/leehuk/factorio-tnfp/) are preferred,
-with the crash log and version information about both factorio and the mod.
+causing a crash.  Bug reports via [github.com](https://github.com/leehuk/factorio-tnfp/) are preferred or
+via the forum.  Please include the crash log and version information about both factorio and the mod.
 
 Multiplayer mode should work without any major issues, though has not been tested.
 
@@ -54,4 +54,4 @@ Once the train arrives and you board, it can optionally display a station select
 
 ## Roadmap
 For now the focus is ensuring the mods stable and deciding how to handle a status query when a request is in
-progress (i.e. pressing the shortcut again), before potentially looking at dynamically creating temporary stops.
+progress (i.e. pressing the hotkey again), before potentially looking at dynamically creating temporary stops.
