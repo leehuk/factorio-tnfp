@@ -4,6 +4,7 @@ Table = require('__stdlib__/stdlib/utils/table')
 tnpdefines = {}
 
 require('tnp/action')
+require('tnp/draw')
 require('tnp/event')
 require('tnp/direction')
 require('tnp/gui')
