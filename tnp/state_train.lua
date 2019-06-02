@@ -39,7 +39,7 @@ function _tnp_state_train_prune()
         elseif not data.train.valid then
             -- The train we were tracking is invalid, but we still have a player reference.  Notify them
             if data.player and data.player.valid then
-                tnp_action_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
+                tnp_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
             end
 
             global.train_data[id] = nil

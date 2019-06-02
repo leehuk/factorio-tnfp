@@ -1,24 +1,3 @@
--- tnp_action_request_cancel()
---   Completes a tnp request and removes all state tracking
-function tnp_action_request_cancel(player, train, message)
-    if player then
-        if player.valid then
-            player.set_shortcut_toggled('tnp-handle-request', false)
-            tnp_gui_stationlist_close(player)
-
-            if message then
-                tnp_message(tnpdefines.loglevel.standard, player, message)
-            end
-        end
-
-        tnp_state_player_delete(player, 'train')
-    end
-
-    if train then
-        tnp_state_train_delete(train, false)
-    end
-end
-
 -- tnp_action_request_board()
 --  Handles actions from a player boarding a requested tnp train.
 function tnp_action_request_board(player, train)
@@ -33,7 +12,7 @@ function tnp_action_request_board(player, train)
     if config['tnp-train-boarding-behaviour'].value == 'manual' then
         -- Force the train into manual mode, request is then fully complete.
         tnp_train_enact(train, true, nil, true, nil)
-        tnp_action_request_cancel(player, train, nil)
+        tnp_request_cancel(player, train, nil)
     elseif config['tnp-train-boarding-behaviour'].value == 'stationselect' then
         -- Force the train into manual mode then display station select
         tnp_train_enact(train, true, nil, true, nil)
@@ -54,7 +33,7 @@ function tnp_action_request_create(player)
                 tnp_draw_path(player, target)
             end
 
-            tnp_action_train_assign(player, target, train)
+            tnp_request_assign(player, target, train)
             return true
         end
 
@@ -67,7 +46,7 @@ function tnp_action_request_create(player)
         if config['tnp-train-arrival-path'].value then
             tnp_draw_path(player, target)
         end
-        tnp_action_train_dispatch(player, target, train)
+        tnp_request_dispatch(player, target, train)
         return true
     else
         tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
@@ -84,7 +63,7 @@ function tnp_action_stationselect_cancel(player)
 
     -- We're still tracking a request at this point we need to cancel, though theres no
     -- schedule to amend.
-    tnp_action_request_cancel(player, train, nil)
+    tnp_request_cancel(player, train, nil)
 end
 
 -- tnp_action_stationselect_redispatch()
@@ -96,20 +75,20 @@ function tnp_action_stationselect_redispatch(player, gui)
     tnp_gui_stationlist_close(player)
 
     if not station or not station.valid then
-        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
         return
     end
 
     if not train or not train.valid then
-        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalid"})
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_invalid"})
     end
 
     -- Lets just revalidate the player is on a valid train
     if not player.vehicle or not player.vehicle.train or not player.vehicle.train.valid then
-        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
     end
 
-    tnp_action_train_redispatch(player, station, player.vehicle.train)
+    tnp_request_redispatch(player, station, player.vehicle.train)
 end
 
 -- tnp_action_train_arrival()
@@ -124,96 +103,8 @@ end
 function tnp_action_train_rearrival(player, train)
     -- From the players perspective the request is now complete so we need to cancel that side,
     -- but we must leave the train active as we cant reset its schedule until the player disembarks.
-    tnp_action_request_cancel(player, nil, {"tnp_train_arrived"})
+    tnp_request_cancel(player, nil, {"tnp_train_arrived"})
     tnp_state_train_set(train, 'status', tnpdefines.train.status.rearrived)
-end
-
--- tnp_action_train_assign()
---   Assigns a parked train to a player
-function tnp_action_train_assign(player, target, train)
-    local config = settings.get_player_settings(player)
-
-    tnp_state_train_set(train, 'player', player)
-    tnp_state_player_set(player, 'train', train)
-
-    tnp_state_train_set(train, 'station', target)
-    tnp_action_train_arrival(player, train)
-
-    if target then
-        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
-    end
-end
-
--- tnp_action_train_dispatch()
---   Dispatches a train
-function tnp_action_train_dispatch(player, target, train)
-    local config = settings.get_player_settings(player)
-
-    tnp_state_train_set(train, 'player', player)
-    tnp_state_player_set(player, 'train', train)
-
-    tnp_state_train_set(train, 'station', target)
-    tnp_state_train_set(train, 'status', tnpdefines.train.status.dispatching)
-    tnp_state_train_set(train, 'timeout', config['tnp-train-arrival-timeout'].value)
-    tnp_train_info_save(train)
-
-    local schedule = tnp_train_schedule_copy(train)
-    local schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
-
-    if schedule_found == false then
-        table.insert(schedule.records, {
-            station = target.backer_name,
-            wait_conditions = {
-                {
-                    type="time",
-                    compare_type = "or",
-                    ticks = config['tnp-train-boarding-timeout'].value*60
-                }
-            }
-        })
-
-        schedule.current = #schedule.records
-    else
-        schedule.current = schedule_found
-    end
-
-    tnp_train_enact(train, false, schedule, nil, false)
-
-    tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", target.backer_name})
-end
-
--- tnp_action_train_redispatch()
---   Actions an redispatch for an onward journey
-function tnp_action_train_redispatch(player, target, train)
-    local config = settings.get_player_settings(player)
-
-    tnp_state_train_set(train, 'player', player)
-    tnp_state_player_set(player, 'train', train)
-
-    tnp_state_train_set(train, 'station', target)
-    tnp_state_train_set(train, 'status', tnpdefines.train.status.redispatched)
-    tnp_train_info_save(train)
-
-    local schedule = tnp_train_schedule_copy(train)
-    local schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
-
-    if schedule_found == false then
-        table.insert(schedule.records, {
-            station = target.backer_name,
-            wait_conditions = {
-                {
-                    type="passenger_not_present",
-                    compare_type = "or"
-                }
-            }
-        })
-
-        schedule.current = #schedule.records
-    else
-        schedule.current = schedule_found
-    end
-
-    tnp_train_enact(train, false, schedule, nil, false)
 end
 
 -- tnp_action_train_schedulechange()
@@ -222,7 +113,7 @@ function tnp_action_train_schedulechange(train, event_player)
     if event_player then
         -- The schedule was changed by a player, on a train we're dispatching.  We need to cancel this request
         local player = tnp_state_train_get(train, 'player')
-        tnp_action_request_cancel(player, train, {"tnp_train_cancelled_schedulechange", event_player.name})
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_schedulechange", event_player.name})
     else
         -- This is likely a schedule change we've made.  Check if we're expecting one.
         local expect = tnp_state_train_get(train, 'expect_schedulechange')
@@ -236,6 +127,7 @@ function tnp_action_train_schedulechange(train, event_player)
         -- !!!: TODO
     end
 end
+
 -- tnp_action_train_statechange()
 --   Performs any checks and actions required when a trains state is changed.
 function tnp_action_train_statechange(train)
@@ -243,7 +135,7 @@ function tnp_action_train_statechange(train)
     local status = tnp_state_train_get(train, 'status')
 
     if not player or not player.valid then
-        tnp_action_request_cancel(player, train, nil)
+        tnp_request_cancel(player, train, nil)
         return
     end
 
@@ -262,14 +154,14 @@ function tnp_action_train_statechange(train)
             -- Train has now departed after arrival.  This could be a timeout, or someone has manually
             -- moved it to another station without changing the schedule.
             tnp_train_enact(train, true, nil, nil, nil)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_left"})
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_left"})
 
         elseif status == tnpdefines.train.status.rearrived then
             -- Train has now departed after rearrival.  The passenger has either disembarked, or someone
             -- moved it to another station without changing the schedule.  Either way we just reset
             -- the schedule.
             tnp_train_enact(train, true, nil, nil, nil)
-            tnp_action_request_cancel(player, train, nil)
+            tnp_request_cancel(player, train, nil)
         end
 
         -- elseif train.state == defines.train_state.path_lost then
@@ -282,16 +174,16 @@ function tnp_action_train_statechange(train)
         -- If we're actively dispatching the train, we need to cancel it and restore its original schedule.
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             tnp_train_enact(train, true, nil, nil, false)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
 
         -- Train has no path, but we need to restore the schedule anyway.
         elseif status == tnpdefines.train.status.arrived then
             tnp_train_enact(train, true, nil, nil, nil)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_timeout_boarding"})
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_timeout_boarding"})
 
         elseif status == tnpdefines.train.status.redispatched then
             tnp_train_enact(train, true, nil, nil, nil)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
         end
         -- elseif train.state == defines.train_state.arrive_signal
         -- Train has arrived at a signal.
@@ -313,7 +205,7 @@ function tnp_action_train_statechange(train)
             -- The station we were dispatching to is no longer valid
             if not station or not station.valid then
                 tnp_train_enact(train, true, nil, nil, nil)
-                tnp_action_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
+                tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
                 return
             end
 
@@ -321,7 +213,7 @@ function tnp_action_train_statechange(train)
             local station_train = station.get_stopped_train()
             if not station_train or not station_train.valid or not station_train.id == train.id then
                 tnp_train_enact(train, true, nil, nil, false)
-                tnp_action_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
+                tnp_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
                 return
             end
 
@@ -350,12 +242,12 @@ function tnp_action_train_statechange(train)
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched or status == tnpdefines.train.status.redispatched then
             -- If we're dispatching the train, we need to cancel the request and restore its original schedule
             tnp_train_enact(train, true, nil, nil, nil)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_manual"})
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_manual"})
 
         elseif status == tnpdefines.train.status.arrived then
             -- Train had arrived, but we still need to restore the schedule.
             tnp_train_enact(train, true, nil, nil, nil)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_manual"})
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_manual"})
         end
     end
 end
@@ -375,7 +267,7 @@ function tnp_action_timeout()
 
         if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             tnp_train_enact(train, true, nil, nil, false)
-            tnp_action_request_cancel(player, train, {"tnp_train_cancelled_timeout_arrival"})
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_timeout_arrival"})
         end
     end
 end
