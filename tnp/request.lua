@@ -29,6 +29,35 @@ function tnp_request_cancel(player, train, message)
     end
 end
 
+-- tnp_request_create()
+--   Attempts to create a new request for a tnp train
+function tnp_request_create(player, target)
+    local config = settings.get_player_settings(player)
+
+    local train = target.get_stopped_train()
+    if train and train.valid then
+        if config['tnp-train-arrival-path'].value then
+            tnp_draw_path(player, target)
+        end
+
+        tnp_request_assign(player, target, train)
+        return true
+    end
+
+    local train = tnp_train_find(player, target)
+    if not train then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_invalid"})
+        return false
+    end
+
+    if config['tnp-train-arrival-path'].value then
+        tnp_draw_path(player, target)
+    end
+
+    tnp_request_dispatch(player, target, train)
+    return true
+end
+
 -- tnp_request_dispatch()
 --   Dispatches a train
 function tnp_request_dispatch(player, target, train)
@@ -102,4 +131,6 @@ function tnp_request_setup(player, target, train, status)
 
     tnp_state_train_set(train, 'status', status)
     tnp_train_info_save(train)
+
+    player.set_shortcut_toggled('tnp-handle-request', true)
 end
