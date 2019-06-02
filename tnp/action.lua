@@ -120,11 +120,6 @@ function tnp_action_request_create(player)
     end
 end
 
--- tnp_action_request_status()
---   Shows the status of a tnp request
-function tnp_action_request_status(player, train)
-end
-
 -- tnp_action_stationselect_cancel()
 --   Actions the stationselect dialog being cancelled
 function tnp_action_stationselect_cancel(player)
