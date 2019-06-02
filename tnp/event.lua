@@ -65,6 +65,20 @@ function tnp_handle_request(event, shortcut)
     end
 end
 
+-- tnp_handle_selectiontool()
+--   Handles a selection tool being used
+function tnp_handle_selectiontool(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    if event.item == "tnp-railtool" then
+        tnp_action_selectiontool(player, event.entities)
+    end
+end
+
 -- tnp_handle_shortcut()
 --   Handles a shortcut being pressed
 function tnp_handle_shortcut(event)

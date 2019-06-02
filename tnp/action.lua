@@ -119,6 +119,11 @@ function tnp_action_player_vehicle(player, vehicle)
     end
 end
 
+-- tnp_action_selectiontool()
+--   Actions an area selection
+function tnp_action_selectiontool(player, entities)
+end
+
 -- tnp_action_stationselect_cancel()
 --   Actions the stationselect dialog being cancelled
 function tnp_action_stationselect_cancel(player)
