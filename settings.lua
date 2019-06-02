@@ -34,6 +34,13 @@ data:extend({
         maximum_value = 64
     },
     {
+        name = "tnp-train-arrival-path",
+        type = "bool-setting",
+        setting_type = "runtime-per-user",
+        order = "b[train]-a[arrival]-a[path]",
+        default_value = true
+    },
+    {
         name = "tnp-train-arrival-timeout",
         type = "int-setting",
         setting_type = "runtime-per-user",
