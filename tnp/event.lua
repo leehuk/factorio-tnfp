@@ -38,6 +38,14 @@ function tnp_handle_input(event)
     end
 end
 
+-- tnp_handle_player_dropped()
+--   Handles a player dropping an object
+function tnp_handle_player_droppeditem(event)
+    if event.entity and event.entity.stack and event.entity.stack.valid and event.entity.stack.valid_for_read and event.entity.stack.name == "tnp-railtool" then
+        event.entity.stack.clear()
+    end
+end
+
 -- tnp_handle_railtool()
 --   Handles a request to provide a railtool
 function tnp_handle_railtool(event, shortcut)

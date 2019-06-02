@@ -38,6 +38,7 @@ data:extend({
           },
           entity_filter_mode = "whitelist",
           alt_entity_filter_mode = "whitelist",
+          stackable = false,
           stack_size = 1,
           show_in_library = false
     }
