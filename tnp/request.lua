@@ -91,6 +91,52 @@ function tnp_request_dispatch(player, target, train)
     tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", target.backer_name})
 end
 
+-- tnp_request_railtooltest()
+--   Tests dispatching a train to a given location, looking for a path error.
+function tnp_request_railtooltest(player, target, train)
+    local config = settings.get_player_settings(player)
+
+    local redispatch = false
+    if player.vehicle and player.vehicle.train then
+        redispatch = true
+    end
+
+    tnp_request_setup(player, target, train, tnpdefines.train.status.railtooltest)
+    if redispatch then
+        tnp_state_train_set(train, 'dynamicstatus', tnpdefines.train.status.redispatched)
+    else
+        tnp_state_train_set(train, 'dynamicstatus', tnpdefines.train.status.dispatched)
+        tnp_state_train_set(train, 'timeout', config['tnp-train-arrival-timeout'].value)
+    end
+
+    local schedule = tnp_train_schedule_copy(train)
+    local wait_conditions
+
+    if redispatch then
+        wait_conditions = {
+            {
+                type="passenger_not_present",
+                compare_type = "or"
+            }
+        }
+    else
+        wait_conditions = {
+            {
+                type="time",
+                compare_type = "or",
+                ticks = config['tnp-train-boarding-timeout'].value*60
+            }
+        }
+    end
+
+    table.insert(schedule.records, {
+        station = target.backer_name,
+        wait_conditions = wait_conditions
+    })
+
+    schedule.current = #schedule.records
+    tnp_train_enact(train, false, schedule, nil, false)
+end
 
 -- tnp_request_redispatch()
 --   Redispatches a train for an onward journey

@@ -1,5 +1,6 @@
 --[[
     State Table:
+        dynamicstatus              = int, actual dispatching status
         expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
         expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
@@ -16,7 +17,8 @@ tnpdefines.train = {
         dispatched          = 2,
         arrived             = 3,
         redispatched        = 4,
-        rearrived           = 5
+        rearrived           = 5,
+        railtooltest        = 6
     }
 }
 
