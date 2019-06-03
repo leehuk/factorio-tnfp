@@ -53,7 +53,12 @@ function tnp_handle_request(event, shortcut)
         return
     end
 
-    tnp_action_player_request(player)
+    local train = tnp_state_player_get(player, 'train')
+    if train then
+        tnp_action_player_cancel(player, train)
+    else
+        tnp_action_player_request(player)
+    end
 end
 
 -- tnp_handle_shortcut()
