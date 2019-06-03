@@ -44,13 +44,6 @@ function tnp_action_player_request(player)
     end
 
     local train = player.vehicle.train
-
-    -- The player is on a non-tnp train.
-    if not tnp_train_check(player, train) then
-        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_nontnp"})
-        return
-    end
-
     local status = tnp_state_train_get(train, 'status')
     local train_player = tnp_state_train_get(train, 'player')
 
