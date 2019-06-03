@@ -87,18 +87,10 @@ function tnp_action_player_railtool(player, entities)
         target = valid_stops[1]
     end
 
-    if not target and #valid_rails > 0 then
-    end
-
-    if not target then
-        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
-        return
-    end
-
-    -- We're already handling a request, we need to cancel that to issue a new one.
+    -- Either way, we now need to know what train we're dispatching and cancel any current requests.
     local train = tnp_state_player_get(player, 'train')
     if train then
-        tnp_train_enact(train, true, nil, nil, false)
+        tnp_train_enact(train, true, nil, nil, nil)
         tnp_request_cancel(player, train, nil)
 
         -- Keep the same train providing its valid though
@@ -107,20 +99,38 @@ function tnp_action_player_railtool(player, entities)
         end
     end
 
-    -- The player isnt on a train so we need to create a clean request
-    if not player.vehicle or not player.vehicle.train then
-        -- We do however have a train that was dispatching towards them
-        if train then
-            tnp_request_dispatch(player, target, train)
-        else
-            tnp_request_create(player, target)
-        end
+    if player.vehicle and player.vehicle.train then
+        train = player.vehicle.train
+    elseif not train then
+        train = tnp_train_find(player, target)
+    end
 
+    if not train then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_invalid"})
+        return false
+    end
+
+    -- Ok, this gets messy.  We now need to test creating train stops and dispatching the train until
+    -- we find one that works.
+    if not target and #valid_rails > 0 then
+        local i = 1
+        repeat
+            target = tnp_dynamicstop_create(player, valid_rails[i], train)
+            i = i + 1
+        until i > #valid_rails or target
+    end
+
+    if not target then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
         return
     end
 
-    -- The player is on a train already, so lets just make this a redispatch
-    tnp_action_player_request_boarded(player, player.vehicle.train, target)
+    -- The player is on the train, this is a redispatch.
+    if player.vehicle and player.vehicle.train then
+        tnp_action_player_request_boarded(player, player.vehicle.train, target)
+    else
+        tnp_request_dispatch(player, target, train)
+    end
 end
 
 -- tnp_action_player_vehicle()

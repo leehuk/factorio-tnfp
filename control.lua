@@ -5,6 +5,7 @@ tnpdefines = {}
 
 require('tnp/action')
 require('tnp/draw')
+require('tnp/dynamicstop')
 require('tnp/event')
 require('tnp/direction')
 require('tnp/gui')
