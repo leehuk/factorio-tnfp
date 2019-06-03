@@ -30,20 +30,19 @@ end
 -- tnp_action_player_request()
 --   Actions a player requesting a train
 function tnp_action_player_request(player)
-    -- The player isnt on a train so we need to create a clean request
-    if not player.vehicle or not player.vehicle.train then
-        local target = tnp_stop_find(player)
+    local target = tnp_stop_find(player)
 
-        if not target then
-            tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
-            return
-        end
-
-        tnp_request_create(player, target)
+    if not target then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
         return
     end
 
-    local train = player.vehicle.train
+    tnp_request_create(player, target)
+end
+
+-- tnp_action_player_request_boarded()
+--   Actions a player request from onboard a train
+function tnp_action_player_request_boarded(player, train)
     local status = tnp_state_train_get(train, 'status')
     local train_player = tnp_state_train_get(train, 'player')
 

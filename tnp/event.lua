@@ -57,7 +57,11 @@ function tnp_handle_request(event, shortcut)
     if train then
         tnp_action_player_cancel(player, train)
     else
-        tnp_action_player_request(player)
+        if player.vehicle and player.vehicle.train then
+            tnp_action_player_request_boarded(player, player.vehicle.train)
+        else
+            tnp_action_player_request(player)
+        end
     end
 end
 
