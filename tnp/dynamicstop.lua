@@ -17,6 +17,10 @@ function tnp_dynamicstop_calculate(position, direction)
         return { x = position.x + 2, y = position.y }
     elseif direction == defines.direction.south then
         return { x = position.x -2, y = position.y }
+    elseif direction == defines.direction.east then
+        return { x = position.x, y = position.y - 2 }
+    elseif direction == defines.direction.west then
+        return { x = position.x, y = position.y + 2 }
     end
 end
 
@@ -44,11 +48,6 @@ function tnp_dynamicstop_create(player, rail, train)
     end
 end
 
--- tnp_dynamicstop_dispatch()
---   Dispatches the train to the given stop
-function tnp_dynamicstop_dispatch(player, station, train)
-end
-
 -- tnp_dynamicstop_place()
 --   Runs a check to confirm if a train stop can be placed.
 function tnp_dynamicstop_place(player, rail, direction)
@@ -66,6 +65,8 @@ function tnp_dynamicstop_place(player, rail, direction)
 
     local name = "zTNfP Temporary [" .. position.x .. "," .. position.y .. "]"
     station.backer_name = name
+
+    return station
 end
 
 -- tnp_dynamicstop_place_check()
