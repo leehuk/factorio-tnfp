@@ -84,9 +84,13 @@ function tnp_train_find(player, target)
             break
         end
 
-        distance = Position.distance(target.position, tnp_cand.front_rail.position)
-        if tnp_train and distance >= tnp_train_distance then
-            break
+        local distance = 0
+        -- If we dont know where we're dispatching to, accept the train choice will be random.
+        if target then
+            distance = Position.distance(target.position, tnp_cand.front_rail.position)
+            if tnp_train and distance >= tnp_train_distance then
+                break
+            end
         end
 
         tnp_train = tnp_cand
