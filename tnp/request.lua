@@ -131,11 +131,13 @@ function tnp_request_railtooltest(player, target, train)
 
     table.insert(schedule.records, {
         station = target.backer_name,
-        wait_conditions = wait_conditions
+        wait_conditions = wait_conditions,
+        temporary = true
     })
 
     schedule.current = #schedule.records
-    tnp_train_enact(train, false, schedule, nil, false)
+    -- We force the train into manual mode first, to ensure we generate an on-the-path status
+    tnp_train_enact(train, false, schedule, true, false)
 end
 
 -- tnp_request_redispatch()
