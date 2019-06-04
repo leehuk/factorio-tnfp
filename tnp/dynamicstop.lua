@@ -18,9 +18,9 @@ function tnp_dynamicstop_calculate(position, direction)
     elseif direction == defines.direction.south then
         return { x = position.x -2, y = position.y }
     elseif direction == defines.direction.east then
-        return { x = position.x, y = position.y - 2 }
-    elseif direction == defines.direction.west then
         return { x = position.x, y = position.y + 2 }
+    elseif direction == defines.direction.west then
+        return { x = position.x, y = position.y - 2 }
     end
 end
 
@@ -49,6 +49,21 @@ function tnp_dynamicstop_create(player, rail, train)
         return true
 
     elseif rail.direction == defines.direction.east or rail.direction == defines.direction.west then
+        local place_east = tnp_dynamicstop_place_check(player, rail, defines.direction.east)
+        local place_west = tnp_dynamicstop_place_check(player, rail, defines.direction.west)
+
+        if not place_east or not place_west then
+            return false
+        end
+
+        local station_east = tnp_dynamicstop_place(player, rail, defines.direction.east)
+        local station_west = tnp_dynamicstop_place(player, rail, defines.direction.west)
+
+        tnp_state_player_set(player, 'dynamicstop', station_east)
+        tnp_state_dynamicstop_set(station_east, 'altstop', station_west)
+        tnp_request_railtooltest(player, station_east, train)
+
+        return true
     else
         -- err what?
         return false
