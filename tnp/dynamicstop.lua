@@ -25,7 +25,7 @@ function tnp_dynamicstop_calculate(position, direction)
 end
 
 -- tnp_dynamicstop_create()
---   Attempts to create a trainstop against a rail.
+--   Create trainstops against either side of a rail, then dispatches to the first
 function tnp_dynamicstop_create(player, rail, train)
     if not rail or not rail.valid then
         return false
@@ -41,6 +41,13 @@ function tnp_dynamicstop_create(player, rail, train)
 
         local station_north = tnp_dynamicstop_place(player, rail, defines.direction.north)
         local station_south = tnp_dynamicstop_place(player, rail, defines.direction.south)
+
+        tnp_state_player_set(player, 'dynamicstop', station_north)
+        tnp_state_dynamicstop_set(station_north, 'altstop', station_south)
+        tnp_request_railtooltest(player, station_north, train)
+
+        return true
+
     elseif rail.direction == defines.direction.east or rail.direction == defines.direction.west then
     else
         -- err what?

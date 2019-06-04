@@ -110,26 +110,31 @@ function tnp_action_player_railtool(player, entities)
         return false
     end
 
-    -- Ok, this gets messy.  We now need to test creating train stops and dispatching the train until
-    -- we find one that works.
-    if not target and #valid_rails > 0 then
-        local i = 1
-        repeat
-            target = tnp_dynamicstop_create(player, valid_rails[i], train)
-            i = i + 1
-        until i > #valid_rails or target
-    end
+    if target then
+        -- The player is on the train, this is a redispatch.
+        if player.vehicle and player.vehicle.train then
+            tnp_action_player_request_boarded(player, player.vehicle.train, target)
+        else
+            tnp_request_dispatch(player, target, train)
+        end
 
-    if not target then
-        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
         return
     end
 
-    -- The player is on the train, this is a redispatch.
-    if player.vehicle and player.vehicle.train then
-        tnp_action_player_request_boarded(player, player.vehicle.train, target)
-    else
-        tnp_request_dispatch(player, target, train)
+    -- Ok, this gets messy.  We now need to test creating train stops until we can create a pair, then
+    -- trigger a dispatch and rely on events from there.
+    local complete = false
+    if #valid_rails > 0 then
+        local i = 1
+        repeat
+            complete = tnp_dynamicstop_create(player, valid_rails[i], train)
+            i = i + 1
+        until i > #valid_rails or complete
+    end
+
+    if not complete then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
+        return
     end
 end
 
@@ -335,6 +340,29 @@ function tnp_action_train_statechange(train)
             -- the schedule.
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, nil)
+
+        elseif status == tnpdefines.train.status.railtooltest then
+            -- The temporary station the railtool is dispatching to works.
+            local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
+            local dynamicstatus = tnp_state_train_get(train, 'dynamicstatus')
+
+            if not dynamicstop then
+                tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+                return
+            end
+
+            -- We have an alternate stop -- remove that
+            local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
+            if altstop then
+                if altstop.valid then
+                    altstop.destroy()
+                end
+
+                tnp_state_dynamicstop_delete(dynamicstop, 'altstop')
+            end
+
+            tnp_state_train_set(train, 'status', dynamicstatus)
+            tnp_state_train_delete(train, 'dynamicstatus')
         end
 
         -- elseif train.state == defines.train_state.path_lost then
@@ -357,6 +385,31 @@ function tnp_action_train_statechange(train)
         elseif status == tnpdefines.train.status.redispatched then
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
+
+        elseif status == tnpdefines.train.status.railtooltest then
+            -- We were attempting to dispatch to a dynamic stop and that failed.  If we have an alternate, try that.
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_state_train_delete(train, 'timeout')
+
+            local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
+            local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
+
+            if not dynamicstop then
+                tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+                return
+            end
+
+            tnp_state_dynamicstop_delete(dynamicstop)
+            dynamicstop.destroy()
+
+            if not altstop then
+                tnp_request_cancel(player, train, {"tnp_train_cancelled_nolocation"})
+                return
+            end
+
+            tnp_state_player_set(player, 'dynamicstop', altstop)
+            tnp_state_dynamicstop_set(altstop, 'altstop', nil)
+            tnp_request_railtooltest(player, altstop, train)
         end
         -- elseif train.state == defines.train_state.arrive_signal
         -- Train has arrived at a signal.
@@ -396,6 +449,18 @@ function tnp_action_train_statechange(train)
         elseif status == tnpdefines.train.status.redispatched then
             -- This was an redispatch station -- so wait for the passenger to disembark
             tnp_action_train_rearrival(player, train)
+
+        elseif status == tnpdefines.train.status.railtooltest then
+            -- This was a railtool test we didnt get a status update about (?)
+            -- For now, correct the status and re-fire the event.
+            local dynamicstatus = tnp_state_train_get(train, 'dynamicstatus')
+            if not dynamicstatus then
+                -- !!! error??
+                return
+            end
+
+            tnp_state_train_set(train, 'status', dynamicstatus)
+            tnp_action_train_statechange(train)
         end
 
     elseif train.state == defines.train_state.manual_control_stop or train.state == defines.train_state.manual_control then
