@@ -1,5 +1,6 @@
 --[[
 State Table:
+    dynamicstop = LuaElement, dynamic stop we're tracking
     gui         = LuaGuiElement, root gui element we're tracking
     player      = LuaPlayer
     train       = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
@@ -22,23 +23,19 @@ function _tnp_state_player_prune()
         elseif not data.player or not data.player.valid then
             global.player_data[id] = nil
         else
-            if data.train and data.gui then
-                if not data.train.valid and not data.gui.valid then
-                    global.player_data[id] = nil
-                elseif not data.train.valid then
-                    global.player_data[id]['train'] = nil
-                elseif not data.gui.valid then
-                    global.player_data[id]['gui'] = nil
-                end
-            elseif data.train then
-                if not data.train.valid then
-                    global.player_data[id] = nil
-                end
-            elseif data.gui then
-                if not data.gui.valid then
-                    global.player_data[id] = nil
-                end
-            else
+            if data.dynamicstop and not data.dynamicstop.valid then
+                global.player_data[id]['dynamicstop'] = nil
+            end
+
+            if data.train and not data.train.valid then
+                global.player_data[id]['train'] = nil
+            end
+
+            if data.gui and not data.gui.valid then
+                global.player_data[id]['gui'] = nil
+            end
+
+            if not global.player_data[id]['dynamicstop'] and not global.player_data[id]['train'] and not global.player_data[id]['gui'] then
                 global.player_data[id] = nil
             end
         end
