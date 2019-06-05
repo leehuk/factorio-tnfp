@@ -363,6 +363,10 @@ function tnp_action_train_statechange(train)
 
             tnp_state_train_set(train, 'status', dynamicstatus)
             tnp_state_train_delete(train, 'dynamicstatus')
+
+            if dynamicstatus == tnpdefines.train.status.dispatched then
+                tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", dynamicstop.backer_name})
+            end
         end
 
         -- elseif train.state == defines.train_state.path_lost then
