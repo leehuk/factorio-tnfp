@@ -2,6 +2,7 @@
     State Table:
         altstop         - LuaEntity, alternate stop we're tracking
         dynamicstop     - LuaEntity, dynamic stop we're tracking
+        player          - LuaPlayer, player we're tracking the request for
 ]]
 
 function _tnp_state_dynamicstop_prune()
@@ -15,6 +16,17 @@ function _tnp_state_dynamicstop_prune()
         count = count + 1
 
         if not ent.dynamicstop.valid then
+            global.dynamicstop_data[id] = nil
+        elseif not ent.player.valid then
+            -- The player has become invalid, destroy all the stops we were tracking 
+            -- and the train pruning will restore the schedule
+            if ent.dynamicstop.valid then
+                ent.dynamicstop.destroy()
+            end
+            if ent.altstop.valid then
+                ent.altstop.destroy()
+            end
+
             global.dynamicstop_data[id] = nil
         end
     end

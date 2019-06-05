@@ -412,6 +412,7 @@ function tnp_action_train_statechange(train)
             end
 
             tnp_state_player_set(player, 'dynamicstop', altstop)
+            tnp_state_dynamicstop_set(altstop, 'player', player)
             tnp_state_dynamicstop_set(altstop, 'altstop', nil)
             tnp_request_railtooltest(player, altstop, train)
         end
