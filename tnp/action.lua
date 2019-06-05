@@ -33,7 +33,7 @@ function tnp_action_player_request(player)
     local target = tnp_stop_find(player)
 
     if not target then
-        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_notrainstop"})
         return
     end
 
@@ -291,7 +291,11 @@ function tnp_action_train_schedulechange(train, event_player)
     if event_player then
         -- The schedule was changed by a player, on a train we're dispatching.  We need to cancel this request
         local player = tnp_state_train_get(train, 'player')
-        tnp_request_cancel(player, train, {"tnp_train_cancelled_schedulechange", event_player.name})
+        local status = tnp_state_train_get(train, 'status')
+
+        if status ~= tnpdefines.train.status.rearrived then
+            tnp_request_cancel(player, train, {"tnp_train_cancelled_schedulechange", event_player.name})
+        end
     else
         -- This is likely a schedule change we've made.  Check if we're expecting one.
         local expect = tnp_state_train_get(train, 'expect_schedulechange')
@@ -363,6 +367,7 @@ function tnp_action_train_statechange(train)
 
             tnp_state_train_set(train, 'status', dynamicstatus)
             tnp_state_train_delete(train, 'dynamicstatus')
+            tnp_state_train_delete(train, 'expect_manualmode')
 
             if dynamicstatus == tnpdefines.train.status.dispatched then
                 tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", dynamicstop.backer_name})

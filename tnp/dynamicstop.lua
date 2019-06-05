@@ -75,8 +75,14 @@ end
 -- tnp_dynamicstop_destroy()
 --   Destroys a dynamic stop
 function tnp_dynamicstop_destroy(player, dynamicstop)
+    local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
+
     if dynamicstop and dynamicstop.valid then
         dynamicstop.destroy()
+    end
+
+    if altstop and altstop.valid then
+        altstop.destroy()
     end
 
     tnp_state_dynamicstop_delete(dynamicstop)
@@ -91,7 +97,12 @@ function tnp_dynamicstop_place(player, rail, direction)
         name = "train-stop",
         position = position,
         direction = direction,
-        force = player.force
+        force = player.force,
+        color = {
+            r = 255,
+            g = 255,
+            b = 255
+        }
     })
 
     if not station or not station.valid then
