@@ -70,6 +70,17 @@ function tnp_dynamicstop_create(player, rail, train)
     end
 end
 
+-- tnp_dynamicstop_destroy()
+--   Destroys a dynamic stop
+function tnp_dynamicstop_destroy(player, dynamicstop)
+    if dynamicstop and dynamicstop.valid then
+        dynamicstop.destroy()
+    end
+
+    tnp_state_dynamicstop_delete(dynamicstop)
+    tnp_state_player_delete(player, 'dynamicstop')
+end
+
 -- tnp_dynamicstop_place()
 --   Runs a check to confirm if a train stop can be placed.
 function tnp_dynamicstop_place(player, rail, direction)
@@ -85,7 +96,7 @@ function tnp_dynamicstop_place(player, rail, direction)
         return false
     end
 
-    local name = "zTNfP Temporary [" .. position.x .. "," .. position.y .. "]"
+    local name = "TNfP Temporary [" .. position.x .. "," .. position.y .. "]"
     station.backer_name = name
 
     return station

@@ -21,6 +21,11 @@ function tnp_request_cancel(player, train, message)
             end
         end
 
+        local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
+        if dynamicstop then
+            tnp_dynamicstop_destroy(player, dynamicstop)
+        end
+
         tnp_state_player_delete(player, 'train')
     end
 
