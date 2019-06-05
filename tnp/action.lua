@@ -272,6 +272,11 @@ end
 -- tnp_action_train_arrival()
 --   Partially fulfils a tnp request, marking a train as successfully arrived.
 function tnp_action_train_arrival(player, train)
+    local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
+    if dynamicstop then
+        tnp_dynamicstop_destroy(player, dynamicstop)
+    end
+
     tnp_state_train_delete(train, 'timeout')
     tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
 end
@@ -513,7 +518,7 @@ function tnp_action_timeout()
         local player = tnp_state_train_get(train, 'player')
         local status = tnp_state_train_get(train, 'status')
 
-        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
+        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched or status == tnpdefines.train.status.railtooltest then
             tnp_train_enact(train, true, nil, nil, false)
             tnp_request_cancel(player, train, {"tnp_train_cancelled_timeout_arrival"})
         end
