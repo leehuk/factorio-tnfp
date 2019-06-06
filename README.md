@@ -25,9 +25,9 @@ Multiplayer mode should work without any major issues, though has not been teste
 ### QoL Mode vs TNfP Mode
 This mod is designed to work both as a pure Quality of Life mod or in TNfP mode with more advanced dispatch functionality.
 
-For players who prefer pocket trains or borrowing trains from the network this mod provides access to QoL enhancements such as a quick station selection dialog, together with the ability to dispatch the current train to any rail segment from the map view via a new temporary station.
+For players who prefer pocket trains or borrowing trains from the network this mod provides access to QoL enhancements such as a quick station selection dialog and the ability to dispatch the current train to a rail segment from the map view via a new temporary station.
 
-In TNfP mode the player can designate one or more train stops as TNfP stations and can then dispatch a train automatically from those stations to any train stop near them, or to any rail segment near them via the TNfP Rail Tool.  Once they board, this can automatically trigger the station selection dialog.
+In TNfP mode the player can mark one or more train stops as TNfP stations and then automatically dispatch trains from those stations to any train stop near them, or to a rail segment near them via the TNfP Rail Tool.  Once they board, this can automatically trigger the station selection dialog.
 
 ### Shortcut Bar and Input Hotkeys
 TNfP provides two additional shortcuts, both of which have input hotkeys:
@@ -36,9 +36,8 @@ TNfP provides two additional shortcuts, both of which have input hotkeys:
 
 Request TNfP Train Shortcut (ALT-P).
 
-* When onboard a train, in either QoL Mode or TNfP mode this will perform the default configurable 'Boarding Behaviour' of showing the station selection screen.
-* In TNfP Mode this will dispatch a TNfP train to the nearest valid train stop to the player, or cancel the current request.
-* In TNfP Mode when onboard a train, this will perform the default configurable 'Boarding Behaviour' of showing the station selection screen.
+* When onboard a train, in either QoL Mode or TNfP mode this shows the station selection screen.
+* In TNfP Mode dispatches a TNfP train to the nearest valid train stop to the player, or cancels the current request if active.
 
 Provide TNfP Rail Tool (SHIFT-ALT-P).
 
@@ -49,7 +48,7 @@ The station selection dialog provides a quick way of moving between stations:
 
 ![TNfP Station Select](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-stationselect.jpg)
 
-When a station is chosen the train will dispatch itself to that train stop and then wait for the player to exit the train.  Once the player does exit the train it will resume its previous schedule, or the player can stay on the train and use the 'Request TNfP Train' input again to move to another location.
+When a station is chosen the train dispatches itself there and then waits for the player to exit the train.  Once the player exits the train it resumes its previous schedule, or the player can stay on the train and use 'Request TNfP Train' again to move to another location.
 
 ### TNfP Rail Tool
 The TNfP Rail Tool provides an improved way of creating temporary train stops.  Once one or more valid rails are selected a new temporary train stop will be created at that location:
@@ -58,7 +57,10 @@ The TNfP Rail Tool provides an improved way of creating temporary train stops.  
 &nbsp;
 ![TNfP Rail Tool Stop](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-station.jpg)
 
-The rail tool works from both the standard player view and the map view.  When on board a train the rail tool can be used from the map view to create a temporary stop against the selected rail segment and send the train there.  In TNfP mode the rail tool can also call a train to the temporary stop to pick the player up and trigger the station selection dialog for onward travel.
+The rail tool works from both the standard player view and the map view.
+
+* When onboard a train, in either QoL Mode or TNfP mode this sends the train to the new temporary stop and waits for the player to exit the train, before resuming its previous schedule.
+* In TNfP Mode dispatches a TNfP train to that temporary stop to pickup the player.
 
 When using the rail tool from on board a train the trains wait condition will be the player exiting the train, at which point it will resume its original schedule.
 
