@@ -35,11 +35,13 @@ TNfP provides two additional shortcuts, both of which have input hotkeys:
 ![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-shortcutbar.jpg)
 
 Request TNfP Train Shortcut (ALT-P).
+
 * When onboard a train, in either QoL Mode or TNfP mode this will perform the default configurable 'Boarding Behaviour' of showing the station selection screen.
 * In TNfP Mode this will dispatch a TNfP train to the nearest valid train stop to the player, or cancel the current request.
 * In TNfP Mode when onboard a train, this will perform the default configurable 'Boarding Behaviour' of showing the station selection screen.
 
 Provide TNfP Rail Tool (SHIFT-ALT-P).
+
 * Places a TNfP Rail Tool into the players hand.
 
 ### Station Selection Dialog
@@ -52,7 +54,7 @@ When a station is chosen the train will dispatch itself to that train stop and t
 ### TNfP Rail Tool
 The TNfP Rail Tool provides an improved way of creating temporary train stops.  Once one or more valid rails are selected a new temporary train stop will be created at that location:
 
-![TNfP Rail Tool Selection](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-select.jpg)
+![TNfP Rail Tool Selection](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-selection.jpg)
 &nbsp;
 ![TNfP Rail Tool Stop](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-station.jpg)
 
