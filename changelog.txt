@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------------------------
 Version: 0.4.0
-Date: 2019-06-05
+Date: 2019-06-06
   Changes:
     - Add the TNfP Rail Tool (SHIFT+ALT+P or shortcut).  This is a selection tool which
       can create temporary train stops anywhere on the map:
