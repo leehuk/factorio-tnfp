@@ -1,12 +1,6 @@
 -- tnp_gui_stationlist()
 --   Draws the station select gui
 function tnp_gui_stationlist(player, train)
-    if not train.schedule or not train.schedule.records then
-        player.print("error")
-        -- error?
-        return
-    end
-
     -- Top Frame
     local gui_top = player.gui.center.add({
         name = "tnp-stationlist",

@@ -1,28 +1,50 @@
----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+Version: 0.4.0
+Date: 2019-06-06
+  Changes:
+    - Add the TNfP Rail Tool (SHIFT+ALT+P or shortcut).  This is a selection tool which
+      can create temporary train stops anywhere on the map:
+      - Allows the player to request a TNfP train when they're not near a train stop.
+      - Allows the player to send their current train anywhere they want from the map
+        view.
+      As with all train stops, only north-south or east-west rails are valid and
+      the rail must be unsignalled.
+    - Allow TNfP requests when on a non-TNfP train.  This means the station select can
+      now be used for pocket trains, or 'borrowed' trains.
+    - Pressing the input shortcut again (ALT-P) now cancels the request.
+    - Draw a line from the player to the station we're dispatching to so its clearer
+      where to go.  Can be turned off via mod setting.
+    - Minor icon update.
+    - Allow the station select to be triggered on trains with no schedule.
+    - Significant refactoring to support the TNfP Rail Tool.
+----------------------------------------------------------------------------------------
 Version: 0.3.0
 Date: 2019-06-01
   Changes:
     - TNfP is now beta rather than experimental.
-    - Add support for requesting a train when already on a TNfP train which will then skip straight
-      to redispatching.
-    - Improve validity and error checking, particularly around driving state, stations and train
-      statuses.
-    - Initial multiplayer support.  We will now periodically clear requests for trains and players
-      that become invalid, as well as avoid double dispatching trains or trains with passengers.
+    - Add support for requesting a train when already on a TNfP train which will then
+      skip straight to redispatching.
+    - Improve validity and error checking, particularly around driving state, stations
+      and train statuses.
+    - Initial multiplayer support.  We will now periodically clear requests for trains
+      and players that become invalid, as well as avoid double dispatching trains or
+      trains with passengers.
     - Add some additional log messages to make errors and completion clearer.
----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
 Version: 0.2.0
 Date: 2019-05-30
   Changes:
     - Omit temporary stations when copying schedules, as they don't copy correctly
-    - Remove arrival behaviour, as boarding timeout is now applied as a wait condition.
+    - Remove arrival behaviour, as boarding timeout is now applied as a wait
+      condition.
     - Handle stations we are dispatching to becoming invalid.
-    - Improve redispatching for an onward journey so the default waitcondition is the passenger
-      is no longer present.  We also now complete correctly if the player gets off the train.
+    - Improve redispatching for an onward journey so the default waitcondition is
+      the passenger is no longer present.  We also now complete correctly if the player
+      gets off the train.
     - Add handling of trains switched to manual mode when they're not moving.
----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2019-05-25
   Changes:
     - initial release
----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------

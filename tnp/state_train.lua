@@ -1,12 +1,14 @@
 --[[
     State Table:
+        dynamicstatus              = int, actual dispatching status
         expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
         expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
         player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         station                    = LuaEntity, train station we're dispatching to
         status                     = int, current dispatching status
-        timeout                    = int, arrival timeout before cancelling the request
+        timeout_arrival            = int, arrival timeout before cancelling the request
+        timeout_railtooltest       = int, timeout before we expect a state change for railtool testing
         train                      = LuaTrain, the train we're tracking
 ]]
 
@@ -16,7 +18,8 @@ tnpdefines.train = {
         dispatched          = 2,
         arrived             = 3,
         redispatched        = 4,
-        rearrived           = 5
+        rearrived           = 5,
+        railtooltest        = 6
     }
 }
 
@@ -39,7 +42,7 @@ function _tnp_state_train_prune()
         elseif not data.train.valid then
             -- The train we were tracking is invalid, but we still have a player reference.  Notify them
             if data.player and data.player.valid then
-                tnp_action_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
+                tnp_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
             end
 
             global.train_data[id] = nil
@@ -132,14 +135,26 @@ function tnp_state_train_timeout()
         return
     end
 
-    local trains = {}
+    local trains = {
+        arrival = {},
+        railtooltest = {}
+    }
 
     for id, data in pairs(global.train_data) do
         -- Exclude any trains pending a prune, or without a timeout
-        if data.train.valid and data.timeout and data.timeout >= 0 then
-            data.timeout = data.timeout - 1
-            if data.timeout <= 0 then
-                table.insert(trains, data.train)
+        if data.train.valid then
+            if data.timeout_arrival and data.timeout_arrival >= 0 then
+                data.timeout_arrival = data.timeout_arrival - 1
+                if data.timeout_arrival <= 0 then
+                    table.insert(trains.arrival, data.train)
+                end
+            end
+
+            if data.timeout_railtooltest and data.timeout_railtooltest >= 0 then
+                data.timeout_railtooltest = data.timeout_railtooltest - 1
+                if data.timeout_railtooltest <= 0 then
+                    table.insert(trains.railtooltest, data.train)
+                end
             end
         end
     end

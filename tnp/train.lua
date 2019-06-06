@@ -34,7 +34,10 @@ function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manu
 
     if manual_mode_pre == false or manual_mode_pre == true then
         if train.manual_mode ~= manual_mode_pre then
-            tnp_state_train_set(train, 'expect_manualmode', true)
+            if manual_mode_pre == true then
+                tnp_state_train_set(train, 'expect_manualmode', true)
+            end
+
             train.manual_mode = manual_mode_pre
         end
     end
@@ -46,7 +49,10 @@ function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manu
 
     if manual_mode_post == false or manual_mode_post == true then
         if manual_mode_post ~= train.manual_mode then
-            tnp_state_train_set(train, 'expect_manualmode', true)
+            if manual_mode_post == true then
+                tnp_state_train_set(train, 'expect_manualmode', true)
+            end
+
             train.manual_mode = manual_mode_post
         end
     end
@@ -81,13 +87,16 @@ function tnp_train_find(player, target)
 
         -- Do not scheduled trains other players are the passenger of
         if tnp_cand.passengers and #tnp_cand.passengers > 0 then
-            player.print("train has passengers" .. #tnp_cand.passengers)
             break
         end
 
-        distance = Position.distance(target.position, tnp_cand.front_rail.position)
-        if tnp_train and distance >= tnp_train_distance then
-            break
+        local distance = 0
+        -- If we dont know where we're dispatching to, accept the train choice will be random.
+        if target then
+            distance = Position.distance(target.position, tnp_cand.front_rail.position)
+            if tnp_train and distance >= tnp_train_distance then
+                break
+            end
         end
 
         tnp_train = tnp_cand

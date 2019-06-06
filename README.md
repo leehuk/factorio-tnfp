@@ -2,27 +2,70 @@
 ## Train Network for Players (Factorio Mod)
 
 ### About
-Provides support functionality for a personal train network, dispatching trains to your location and
-taking you onward.
+Provides QoL functionality to players using trains for transport.
 
-This mod can be safely added and removed to a new or existing playthrough.
-
-### Important Notes
-**This mod is currently beta.**  This mod should be mostly stable, though there is the possibility of it
-causing a crash.  Bug reports via [github.com](https://github.com/leehuk/factorio-tnfp/) are preferred,
-with the crash log and version information about both factorio and the mod.
-
-Multiplayer mode should work without any major issues, though has not been tested.
-
-### Features
-* Build and designate a TNfP network via a single combinator signal.
-* Dispatch personal trains to any train stop nearby.
-* Dispatch either via an input hotkey or the shortcut bar.
+### Key Features
+* (Optionally) Build and designate a TNfP network via a single combinator signal.
+* Dispatch TNfP trains to any train stop nearby.
+* Provides a TNfP Rail Tool (selection tool) which can create new temporary train stops from the map view and dispatch the current train the players is on there, or dispatch a TNfP train to the player to pick them up.
 * Station selection dialog when you board a train to take you onward.
+* This mod can be safely added and removed to a new or existing playthrough.
+
+### Misc Features
+* Configurable input hotkey (ALT-P default) or shortcut to dispatch trains.
+* Configurable input hotkey (SHIFT-ALT-P default) or shortcut for TNfP Rail Tool.
 * Controllable behaviour and timeouts for dispatching and arrivals.
 * Controllable levels of notifications.
 
-### Setup Guide
+### Important Notes
+**This mod is currently beta.**  This mod should be mostly stable, though there is the possibility of it causing a crash.  Bug reports via [github.com](https://github.com/leehuk/factorio-tnfp/) are preferred or via the forum.  Please include the crash log and version information about both factorio and the mod.
+
+Multiplayer mode should work without any major issues, though has not been tested.
+
+### QoL Mode vs TNfP Mode
+This mod is designed to work both as a pure Quality of Life mod or in TNfP mode with more advanced dispatch functionality.
+
+For players who prefer pocket trains or borrowing trains from the network this mod provides access to QoL enhancements such as a quick station selection dialog, together with the ability to dispatch the current train to any rail segment from the map view via a new temporary station.
+
+In TNfP mode the player can designate one or more train stops as TNfP stations and can then dispatch a train automatically from those stations to any train stop near them, or to any rail segment near them via the TNfP Rail Tool.  Once they board, this can automatically trigger the station selection dialog.
+
+### Shortcut Bar and Input Hotkeys
+TNfP provides two additional shortcuts, both of which have input hotkeys:
+
+![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-shortcutbar.jpg)
+
+Request TNfP Train Shortcut (ALT-P).
+* When onboard a train, in either QoL Mode or TNfP mode this will perform the default configurable 'Boarding Behaviour' of showing the station selection screen.
+* In TNfP Mode this will dispatch a TNfP train to the nearest valid train stop to the player, or cancel the current request.
+* In TNfP Mode when onboard a train, this will perform the default configurable 'Boarding Behaviour' of showing the station selection screen.
+
+Provide TNfP Rail Tool (SHIFT-ALT-P).
+* Places a TNfP Rail Tool into the players hand.
+
+### Station Selection Dialog
+The station selection dialog provides a quick way of moving between stations:
+
+![TNfP Station Select](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-stationselect.jpg)
+
+When a station is chosen the train will dispatch itself to that train stop and then wait for the player to exit the train.  Once the player does exit the train it will resume its previous schedule, or the player can stay on the train and use the 'Request TNfP Train' input again to move to another location.
+
+### TNfP Rail Tool
+The TNfP Rail Tool provides an improved way of creating temporary train stops.  Once one or more valid rails are selected a new temporary train stop will be created at that location:
+
+![TNfP Rail Tool Selection](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-select.jpg)
+&nbsp;
+![TNfP Rail Tool Stop](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-station.jpg)
+
+The rail tool works from both the standard player view and the map view.  When on board a train the rail tool can be used from the map view to create a temporary stop against the selected rail segment and send the train there.  In TNfP mode the rail tool can also call a train to the temporary stop to pick the player up and trigger the station selection dialog for onward travel.
+
+When using the rail tool from on board a train the trains wait condition will be the player exiting the train, at which point it will resume its original schedule.
+
+To remove a rail tool from your inventory, drop it on the ground near the player (default 'z') and it will be automatically destroyed.
+
+### TNfP Network
+Creating a TNfP network allows you to dispatch TNfP trains to any valid train stop nearby or via the rail tool to a new temporary station.
+
+To enable TNfP Mode:
 1. Ensure you've researched trains and train stops.
 1. Ensure you have a train stop thats only intended for player use, with a train assigned to stop there.
 1. Craft a Constant Combinator and place it near your personal train stop.
@@ -31,13 +74,15 @@ Multiplayer mode should work without any major issues, though has not been teste
 
 ![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-combinator.jpg)
 
-Once you connect the combinator the train stop becomes a TNfP Station.  If a train has a TNfP Station
-anywhere in its schedule then it becomes a TNfP Train and available for dispatch.
+Once you connect the combinator the train stop becomes a TNfP Station.  Any train which has that train stop anywhere in its schedule then becomes a TNfP train and available for dispatching to the player.
 
-### Dispatching Trains
+This allows the player to use the existing train network for personal use, without the requirement to add personal stations at every location or outpost, or fill a trains schedule with all possible locations.  Equally when players have an extensive web of personal stations, the various station selection dialog views allow moving around this network easier.
 
-Trains can be dispatched either via the default hotkey (ALT-P) or via the shortcut bar.
-![TNfP Combinator](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-shortcutbar.jpg)
+### Technical Information
+
+General technical information, for the curious.
+
+#### Dispatching Logic
 
 When dispatching trains, TNfP will prioritise as follows:
 1. A TNfP train the player is currently in.
@@ -45,13 +90,24 @@ When dispatching trains, TNfP will prioritise as follows:
 1. A TNfP train stop.
 1. A standard train stop, if it is not blocked by another train.
 
-If TNfP needs to dispatch a train to a player, it will dispatch the closest valid and unallocated train
-based on straight line distance.
+If TNfP needs to dispatch a train to a player, it will dispatch the closest valid and unallocated train based on straight line distance.
 
-Once the train arrives and you board, it can optionally display a station selection dialog.
+TNfP will apply a configurable arrival timeout for the train to arrive at the requested location.  If the train does not arrive before this timeout, the request will be cancelled and the train will have its original schedule restored.
 
-![TNfP Station Select](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-stationselect.jpg)
+#### Arrival Logic
 
-## Roadmap
-For now the focus is ensuring the mods stable and deciding how to handle a status query when a request is in
-progress (i.e. pressing the shortcut again), before potentially looking at dynamically creating temporary stops.
+The destination train stop for a TNfP dispatch request is added with a standard station wait condition, using a configurable time 'Boarding Timeout'.  If the player does not board in this time, TNfP will detect the train departing and restore its original schedule.  If the player does board the train, it will immediately reset the schedule and perform the configurable 'Boarding Behaviour'.
+
+#### Boarding Behaviour
+
+When a player boards a dispatched train, the original schedule is restored but the train is immediately switched to manual mode and so will not resume the schedule.  If TNfP is configured to display the optional station selection dialog this will appear, allowing the player to select an onward destination.
+
+If the station selection dialog is closed or the player exits the train, it will remain in manual mode but with its original schedule.
+
+#### Redispatch Behaviour
+
+When a player has selected an onward destination, TNfP will add the new station with a standard station wait condition of 'Passenger Not Present'.  This station will then remain in the schedule until it becomes true (i.e. the passenger leaves the train), or the passenger selects another onward destination.
+
+#### Temporary Station Cleanup
+
+TNfP relies on a particular quirk in factorio, in that once a train is waiting at a station -- if the station is destroyed/deleted, factorio will continue to wait until the station condition is true before departing.  This allows TNfP to clean up the temporary stations as early as possible, but with the caveat the schedule looks a little odd.
