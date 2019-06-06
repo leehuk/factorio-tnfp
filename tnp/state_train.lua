@@ -7,7 +7,8 @@
         player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         station                    = LuaEntity, train station we're dispatching to
         status                     = int, current dispatching status
-        timeout                    = int, arrival timeout before cancelling the request
+        timeout_arrival            = int, arrival timeout before cancelling the request
+        timeout_railtooltest       = int, timeout before we expect a state change for railtool testing
         train                      = LuaTrain, the train we're tracking
 ]]
 
@@ -134,14 +135,26 @@ function tnp_state_train_timeout()
         return
     end
 
-    local trains = {}
+    local trains = {
+        arrival = {},
+        railtooltest = {}
+    }
 
     for id, data in pairs(global.train_data) do
         -- Exclude any trains pending a prune, or without a timeout
-        if data.train.valid and data.timeout and data.timeout >= 0 then
-            data.timeout = data.timeout - 1
-            if data.timeout <= 0 then
-                table.insert(trains, data.train)
+        if data.train.valid then
+            if data.timeout_arrival and data.timeout_arrival >= 0 then
+                data.timeout_arrival = data.timeout_arrival - 1
+                if data.timeout_arrival <= 0 then
+                    table.insert(trains.arrival, data.train)
+                end
+            end
+
+            if data.timeout_railtooltest and data.timeout_railtooltest >= 0 then
+                data.timeout_railtooltest = data.timeout_railtooltest - 1
+                if data.timeout_railtooltest <= 0 then
+                    table.insert(trains.railtooltest, data.train)
+                end
             end
         end
     end

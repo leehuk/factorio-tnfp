@@ -69,7 +69,7 @@ function tnp_request_dispatch(player, target, train)
     local config = settings.get_player_settings(player)
 
     tnp_request_setup(player, target, train, tnpdefines.train.status.dispatching)
-    tnp_state_train_set(train, 'timeout', config['tnp-train-arrival-timeout'].value)
+    tnp_state_train_set(train, 'timeout_arrival', config['tnp-train-arrival-timeout'].value)
 
     local schedule = tnp_train_schedule_copy(train)
     local schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
@@ -107,11 +107,12 @@ function tnp_request_railtooltest(player, target, train)
     end
 
     tnp_request_setup(player, target, train, tnpdefines.train.status.railtooltest)
+    tnp_state_train_set(train, 'timeout_railtooltest', 2)
     if redispatch then
         tnp_state_train_set(train, 'dynamicstatus', tnpdefines.train.status.redispatched)
     else
         tnp_state_train_set(train, 'dynamicstatus', tnpdefines.train.status.dispatched)
-        tnp_state_train_set(train, 'timeout', config['tnp-train-arrival-timeout'].value)
+        tnp_state_train_set(train, 'timeout_arrival', config['tnp-train-arrival-timeout'].value)
     end
 
     local schedule = tnp_train_schedule_copy(train)

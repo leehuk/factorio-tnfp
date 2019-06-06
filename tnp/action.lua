@@ -277,7 +277,7 @@ function tnp_action_train_arrival(player, train)
         tnp_dynamicstop_destroy(player, dynamicstop)
     end
 
-    tnp_state_train_delete(train, 'timeout')
+    tnp_state_train_delete(train, 'timeout_arrival')
     tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
 end
 
@@ -324,6 +324,11 @@ function tnp_action_train_statechange(train)
     if not player or not player.valid then
         tnp_request_cancel(player, train, nil)
         return
+    end
+
+    -- We have now seen a state change request for one of our railtool tests
+    if status == tnpdefines.train.status.railtooltest then
+        tnp_state_train_delete(train, 'timeout_railtooltest')
     end
 
     if train.state == defines.train_state.on_the_path then
@@ -403,7 +408,7 @@ function tnp_action_train_statechange(train)
         elseif status == tnpdefines.train.status.railtooltest then
             -- We were attempting to dispatch to a dynamic stop and that failed.  If we have an alternate, try that.
             tnp_train_enact(train, true, nil, nil, nil)
-            tnp_state_train_delete(train, 'timeout')
+            tnp_state_train_delete(train, 'timeout_arrival')
 
             local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
             local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
@@ -510,11 +515,11 @@ end
 function tnp_action_timeout()
     local trains = tnp_state_train_timeout()
 
-    if not trains or #trains == 0 then
+    if not trains or (#trains.arrival == 0 and #trains.railtooltest == 0) then
         return
     end
 
-    for _, train in pairs(trains) do
+    for _, train in pairs(trains.arrival) do
         local player = tnp_state_train_get(train, 'player')
         local status = tnp_state_train_get(train, 'status')
 
@@ -522,5 +527,10 @@ function tnp_action_timeout()
             tnp_train_enact(train, true, nil, nil, false)
             tnp_request_cancel(player, train, {"tnp_train_cancelled_timeout_arrival"})
         end
+    end
+
+    for _, train in pairs(trains.railtooltest) do
+        tnp_state_train_delete(train, 'timeout_railtooltest')
+        tnp_action_train_statechange(train)
     end
 end
