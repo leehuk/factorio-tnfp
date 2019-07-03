@@ -67,7 +67,7 @@ function tnp_stop_getall(player)
     local tnp_stops = {}
 
     local entities = player.surface.find_entities_filtered({
-        name = "train-stop"
+        type = "train-stop"
     })
     for _, ent in pairs(entities) do
         if tnp_stop_check(ent) then
