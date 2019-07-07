@@ -29,6 +29,13 @@ For players who prefer pocket trains or borrowing trains from the network this m
 
 In TNfP mode the player can mark one or more train stops as TNfP stations and then automatically dispatch trains from those stations to any train stop near them, or to a rail segment near them via the TNfP Rail Tool.  Once they board, this can automatically trigger the station selection dialog.
 
+### Mod Compatibility
+TNfP should be compatible with all mods relating to trains, providing they don't change train schedules or add custom types of train stops.
+
+When used with mods which add custom types of train stops, TNfP will work as follows:
+* TSM (Train Supply Manager): TNfP will dispatch to 'Requester' stops, but will completely ignore 'Supplier' stops due to conflicts with scheduling trains.
+* Default: TNfP uses a configuration option controlling whether stops are considered safe to dispatch to (and thus ignored) or not.
+
 ### Shortcut Bar and Input Hotkeys
 TNfP provides two additional shortcuts, both of which have input hotkeys:
 

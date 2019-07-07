@@ -25,6 +25,17 @@ data:extend({
         }
     },
     {
+        name = "tnp-trainstop-mod-behaviour",
+        type = "string-setting",
+        setting_type = "runtime-global",
+        order = "a[message]-b[target]",
+        default_value = "safe",
+        allowed_values = {
+            "safe",
+            "standard"
+        }
+    },
+    {
         name = "tnp-train-search-radius",
         type = "int-setting",
         setting_type = "runtime-per-user",

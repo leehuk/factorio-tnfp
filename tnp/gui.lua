@@ -145,19 +145,21 @@ function tnp_gui_stationlist(player, train)
 
     -- Secondly and thirdly, the stops this train has and the all list.  Both use the same data.
     local stations_unsorted = player.surface.find_entities_filtered({
-        name = "train-stop"
+        type = "train-stop"
     })
     local stations_key = {}
     local stations_map = {}
     local stations_map_count = {}
 
     for _, station in pairs(stations_unsorted) do
-        if not stations_map[station.backer_name] then
-            table.insert(stations_key, station.backer_name)
-            stations_map[station.backer_name] = station
-            stations_map_count[station.backer_name] = 1
-        else
-            stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+        if tnp_stop_danger(station) == false then
+            if not stations_map[station.backer_name] then
+                table.insert(stations_key, station.backer_name)
+                stations_map[station.backer_name] = station
+                stations_map_count[station.backer_name] = 1
+            else
+                stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+            end
         end
     end
     table.sort(stations_key)

@@ -72,7 +72,7 @@ function tnp_action_player_railtool(player, entities)
 
     for _, ent in pairs(entities) do
         if ent.type == "train-stop" then
-            if ent.valid then
+            if ent.valid and tnp_stop_danger(ent) == false then
                 table.insert(valid_stops, ent)
             end
         elseif ent.type == "straight-rail" then
