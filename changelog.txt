@@ -1,4 +1,15 @@
 ----------------------------------------------------------------------------------------
+Version: 0.4.1
+Date: 2019-07-12
+  Changes:
+    - Add explicit support for LTN train stops, permitting dispatch to any LTN stop
+      that is not a depot.  LTN Depots are ignored due to them rescheduling trains.
+    - Add explicit support for TSM train stops, permitting dispatch to requester stops.
+      TSM supplier stops are ignored due to them rescheduling trains.
+    - Add general support for other modded train stops, with a configuration option to
+      control whether these are treated 'safely' and ignored or dispatched to.
+    - Fix a crash when using the railtool a second time over a temporary station.
+----------------------------------------------------------------------------------------
 Version: 0.4.0
 Date: 2019-06-06
   Changes:
