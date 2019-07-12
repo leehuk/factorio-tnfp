@@ -13,6 +13,7 @@ require('tnp/message')
 require('tnp/request')
 require('tnp/state_dynamicstop')
 require('tnp/state_gui')
+require('tnp/state_ltnstop')
 require('tnp/state_player')
 require('tnp/state_train')
 require('tnp/stop')
@@ -49,3 +50,18 @@ script.on_event(defines.events.on_player_selected_area, tnp_handle_selectiontool
 -- Input Handling
 script.on_event("tnp-handle-railtool", tnp_handle_input)
 script.on_event("tnp-handle-request", tnp_handle_input)
+
+-- LTN Handling
+script.on_init(function()
+    if remote.interfaces["logistic-train-network"] then
+        local ltn_stops_updated_event = remote.call("logistic-train-network", "on_stops_updated")
+        script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
+    end
+end)
+
+script.on_load(function()
+    if remote.interfaces["logistic-train-network"] then
+        local ltn_stops_updated_event = remote.call("logistic-train-network", "on_stops_updated")
+        script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
+    end
+end)

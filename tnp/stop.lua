@@ -35,6 +35,13 @@ function tnp_stop_danger(stop)
         return false
     end
 
+    -- LTN (Logistic Train Network)
+    if stop.name == "logistic-train-stop" then
+        if tnp_state_ltnstop_get(stop, 'depot') then
+            return true
+        end
+    end
+
     -- No explicit compatibility, so fall back to the default mod setting.
     if settings.global['tnp-trainstop-mod-behaviour'].value == "safe" then
         return true
