@@ -2,7 +2,7 @@
 ## Train Network for Players (Factorio Mod)
 
 ### About
-Provides QoL functionality to players using trains for transport.
+Provides QoL functionality to improve using trains for player transport.
 
 ### Key Features
 * (Optionally) Build and designate a TNfP network via a single combinator signal.
@@ -28,6 +28,14 @@ This mod is designed to work both as a pure Quality of Life mod or in TNfP mode 
 For players who prefer pocket trains or borrowing trains from the network this mod provides access to QoL enhancements such as a quick station selection dialog and the ability to dispatch the current train to a rail segment from the map view via a new temporary station.
 
 In TNfP mode the player can mark one or more train stops as TNfP stations and then automatically dispatch trains from those stations to any train stop near them, or to a rail segment near them via the TNfP Rail Tool.  Once they board, this can automatically trigger the station selection dialog.
+
+### Mod Compatibility
+TNfP should be compatible with all mods relating to trains, providing they don't change train schedules or add custom types of train stops.
+
+When used with mods which add custom types of train stops, TNfP will work as follows:
+* LTN (Logistic Train Network): TNfP will dispatch to any stop except depots, which are ignored due to conflicts with scheduling trains.
+* TSM (Train Supply Manager): TNfP will dispatch to 'Requester' stops, but will completely ignore 'Supplier' stops due to conflicts with scheduling trains.
+* Default: TNfP uses a configuration option controlling whether stops are considered safe to dispatch to (and thus ignored) or not.
 
 ### Shortcut Bar and Input Hotkeys
 TNfP provides two additional shortcuts, both of which have input hotkeys:

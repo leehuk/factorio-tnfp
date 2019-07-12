@@ -114,33 +114,53 @@ function tnp_gui_stationlist(player, train)
     local stations_unsorted = tnp_stop_getall(player)
     local stations_key = {}
     local stations_map = {}
+    local stations_map_count = {}
 
     for _, station in pairs(stations_unsorted) do
-        table.insert(stations_key, station.backer_name)
-        stations_map[station.backer_name] = station
+        if not stations_map[station.backer_name] then
+            table.insert(stations_key, station.backer_name)
+            stations_map[station.backer_name] = station
+            stations_map_count[station.backer_name] = 1
+        else
+            stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+        end
     end
     table.sort(stations_key)
 
     for i, station in ipairs(stations_key) do
+        local caption = station
+        if stations_map_count[station] > 1 then
+            caption = caption .. " (" .. stations_map_count[station] .. ")"
+        end
+
         local gui_button = gui_stationtable_tnfp.add({
             name = "tnp-stationlist-desttnfp-" .. i,
             type = "button",
-            caption = station,
+            caption = caption,
             style = "tnp_stationlist_stationlistentry"
         })
+
         tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
     end
 
     -- Secondly and thirdly, the stops this train has and the all list.  Both use the same data.
     local stations_unsorted = player.surface.find_entities_filtered({
-        name = "train-stop"
+        type = "train-stop"
     })
     local stations_key = {}
     local stations_map = {}
+    local stations_map_count = {}
 
     for _, station in pairs(stations_unsorted) do
-        table.insert(stations_key, station.backer_name)
-        stations_map[station.backer_name] = station
+        if tnp_stop_danger(station) == false then
+            if not stations_map[station.backer_name] then
+                table.insert(stations_key, station.backer_name)
+                stations_map[station.backer_name] = station
+                stations_map_count[station.backer_name] = 1
+            else
+                stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+            end
+        end
     end
     table.sort(stations_key)
 
@@ -152,10 +172,15 @@ function tnp_gui_stationlist(player, train)
         if trains then
             for _, stationtrain in pairs(trains) do
                 if train.id == stationtrain.id then
+                    local caption = station
+                    if stations_map_count[station] > 1 then
+                        caption = caption .. " (" .. stations_map_count[station] .. ")"
+                    end
+
                     local gui_button = gui_stationtable_train.add({
                         name = "tnp-stationlist-desttrain-" .. i,
                         type = "button",
-                        caption = station,
+                        caption = caption,
                         style = "tnp_stationlist_stationlistentry"
                     })
                     tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
@@ -163,10 +188,15 @@ function tnp_gui_stationlist(player, train)
             end
         end
 
+        local caption = station
+        if stations_map_count[station] > 1 then
+            caption = caption .. " (" .. stations_map_count[station] .. ")"
+        end
+
         local gui_button = gui_stationtable_all.add({
             name = "tnp-stationlist-destall-" .. i,
             type = "button",
-            caption = station,
+            caption = caption,
             style = "tnp_stationlist_stationlistentry"
         })
         tnp_state_gui_set(gui_button, player, 'station', stations_map[station])

@@ -1,11 +1,11 @@
 {
     "name": "TrainNetworkForPlayers",
     "title": "Train Network for Players",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "factorio_version": "0.17",
-    "date": "2019-06-06",
+    "date": "2019-07-12",
     "author": "leeh",
     "homepage": "",
     "description": "",
-    "dependencies": ["base", "stdlib >= 1.0.4"]
+    "dependencies": ["base", "stdlib >= 1.0.4", "? LogisticTrainNetwork"]
   }

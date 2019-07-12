@@ -38,6 +38,20 @@ function tnp_handle_input(event)
     end
 end
 
+-- tnp_handle_ltn_stops()
+--   Handles the event from LTN advertising its available stops to us
+function tnp_handle_ltn_stops(event)
+    if event.logistic_train_stops then
+        tnp_state_ltnstop_destroy()
+        for _, ltndata in pairs(event.logistic_train_stops) do
+            -- We are currently only tracking depot stops
+            if ltndata['isDepot'] then
+                tnp_state_ltnstop_set(ltndata['entity'], 'depot', true)
+            end
+        end
+    end
+end
+
 -- tnp_handle_player_dropped()
 --   Handles a player dropping an object
 function tnp_handle_player_droppeditem(event)
