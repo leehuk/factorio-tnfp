@@ -70,24 +70,8 @@ function tnp_action_player_railtool(player, entities)
     local valid_stops = {}
     local valid_rails = {}
 
-    for _, ent in pairs(entities) do
-        if ent.type == "train-stop" then
-            if ent.valid and tnp_stop_danger(ent) == false then
-                table.insert(valid_stops, ent)
-            end
-        elseif ent.type == "straight-rail" then
-            if ent.valid and tnp_direction_iscardinal(ent.direction) then
-                table.insert(valid_rails, ent)
-            end
-        end
-    end
-
-    local target = nil
-    if #valid_stops > 0 then
-        target = valid_stops[1]
-    end
-
-    -- Either way, we now need to know what train we're dispatching and cancel any current requests.
+    -- We need to know what train we're dispatching and cancel any current requests.  Do this early to ensure we cleanup
+    -- any temporary stops etc.
     local train = tnp_state_player_get(player, 'train')
     if train then
         tnp_train_enact(train, true, nil, nil, nil)
@@ -97,6 +81,25 @@ function tnp_action_player_railtool(player, entities)
         if not train.valid then
             train = nil
         end
+    end
+
+    for _, ent in pairs(entities) do
+        if ent.valid then
+            if ent.type == "train-stop" then
+                if tnp_stop_danger(ent) == false then
+                    table.insert(valid_stops, ent)
+                end
+            elseif ent.type == "straight-rail" then
+                if tnp_direction_iscardinal(ent.direction) then
+                    table.insert(valid_rails, ent)
+                end
+            end
+        end
+    end
+
+    local target = nil
+    if #valid_stops > 0 then
+        target = valid_stops[1]
     end
 
     if player.vehicle and player.vehicle.train then
