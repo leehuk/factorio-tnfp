@@ -57,11 +57,31 @@ script.on_init(function()
         local ltn_stops_updated_event = remote.call("logistic-train-network", "on_stops_updated")
         script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
     end
+
+    global.dynamicstop_data = global.dynamicstop_data or {}
+    global.gui_data = global.gui_data or {}
+    global.ltnstop_data = global.ltnstop_data or {}
+    global.player_data = global.player_data or {}
+    global.train_data = global.train_data or {}
 end)
 
 script.on_load(function()
     if remote.interfaces["logistic-train-network"] then
         local ltn_stops_updated_event = remote.call("logistic-train-network", "on_stops_updated")
         script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
+    end
+end)
+
+script.on_configuration_changed(function(event)
+    if event["mod_changes"] and event["mod_changes"]["TrainNetworkForPlayers"] then
+        if not event["mod_changes"]["TrainNetworkForPlayers"]["version"] then
+            event["mod_changes"]["TrainNetworkForPlayers"]["version"] = "0.4.2"
+
+            global.dynamicstop_data = global.dynamicstop_data or {}
+            global.gui_data = global.gui_data or {}
+            global.ltnstop_data = global.ltnstop_data or {}
+            global.player_data = global.player_data or {}
+            global.train_data = global.train_data or {}
+        end
     end
 end)

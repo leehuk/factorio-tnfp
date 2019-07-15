@@ -10,24 +10,12 @@
 -- _tnp_state_gui_prune()
 --   Clears invalid state information about LuaGuiElements
 function _tnp_state_gui_prune()
-    if not global.gui_data then
-        return
-    end
-
-    local count = 0
-
     for id, ent in pairs(global.gui_data) do
-        count = count + 1
-
         if not ent.element.valid then
             global.gui_data[id] = nil
         elseif not ent.player or not ent.player.valid then
             global.gui_data[id] = nil
         end
-    end
-
-    if count == 0 then
-        global.gui_data = nil
     end
 end
 
@@ -40,7 +28,7 @@ function tnp_state_gui_delete(element)
         return
     end
 
-    if global.gui_data and global.gui_data[element.index] then
+    if global.gui_data[element.index] then
         if key then
             global.gui_data[element.index][key] = nil
         else
@@ -58,7 +46,7 @@ function tnp_state_gui_get(element, player, key)
         return false
     end
 
-    if global.gui_data and global.gui_data[element.index] and global.gui_data[element.index][key] then
+    if global.gui_data[element.index] and global.gui_data[element.index][key] then
         return global.gui_data[element.index][key]
     end
 
@@ -72,10 +60,6 @@ function tnp_state_gui_set(element, player, key, value)
 
     if not element.valid or not player.valid then
         return false
-    end
-
-    if not global.gui_data then
-        global.gui_data = {}
     end
 
     if not global.gui_data[element.index] then
