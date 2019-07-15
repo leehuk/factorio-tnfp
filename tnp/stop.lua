@@ -65,7 +65,7 @@ function tnp_stop_find(player)
     local valid_stops_std = {}
 
     local entities = player.surface.find_entities_filtered({
-        area = Position.expand_to_area(player.position, config['tnp-train-search-radius'].value),
+        area = tnp_math_postoarea(player.position, config['tnp-train-search-radius'].value),
         type = "train-stop"
     })
 

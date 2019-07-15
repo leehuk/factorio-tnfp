@@ -1,4 +1,3 @@
-Position = require('__stdlib__/stdlib/area/position')
 Table = require('__stdlib__/stdlib/utils/table')
 
 tnpdefines = {}
@@ -9,6 +8,7 @@ require('tnp/dynamicstop')
 require('tnp/event')
 require('tnp/direction')
 require('tnp/gui')
+require('tnp/math')
 require('tnp/message')
 require('tnp/request')
 require('tnp/state_dynamicstop')
