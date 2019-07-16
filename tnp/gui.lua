@@ -1,6 +1,13 @@
 -- tnp_gui_stationlist()
 --   Draws the station select gui
 function tnp_gui_stationlist(player, train)
+    -- If a GUI already exists destroy it
+    for _, child in pairs(player.gui.center.children) do
+        if child.name == "tnp-stationlist" then
+            child.destroy()
+        end
+    end
+
     -- Top Frame
     local gui_top = player.gui.center.add({
         name = "tnp-stationlist",
