@@ -1,4 +1,10 @@
 ----------------------------------------------------------------------------------------
+Version: 0.4.2
+Date: 2019-07-17
+  Changes:
+    - Fix a multiplayer desync issue and improve state management
+    - Fix an error in multiplayer with the stationselect
+----------------------------------------------------------------------------------------
 Version: 0.4.1
 Date: 2019-07-12
   Changes:
