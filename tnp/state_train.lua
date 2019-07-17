@@ -26,15 +26,7 @@ tnpdefines.train = {
 -- _tnp_state_train_prune()
 --   Prune the state train data of any invalid trains
 function _tnp_state_train_prune()
-    if not global.train_data then
-        return
-    end
-
-    local count = 0
-
     for id, data in pairs(global.train_data) do
-        count = count + 1
-
         if not data then
             global.train_data[id] = nil
         elseif not data.train then
@@ -52,10 +44,6 @@ function _tnp_state_train_prune()
             global.train_data[id] = nil
         end
     end
-
-    if count == 0 then
-        global.train_data = nil
-    end
 end
 
 -- tnp_state_train_delete()
@@ -67,7 +55,7 @@ function tnp_state_train_delete(train, key)
         return
     end
 
-    if global.train_data and global.train_data[train.id] then
+    if global.train_data[train.id] then
         if key then
             global.train_data[train.id][key] = nil
         else
@@ -85,7 +73,7 @@ function tnp_state_train_get(train, key)
         return false
     end
 
-    if global.train_data and global.train_data[train.id] and global.train_data[train.id][key] then
+    if global.train_data[train.id] and global.train_data[train.id][key] then
         return global.train_data[train.id][key]
     end
 
@@ -99,7 +87,7 @@ function tnp_state_train_query(train)
         return false
     end
 
-    if global.train_data and global.train_data[train.id] then
+    if global.train_data[train.id] then
         return true
     end
 
@@ -115,10 +103,6 @@ function tnp_state_train_set(train, key, value)
         return false
     end
 
-    if not global.train_data then
-        global.train_data = {}
-    end
-
     if not global.train_data[train.id] then
         global.train_data[train.id] = {}
         global.train_data[train.id]['train'] = train
@@ -131,10 +115,6 @@ end
 -- tnp_state_train_timeout()
 --   Drops timeouts on all trains and returns a list of any now expired requests
 function tnp_state_train_timeout()
-    if not global.train_data then
-        return
-    end
-
     local trains = {
         arrival = {},
         railtooltest = {}

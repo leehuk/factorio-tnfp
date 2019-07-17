@@ -6,15 +6,7 @@
 ]]
 
 function _tnp_state_dynamicstop_prune()
-    if not global.dynamicstop_data then
-        return
-    end
-
-    local count = 0
-
     for id, ent in pairs(global.dynamicstop_data) do
-        count = count + 1
-
         if not ent.dynamicstop.valid then
             global.dynamicstop_data[id] = nil
         elseif not ent.player.valid then
@@ -30,10 +22,6 @@ function _tnp_state_dynamicstop_prune()
             global.dynamicstop_data[id] = nil
         end
     end
-
-    if count == 0 then
-        global.dynamicstop_data = nil
-    end
 end
 
 -- tnp_state_dynamicstop_delete()
@@ -45,7 +33,7 @@ function tnp_state_dynamicstop_delete(ent, key)
         return
     end
 
-    if global.dynamicstop_data and global.dynamicstop_data[ent.unit_number] then
+    if global.dynamicstop_data[ent.unit_number] then
         if key then
             global.dynamicstop_data[ent.unit_number][key] = nil
         else
@@ -63,7 +51,7 @@ function tnp_state_dynamicstop_get(ent, key)
         return false
     end
 
-    if global.dynamicstop_data and global.dynamicstop_data[ent.unit_number] and global.dynamicstop_data[ent.unit_number][key] then
+    if global.dynamicstop_data[ent.unit_number] and global.dynamicstop_data[ent.unit_number][key] then
         return global.dynamicstop_data[ent.unit_number][key]
     end
 
@@ -77,10 +65,6 @@ function tnp_state_dynamicstop_set(ent, key, value)
 
     if not ent.valid then
         return false
-    end
-
-    if not global.dynamicstop_data then
-        global.dynamicstop_data = {}
     end
 
     if not global.dynamicstop_data[ent.unit_number] then

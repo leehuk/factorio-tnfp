@@ -9,15 +9,7 @@ State Table:
 -- _tnp_state_player_prune()
 --   Prune the state player data of any invalid players
 function _tnp_state_player_prune()
-    if not global.player_data then
-        return
-    end
-
-    local count = 0
-
     for id, data in pairs(global.player_data) do
-        count = count + 1
-
         if not data then
             global.player_data[id] = nil
         elseif not data.player or not data.player.valid then
@@ -40,10 +32,6 @@ function _tnp_state_player_prune()
             end
         end
     end
-
-    if count == 0 then
-        global.player_data = nil
-    end
 end
 
 -- tnp_state_player_delete()
@@ -55,7 +43,7 @@ function tnp_state_player_delete(player, key)
         return
     end
 
-    if global.player_data and global.player_data[player.index] then
+    if global.player_data[player.index] then
         if key then
             global.player_data[player.index][key] = nil
 
@@ -78,7 +66,7 @@ function tnp_state_player_get(player, key)
         return false
     end
 
-    if global.player_data and global.player_data[player.index] and global.player_data[player.index][key] then
+    if global.player_data[player.index] and global.player_data[player.index][key] then
         return global.player_data[player.index][key]
     end
 
@@ -92,7 +80,7 @@ function tnp_state_player_query(player)
         return false
     end
 
-    if global.player_data and global.player_data[player.index] then
+    if global.player_data[player.index] then
         return true
     end
 
@@ -107,10 +95,6 @@ function tnp_state_player_set(player, key, value)
 
     if not player.valid then
         return false
-    end
-
-    if not global.player_data then
-        global.player_data = {}
     end
 
     if not global.player_data[player.index] then

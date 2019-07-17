@@ -7,7 +7,7 @@
 -- tnp_state_ltnstop_destroy()
 --   Destroys all state for ltn stops
 function tnp_state_ltnstop_destroy()
-    global.ltnstop_data = nil
+    global.ltnstop_data = {}
 end
 
 -- tnp_state_ltnstop_get()
@@ -17,7 +17,7 @@ function tnp_state_ltnstop_get(ent, key)
         return false
     end
 
-    if global.ltnstop_data and global.ltnstop_data[ent.unit_number] and global.ltnstop_data[ent.unit_number][key] then
+    if global.ltnstop_data[ent.unit_number] and global.ltnstop_data[ent.unit_number][key] then
         return global.ltnstop_data[ent.unit_number][key]
     end
 
@@ -29,10 +29,6 @@ end
 function tnp_state_ltnstop_set(ent, key, value)
     if not ent.valid then
         return false
-    end
-
-    if not global.ltnstop_data then
-        global.ltnstop_data = {}
     end
 
     if not global.ltnstop_data[ent.unit_number] then
