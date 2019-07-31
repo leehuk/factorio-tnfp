@@ -1,4 +1,10 @@
 ----------------------------------------------------------------------------------------
+Version: 0.4.3
+Date: 2019-07-31
+  Changes:
+    - Fix an error since 0.17.59 with assigning an empty train schedule using an empty
+      hash instead of nil.
+----------------------------------------------------------------------------------------
 Version: 0.4.2
 Date: 2019-07-17
   Changes:
