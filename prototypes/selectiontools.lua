@@ -5,7 +5,7 @@ data:extend({
         flags = {
             "hidden"
         },
-        icon = "__TrainNetworkForPlayers__/graphics/icons/shortcut-tnprailtool-32.png",
+        icon = "__TrainNetworkForPlayers__/graphics/icons/railtool-32.png",
         icon_size = 32,
         selection_color = {
             b = 1,

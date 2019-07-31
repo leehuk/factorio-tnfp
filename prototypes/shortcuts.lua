@@ -41,7 +41,7 @@ data:extend({
             "shortcut.tnp-handle-railtool"
         },
         icon = {
-            filename = "__TrainNetworkForPlayers__/graphics/icons/shortcut-tnprailtool-32.png",
+            filename = "__TrainNetworkForPlayers__/graphics/icons/railtool-32.png",
             priority = "extra-high-no-scale",
             size = 32,
             scale = 1,
@@ -50,7 +50,7 @@ data:extend({
             }
         },
         icon = {
-            filename = "__TrainNetworkForPlayers__/graphics/icons/shortcut-tnprailtool-24.png",
+            filename = "__TrainNetworkForPlayers__/graphics/icons/railtool-24.png",
             priority = "extra-high-no-scale",
             size = 24,
             scale = 1,
