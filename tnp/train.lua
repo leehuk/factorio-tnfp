@@ -170,12 +170,12 @@ end
 -- inputs:      train, LuaTrain. Must be valid.
 -- outputs:     hash(TrainSchedule).
 function tnp_train_schedule_copy(train)
-    schedule = {}
-    schedule.records = {}
-
     if not train.schedule or not train.schedule.records or #train.schedule.records == 0 then
-        return schedule
+        return nil
     end
+
+    local schedule = {}
+    schedule.records = {}
 
     for _, record in pairs(train.schedule.records) do
         -- Temporary stations to locations end up invalid when copied, so discard them
@@ -185,6 +185,12 @@ function tnp_train_schedule_copy(train)
                 wait_conditions = Table.deep_copy(record.wait_conditions)
             })
         end
+    end
+
+    -- If by stripping the temporary stations we've ended up with a blank schedule, we need to
+    -- return an overall nil schedule to avoid an error.
+    if #schedule.records == 0 then
+        return nil
     end
 
     -- As we may have removed temporary stations, check the current station is still in bounds

@@ -74,6 +74,11 @@ function tnp_request_dispatch(player, target, train)
     local schedule = tnp_train_schedule_copy(train)
     local schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
 
+    if not schedule then
+        schedule = {}
+        schedule.records = {}
+    end
+
     if schedule_found == false then
         table.insert(schedule.records, {
             station = target.backer_name,
@@ -116,6 +121,12 @@ function tnp_request_railtooltest(player, target, train)
     end
 
     local schedule = tnp_train_schedule_copy(train)
+
+    if not schedule then
+        schedule = {}
+        schedule.records = {}
+    end
+
     local wait_conditions
 
     if redispatch then
@@ -153,6 +164,11 @@ function tnp_request_redispatch(player, target, train)
 
     local schedule = tnp_train_schedule_copy(train)
     local schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
+
+    if not schedule then
+        schedule = {}
+        schedule.records = {}
+    end
 
     if schedule_found == false then
         table.insert(schedule.records, {
