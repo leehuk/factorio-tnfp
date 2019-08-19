@@ -114,6 +114,11 @@ function tnp_action_player_railtool(player, entities)
     end
 
     if target then
+        if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
+            player.clean_cursor()
+        end
+        player.close_map()
+
         -- The player is on the train, this is a redispatch.
         if player.vehicle and player.vehicle.train then
             tnp_action_player_request_boarded(player, player.vehicle.train, target)
@@ -135,7 +140,12 @@ function tnp_action_player_railtool(player, entities)
         until i > #valid_rails or complete
     end
 
-    if not complete then
+    if complete then
+        if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
+            player.clean_cursor()
+        end
+        player.close_map()
+    else
         tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
         return
     end
