@@ -21,8 +21,10 @@ function tnp_handle_gui_click(event)
         return
     end
 
-    if event.element.name == "tnp-stationlist-headingbuttonclose" then
+    if event.element.name == "tnp-stationlist-headingbutton-close" then
         tnp_action_stationselect_cancel(player)
+    elseif event.element.name == "tnp-stationlist-headingbutton-railtool" then
+        tnp_action_stationselect_railtoolmap(player)
     elseif string.find(event.element.name, "tnp-stationlist-dest", 1, true) ~= nil then
         tnp_action_stationselect_redispatch(player, event.element)
     end

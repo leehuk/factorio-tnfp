@@ -30,11 +30,30 @@ function tnp_gui_stationlist(player, train)
         caption = "TNfP Station Select",
         style = "tnp_stationlist_headingtext"
     })
-    local gui_close = gui_heading_area.add({
-        name = "tnp-stationlist-headingbuttonclose",
+
+    local gui_heading_buttonarea = gui_heading_area.add({
+        name = "tnp-stationlist-headingbuttonarea",
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_headingbuttonarea"
+    })
+    local gui_railtool = gui_heading_buttonarea.add({
+        name = "tnp-stationlist-headingbutton-railtool",
         type = "sprite-button",
-        sprite = "tnp_close",
-        style = "tnp_stationlist_headingbutton"
+        sprite = "tnp_button_railtool",
+        style = "tnp_stationlist_headingbutton_railtool"
+    })
+    gui_heading_buttonarea.add({
+        name = "tnp-stationlist-headingbutton-spacer1",
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_headingbutton_spacer"
+    })
+    local gui_close = gui_heading_buttonarea.add({
+        name = "tnp-stationlist-headingbutton-close",
+        type = "sprite-button",
+        sprite = "tnp_button_close",
+        style = "tnp_stationlist_headingbutton_close"
     })
     tnp_state_gui_set(gui_close, player, 'close', true)
 

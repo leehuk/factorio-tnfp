@@ -247,6 +247,12 @@ function tnp_action_stationselect_cancel(player)
     tnp_request_cancel(player, train, nil)
 end
 
+function tnp_action_stationselect_railtoolmap(player)
+    tnp_gui_stationlist_close(player)
+    player.open_map(player.position)
+    tnp_action_railtool(player)
+end
+
 -- tnp_action_stationselect_redispatch()
 --   Actions a stationselect request to redispatch
 function tnp_action_stationselect_redispatch(player, gui)
