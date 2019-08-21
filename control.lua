@@ -1,7 +1,6 @@
-Table = require('__stdlib__/stdlib/utils/table')
-
 tnpdefines = {}
 
+require('util')
 require('tnp/action')
 require('tnp/draw')
 require('tnp/dynamicstop')

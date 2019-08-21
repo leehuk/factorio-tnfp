@@ -44,7 +44,7 @@ function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manu
 
     if schedule then
         tnp_state_train_set(train, 'expect_schedulechange', true)
-        train.schedule = Table.deep_copy(schedule)
+        train.schedule = util.table.deepcopy(schedule)
     end
 
     if manual_mode_post == false or manual_mode_post == true then
@@ -182,7 +182,7 @@ function tnp_train_schedule_copy(train)
         if not record.temporary or record.temporary == false then
             table.insert(schedule.records, {
                 station = record.station,
-                wait_conditions = Table.deep_copy(record.wait_conditions)
+                wait_conditions = util.table.deepcopy(record.wait_conditions)
             })
         end
     end

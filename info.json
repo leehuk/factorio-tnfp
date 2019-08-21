@@ -7,5 +7,5 @@
     "author": "leeh",
     "homepage": "",
     "description": "",
-    "dependencies": ["base", "stdlib >= 1.0.4", "? LogisticTrainNetwork"]
+    "dependencies": ["base >= 0.17.41", "? LogisticTrainNetwork"]
   }
