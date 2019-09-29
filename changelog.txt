@@ -1,27 +1,27 @@
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.5.0
 Date: 2019-09-29
   Changes:
-    - Add a search field to the Station Select dialog to filter the list of stations
-      with a mod setting to automatically focus it.
+    - Add a search field to the Station Select dialog to filter the list of stations with a mod
+      setting to automatically focus it.
     - Add a button to the Station Select dialog to open the map with a railtool in hand
     - The railtool will now automatically close the map and clear the cursor on success
     - Make the station select dialog use localised text strings
     - Updated railtool icon
     - Replace stdlib dependency with standard util.table.deepcopy()
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.4.3
 Date: 2019-07-31
   Changes:
     - Fix an error since 0.17.59 with assigning an empty train schedule using an empty
       hash instead of nil.
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.4.2
 Date: 2019-07-17
   Changes:
     - Fix a multiplayer desync issue and improve state management
     - Fix an error in multiplayer with the stationselect
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.4.1
 Date: 2019-07-12
   Changes:
@@ -32,7 +32,7 @@ Date: 2019-07-12
     - Add general support for other modded train stops, with a configuration option to
       control whether these are treated 'safely' and ignored or dispatched to.
     - Fix a crash when using the railtool a second time over a temporary station.
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.4.0
 Date: 2019-06-06
   Changes:
@@ -51,7 +51,7 @@ Date: 2019-06-06
     - Minor icon update.
     - Allow the station select to be triggered on trains with no schedule.
     - Significant refactoring to support the TNfP Rail Tool.
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.3.0
 Date: 2019-06-01
   Changes:
@@ -64,7 +64,7 @@ Date: 2019-06-01
       and players that become invalid, as well as avoid double dispatching trains or
       trains with passengers.
     - Add some additional log messages to make errors and completion clearer.
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.2.0
 Date: 2019-05-30
   Changes:
@@ -76,9 +76,8 @@ Date: 2019-05-30
       the passenger is no longer present.  We also now complete correctly if the player
       gets off the train.
     - Add handling of trains switched to manual mode when they're not moving.
-----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2019-05-25
   Changes:
     - initial release
-----------------------------------------------------------------------------------------
