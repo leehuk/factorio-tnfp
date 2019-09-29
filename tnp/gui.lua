@@ -1,6 +1,8 @@
 -- tnp_gui_stationlist()
 --   Draws the station select gui
 function tnp_gui_stationlist(player, train)
+    local config = settings.get_player_settings(player)
+
     -- If a GUI already exists destroy it
     for _, child in pairs(player.gui.center.children) do
         if child.name == "tnp-stationlist" then
@@ -99,6 +101,10 @@ function tnp_gui_stationlist(player, train)
         style = "tnp_stationlist_search",
         selectable = true
     })
+
+    if config['tnp-stationlist-focussearch'].value == true then
+        gui_stationsearch.focus()
+    end
 
     -- Station Lists, scroll panes
     local gui_stationlist_tnfp = gui_top.add({

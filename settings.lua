@@ -79,5 +79,12 @@ data:extend({
         default_value = 15,
         minimum_value = 1,
         maximum_value = 120
+    },
+    {
+        name = "tnp-stationlist-focussearch",
+        type = "bool-setting",
+        setting_type = "runtime-per-user",
+        order = "c[stationlist]-a[focussearch]",
+        default_value = false
     }
 })
