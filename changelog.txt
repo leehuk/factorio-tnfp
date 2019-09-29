@@ -1,4 +1,15 @@
 ----------------------------------------------------------------------------------------
+Version: 0.5.0
+Date: 2019-09-29
+  Changes:
+    - Add a search field to the Station Select dialog to filter the list of stations
+      with a mod setting to automatically focus it.
+    - Add a button to the Station Select dialog to open the map with a railtool in hand
+    - The railtool will now automatically close the map and clear the cursor on success
+    - Make the station select dialog use localised text strings
+    - Updated railtool icon
+    - Replace stdlib dependency with standard util.table.deepcopy()
+----------------------------------------------------------------------------------------
 Version: 0.4.3
 Date: 2019-07-31
   Changes:
