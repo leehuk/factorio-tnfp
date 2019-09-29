@@ -27,7 +27,7 @@ function tnp_gui_stationlist(player, train)
     gui_heading_area.add({
         name = "tnp-stationlist-headingtext",
         type = "label",
-        caption = "TNfP Station Select",
+        caption = {"tnp_gui_stationlist_heading"},
         style = "tnp_stationlist_headingtext"
     })
 
@@ -67,21 +67,21 @@ function tnp_gui_stationlist(player, train)
     local gui_stationtype_tnfp = gui_stationtype_area.add({
         name = "tnp-stationlist-stationtypetnfp",
         type = "radiobutton",
-        caption = "Show TNfP Stations",
+        caption = {"tnp_gui_stationlist_typetnfp"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
     local gui_stationtype_train = gui_stationtype_area.add({
         name = "tnp-stationlist-stationtypetrain",
         type = "radiobutton",
-        caption = "Show Stations from Train",
+        caption = {"tnp_gui_stationlist_typetrain"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
     local gui_stationtype_all = gui_stationtype_area.add({
         name = "tnp-stationlist-stationtypeall",
         type = "radiobutton",
-        caption = "Show All Stations",
+        caption = {"tnp_gui_stationlist_typeall"},
         state = true,
         style = "tnp_stationlist_stationtyperadio"
     })
