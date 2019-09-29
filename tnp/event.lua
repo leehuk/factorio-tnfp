@@ -21,10 +21,26 @@ function tnp_handle_gui_click(event)
         return
     end
 
-    if event.element.name == "tnp-stationlist-headingbuttonclose" then
+    if event.element.name == "tnp-stationlist-headingbutton-close" then
         tnp_action_stationselect_cancel(player)
+    elseif event.element.name == "tnp-stationlist-headingbutton-railtool" then
+        tnp_action_stationselect_railtoolmap(player)
     elseif string.find(event.element.name, "tnp-stationlist-dest", 1, true) ~= nil then
         tnp_action_stationselect_redispatch(player, event.element)
+    end
+end
+
+-- tnp_handle_gui_text()
+--   Handles text input via gui elements
+function tnp_handle_gui_text(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    if event.element.name == "tnp-stationlist-search" then
+        tnp_gui_stationlist_search(player, event.element)
     end
 end
 

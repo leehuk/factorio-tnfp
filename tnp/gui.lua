@@ -1,6 +1,8 @@
 -- tnp_gui_stationlist()
 --   Draws the station select gui
 function tnp_gui_stationlist(player, train)
+    local config = settings.get_player_settings(player)
+
     -- If a GUI already exists destroy it
     for _, child in pairs(player.gui.center.children) do
         if child.name == "tnp-stationlist" then
@@ -27,14 +29,33 @@ function tnp_gui_stationlist(player, train)
     gui_heading_area.add({
         name = "tnp-stationlist-headingtext",
         type = "label",
-        caption = "TNfP Station Select",
+        caption = {"tnp_gui_stationlist_heading"},
         style = "tnp_stationlist_headingtext"
     })
-    local gui_close = gui_heading_area.add({
-        name = "tnp-stationlist-headingbuttonclose",
+
+    local gui_heading_buttonarea = gui_heading_area.add({
+        name = "tnp-stationlist-headingbuttonarea",
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_headingbuttonarea"
+    })
+    local gui_railtool = gui_heading_buttonarea.add({
+        name = "tnp-stationlist-headingbutton-railtool",
         type = "sprite-button",
-        sprite = "tnp_close",
-        style = "tnp_stationlist_headingbutton"
+        sprite = "tnp_button_railtool",
+        style = "tnp_stationlist_headingbutton_railtool"
+    })
+    gui_heading_buttonarea.add({
+        name = "tnp-stationlist-headingbutton-spacer1",
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_headingbutton_spacer"
+    })
+    local gui_close = gui_heading_buttonarea.add({
+        name = "tnp-stationlist-headingbutton-close",
+        type = "sprite-button",
+        sprite = "tnp_button_close",
+        style = "tnp_stationlist_headingbutton_close"
     })
     tnp_state_gui_set(gui_close, player, 'close', true)
 
@@ -48,24 +69,42 @@ function tnp_gui_stationlist(player, train)
     local gui_stationtype_tnfp = gui_stationtype_area.add({
         name = "tnp-stationlist-stationtypetnfp",
         type = "radiobutton",
-        caption = "Show TNfP Stations",
+        caption = {"tnp_gui_stationlist_typetnfp"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
     local gui_stationtype_train = gui_stationtype_area.add({
         name = "tnp-stationlist-stationtypetrain",
         type = "radiobutton",
-        caption = "Show Stations from Train",
+        caption = {"tnp_gui_stationlist_typetrain"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
     local gui_stationtype_all = gui_stationtype_area.add({
         name = "tnp-stationlist-stationtypeall",
         type = "radiobutton",
-        caption = "Show All Stations",
+        caption = {"tnp_gui_stationlist_typeall"},
         state = true,
         style = "tnp_stationlist_stationtyperadio"
     })
+
+    local gui_stationsearch_area = gui_top.add({
+        name = "tnp-stationlist-searcharea",
+        type = "flow",
+        direction = "vertical",
+        style = "tnp_stationlist_searcharea"
+    })
+
+    local gui_stationsearch = gui_stationsearch_area.add({
+        name = "tnp-stationlist-search",
+        type = "textfield",
+        style = "tnp_stationlist_search",
+        selectable = true
+    })
+
+    if config['tnp-stationlist-focussearch'].value == true then
+        gui_stationsearch.focus()
+    end
 
     -- Station Lists, scroll panes
     local gui_stationlist_tnfp = gui_top.add({
@@ -225,6 +264,27 @@ function tnp_gui_stationlist_close(player)
 
     tnp_state_player_delete(player, 'gui')
     _tnp_state_gui_prune()
+end
+
+-- tnp_gui_stationlist_search()
+--   Handles filtering the list of stations in the stationselect
+function tnp_gui_stationlist_search(player, element)
+    local gui_stationsearch_area = element.parent
+    local gui_top = gui_stationsearch_area.parent
+    local search = element.text:lower()
+
+    for _, stationlist in pairs(gui_top.children) do
+        if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" then
+            local stationtable = stationlist.children[1]
+            for _, station in pairs(stationtable.children) do
+                if search == "" or station.caption:lower():find(search, 1, true) ~= nil then
+                    station.visible = true
+                else
+                    station.visible = false
+                end
+            end
+        end
+    end
 end
 
 -- tnp_gui_stationlist_switch()
