@@ -86,6 +86,20 @@ function tnp_gui_stationlist(player, train)
         style = "tnp_stationlist_stationtyperadio"
     })
 
+    local gui_stationsearch_area = gui_top.add({
+        name = "tnp-stationlist-searcharea",
+        type = "flow",
+        direction = "vertical",
+        style = "tnp_stationlist_searcharea"
+    })
+
+    local gui_stationsearch = gui_stationsearch_area.add({
+        name = "tnp-stationlist-search",
+        type = "textfield",
+        style = "tnp_stationlist_search",
+        selectable = true
+    })
+
     -- Station Lists, scroll panes
     local gui_stationlist_tnfp = gui_top.add({
         name = "tnp-stationlist-stationlisttnfp",
@@ -244,6 +258,27 @@ function tnp_gui_stationlist_close(player)
 
     tnp_state_player_delete(player, 'gui')
     _tnp_state_gui_prune()
+end
+
+-- tnp_gui_stationlist_search()
+--   Handles filtering the list of stations in the stationselect
+function tnp_gui_stationlist_search(player, element)
+    local gui_stationsearch_area = element.parent
+    local gui_top = gui_stationsearch_area.parent
+    local search = element.text:lower()
+
+    for _, stationlist in pairs(gui_top.children) do
+        if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" then
+            local stationtable = stationlist.children[1]
+            for _, station in pairs(stationtable.children) do
+                if search == "" or station.caption:lower():find(search, 1, true) ~= nil then
+                    station.visible = true
+                else
+                    station.visible = false
+                end
+            end
+        end
+    end
 end
 
 -- tnp_gui_stationlist_switch()

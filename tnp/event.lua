@@ -30,6 +30,20 @@ function tnp_handle_gui_click(event)
     end
 end
 
+-- tnp_handle_gui_text()
+--   Handles text input via gui elements
+function tnp_handle_gui_text(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    if event.element.name == "tnp-stationlist-search" then
+        tnp_gui_stationlist_search(player, event.element)
+    end
+end
+
 -- tnp_handle_input()
 --   Handles a request via the custom input
 function tnp_handle_input(event)

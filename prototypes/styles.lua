@@ -1,7 +1,7 @@
 data.raw["gui-style"].default["tnp_stationlist"] = {
     type = "frame_style",
     parent = "frame",
-    height = 498,
+    height = 524,
     width = 356
 }
 
@@ -68,13 +68,29 @@ data.raw["gui-style"].default["tnp_stationlist_stationtypearea"] = {
     type = "vertical_flow_style",
     parent = "vertical_flow",
     visible = true,
-    height = 80,
+    height = 72,
     width = 332
 }
 
 data.raw["gui-style"].default["tnp_stationlist_stationtyperadio"] = {
     type = "radiobutton_style",
     parent = "radiobutton"
+}
+
+data.raw["gui-style"].default["tnp_stationlist_searcharea"] = {
+    type = "vertical_flow_style",
+    parent = "vertical_flow",
+    visible = true,
+    height = 34,
+    width = 332
+}
+
+data.raw["gui-style"].default["tnp_stationlist_search"] = {
+    type = "textbox_style",
+    parent = "textbox",
+    visible = true,
+    height = 30,
+    width = 330
 }
 
 data.raw["gui-style"].default["tnp_stationlist_stationlistscroll"] = {
