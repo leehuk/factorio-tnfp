@@ -84,9 +84,17 @@ function tnp_gui_stationlist(player, train)
         name = "tnp-stationlist-stationtypeall",
         type = "radiobutton",
         caption = {"tnp_gui_stationlist_typeall"},
-        state = true,
+        state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
+
+    if config['tnp-stationlist-view'].value == 'tnfp' then
+        gui_stationtype_tnfp.state = true
+    elseif config['tnp-stationlist-view'].value == 'train' then
+        gui_stationtype_train.state = true
+    else
+        gui_stationtype_all.state = true
+    end
 
     local gui_stationsearch_area = gui_top.add({
         name = "tnp-stationlist-searcharea",
@@ -149,7 +157,7 @@ function tnp_gui_stationlist(player, train)
 
     if gui_stationtype_tnfp.state == true then
         gui_stationlist_tnfp.visible = true
-    elseif gui_stationtype_train == true then
+    elseif gui_stationtype_train.state == true then
         gui_stationlist_train.visible = true
     elseif gui_stationtype_all.state == true then
         gui_stationlist_all.visible = true

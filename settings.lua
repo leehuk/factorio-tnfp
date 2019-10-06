@@ -81,10 +81,22 @@ data:extend({
         maximum_value = 120
     },
     {
+        name = "tnp-stationlist-view",
+        type = "string-setting",
+        setting_type = "runtime-per-user",
+        order = "c[stationlist]-a[view]",
+        default_value = "all",
+        allowed_values = {
+            "train",
+            "tnfp",
+            "all"
+        }
+    },
+    {
         name = "tnp-stationlist-focussearch",
         type = "bool-setting",
         setting_type = "runtime-per-user",
-        order = "c[stationlist]-a[focussearch]",
+        order = "c[stationlist]-b[focussearch]",
         default_value = false
     }
 })
