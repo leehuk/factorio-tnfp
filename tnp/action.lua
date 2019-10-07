@@ -345,6 +345,8 @@ function tnp_action_train_statechange(train)
         return
     end
 
+    local config = settings.get_player_settings(player)
+
     -- We have now seen a state change request for one of our railtool tests
     if status == tnpdefines.train.status.railtooltest then
         tnp_state_train_delete(train, 'timeout_railtooltest')
@@ -477,13 +479,21 @@ function tnp_action_train_statechange(train)
             -- Our train has arrived at a different station.
             local station_train = station.get_stopped_train()
             if not station_train or not station_train.valid or not station_train.id == train.id then
-                tnp_train_enact(train, true, nil, nil, false)
-                tnp_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
-                return
-            end
+                if train.station ~= nil and train.station.valid and train.station.backer_name == station.backer_name then
+                    if config['tnp-train-arrival-path'].value then
+                        tnp_draw_path(player, train.station)
+                    end
 
-            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived"})
-            tnp_action_train_arrival(player, train)
+                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_alternate", station.backer_name})
+                    tnp_action_train_arrival(player, train)
+                else
+                    tnp_train_enact(train, true, nil, nil, false)
+                    tnp_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
+                end
+            else
+                tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived"})
+                tnp_action_train_arrival(player, train)
+            end
 
         elseif status == tnpdefines.train.status.redispatched then
             -- This was an redispatch station -- so wait for the passenger to disembark

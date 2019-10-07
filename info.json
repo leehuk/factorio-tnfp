@@ -1,9 +1,9 @@
 {
     "name": "TrainNetworkForPlayers",
     "title": "Train Network for Players",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "factorio_version": "0.17",
-    "date": "2019-09-29",
+    "date": "2019-10-07",
     "author": "leeh",
     "homepage": "https://leehuk.github.io/factorio-tnfp/",
     "description": "",

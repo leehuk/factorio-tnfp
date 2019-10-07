@@ -20,6 +20,7 @@ The station select dialog provides a quick way of moving between stations and ca
 * Filter the list of stations further via the search bar.
 * Selecting a station will temporarily add it to the trains schedule and dispatch the train there, where it will wait for the player to exit before resuming its previous schedule.
 * The railtool button will provide a railtool and open the map, allowing the train to be dispatched to any valid rail segment.
+* Mod setting to control the default filter
 
 ### TNfP Network
 If one or more trains are assigned into a TNfP network they can be automatically dispatched to the players location using the two shortcuts:

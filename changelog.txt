@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.1
+Date: 2019-10-07
+  Changes:
+    - Add a mod setting to control the default view in the station select dialog
+    - Amend dispatch logic so the train arriving at a different station than the one it expects
+      but with the same name is handled gracefully
+    - Fix localisation of mod setting dropdowns
+---------------------------------------------------------------------------------------------------
 Version: 0.5.0
 Date: 2019-09-29
   Changes:
