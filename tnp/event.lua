@@ -162,28 +162,18 @@ end
 --   Handles a player entering or exiting a vehicle
 function tnp_handle_player_vehicle(event)
     local player = game.players[event.player_index]
+    local vehicle = event.entity
 
-    if not player.valid then
+    if not player.valid or not vehicle or not vehicle.valid then
         return
     end
 
-    -- This player doesnt have a request outstanding
-    if not tnp_state_player_query(player) then
-        -- Check whether they've stolen a tnp assigned train
-        if event.entity and event.entity.train and tnp_state_train_query(event.entity.train) then
-            local train = event.entity.train
-            local train_player = tnp_state_train_get(train, 'player')
-
-            if train_player and (not train_player.valid or train_player.index ~= player.index) then
-                tnp_train_enact(train, true, nil, nil, nil)
-                tnp_request_cancel(train_player, train, {"tnp_train_cancelled_stolen", player.name})
-            end
-        end
-
+    -- This is a non-train vehicle
+    if not vehicle.train then
         return
     end
 
-    tnp_action_player_vehicle(player, player.vehicle)
+    tnp_action_player_train(player, vehicle.train)
 end
 
 
