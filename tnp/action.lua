@@ -206,9 +206,35 @@ function tnp_action_player_train(player, train)
         if status == tnpdefines.train.status.arrived then
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, {"tnp_train_cancelled"})
-        elseif status == tnpdefines.train.status.redispatched or status == tnpdefines.train.status.rearrived then
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_complete"})
+        elseif status == tnpdefines.train.status.redispatched then
+            if tnp_state_train_get(train, 'keep_schedule') then
+                local station = tnp_state_train_get(train, 'station')
+
+                local target = "?"
+                if station and station.valid then
+                    target = station.backer_name
+                end
+
+                tnp_request_cancel(player, train, {"tnp_train_complete_continue", target})
+            else
+                tnp_train_enact(train, true, nil, nil, nil)
+                tnp_request_cancel(player, train, {"tnp_train_complete_resume"})
+            end
+        elseif status == tnpdefines.train.status.rearrived then
+            if tnp_state_train_get(train, 'keep_schedule') then
+                local station = tnp_state_train_get(train, 'station')
+
+                local target = "?"
+                if station and station.valid then
+                    target = station.backer_name
+                end
+
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_remain", target})
+                tnp_request_cancel(player, train, nil)
+            else
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_resume"})
+                tnp_train_enact(train, true, nil, nil, nil)
+            end
         end
     end
 end
