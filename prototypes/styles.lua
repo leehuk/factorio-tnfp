@@ -9,7 +9,7 @@ data.raw["gui-style"].default["tnp_stationlist_headingarea"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",
     visible = true,
-    height = 37,
+    height = 29,
     width = 340,
     cell_padding = 0
 }
@@ -20,7 +20,7 @@ data.raw["gui-style"].default["tnp_stationlist_headingtext"] = {
     single_line = true,
     horizontal_align = "left",
     vertical_align = "center",
-    width = 248,
+    width = 264,
     cell_padding = 0
 }
 
@@ -28,7 +28,7 @@ data.raw["gui-style"].default["tnp_stationlist_headingbuttonarea"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",
     visible = true,
-    height = 36,
+    height = 28,
     width = 96,
     cell_padding = 0
 }
@@ -37,8 +37,8 @@ data.raw["gui-style"].default["tnp_stationlist_headingbutton_spacer"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",
     visible = true,
-    height = 36,
-    width = 6,
+    height = 28,
+    width = 4,
     cell_padding = 0
 }
 
@@ -48,8 +48,8 @@ data.raw["gui-style"].default["tnp_stationlist_headingbutton_railtool"] = {
     horizontal_align = "right",
     vertical_align = "center",
     scalable = false,
-    height = 36,
-    width = 36,
+    height = 28,
+    width = 28,
     cell_padding = 0
 }
 
@@ -59,8 +59,8 @@ data.raw["gui-style"].default["tnp_stationlist_headingbutton_close"] = {
     horizontal_align = "right",
     vertical_align = "center",
     scalable = false,
-    height = 36,
-    width = 36,
+    height = 28,
+    width = 28,
     cell_padding = 0
 }
 
@@ -95,7 +95,7 @@ data.raw["gui-style"].default["tnp_stationlist_search"] = {
 
 data.raw["gui-style"].default["tnp_stationlist_stationlistscroll"] = {
     type = "scroll_pane_style",
-    height = 350,
+    height = 362,
     width = 332
 }
 
