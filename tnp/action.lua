@@ -564,6 +564,10 @@ function tnp_action_train_statechange(train)
             -- Train had arrived, but we still need to restore the schedule.
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, {"tnp_train_cancelled_manual"})
+
+        elseif status == tnpdefines.train.status.rearrived then
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_request_cancel(player, train, {"tnp_train_complete_manual"})
         end
     end
 end
