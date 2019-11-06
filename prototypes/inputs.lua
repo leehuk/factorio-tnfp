@@ -10,5 +10,11 @@ data:extend({
         type = "custom-input",
         key_sequence = "SHIFT + ALT + P",
         consuming = "none"
+    },
+    {
+        name = "tnp-handle-train-manual",
+        type = "custom-input",
+        key_sequence = "SHIFT + ALT + M",
+        consuming = "none"
     }
 })

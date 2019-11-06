@@ -51,6 +51,8 @@ function tnp_handle_input(event)
         tnp_handle_request(event, false)
     elseif event.input_name == "tnp-handle-railtool" then
         tnp_handle_railtool(event, false)
+    elseif event.input_name == "tnp-handle-train-manual" then
+        tnp_handle_train_manual(event)
     end
 end
 
@@ -176,6 +178,21 @@ function tnp_handle_player_vehicle(event)
     tnp_action_player_train(player, vehicle.train)
 end
 
+-- tnp_handle_train_manual()
+--   Handles a player requesting a train is switched to manual mode
+function tnp_handle_train_manual(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    if not player.vehicle or not player.vehicle.valid or not player.vehicle.train then
+        return
+    end
+
+    player.vehicle.train.manual_mode = true
+end
 
 -- tnp_handle_train_schedulechange()
 --   Handles a trains schedule being changed
