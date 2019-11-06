@@ -3,6 +3,7 @@
         close           = boolean, if this button closes the gui
         element         = LuaGuiElement
         name            = string, name of button
+        pinstation      = LuaElement, if this is a station gui its the station element for pinning
         player          = LuaPlayer, reference to player.
         station         = LuaElement, if this is a station gui its the station element
 ]]

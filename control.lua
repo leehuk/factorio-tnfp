@@ -14,6 +14,7 @@ require('tnp/state_dynamicstop')
 require('tnp/state_gui')
 require('tnp/state_ltnstop')
 require('tnp/state_player')
+require('tnp/state_stationpins')
 require('tnp/state_train')
 require('tnp/stop')
 require('tnp/train')
@@ -63,6 +64,7 @@ script.on_init(function()
     global.gui_data = global.gui_data or {}
     global.ltnstop_data = global.ltnstop_data or {}
     global.player_data = global.player_data or {}
+    global.stationpins_data = global.stationpins_data or {}
     global.train_data = global.train_data or {}
 end)
 
@@ -83,6 +85,11 @@ script.on_configuration_changed(function(event)
             global.ltnstop_data = global.ltnstop_data or {}
             global.player_data = global.player_data or {}
             global.train_data = global.train_data or {}
+        end
+
+        if event["mod_changes"]["TrainNetworkForPlayers"]["version"] == "0.4.2" then
+            event["mod_changes"]["TrainNetworkForPlayers"]["version"] = "0.6.0"
+            global.stationpins_data = global.stationpins_data or {}
         end
     end
 end)
