@@ -81,7 +81,7 @@ data.raw["gui-style"].default["tnp_stationlist_searcharea"] = {
     type = "vertical_flow_style",
     parent = "vertical_flow",
     visible = true,
-    height = 34,
+    height = 30,
     width = 332
 }
 
@@ -90,13 +90,15 @@ data.raw["gui-style"].default["tnp_stationlist_search"] = {
     parent = "textbox",
     visible = true,
     height = 30,
-    width = 330
+    width = 332
 }
 
 data.raw["gui-style"].default["tnp_stationlist_stationlistscroll"] = {
     type = "scroll_pane_style",
     height = 362,
-    width = 332
+    width = 332,
+    vertical_scroll_policy = "auto-and-reserve-space",
+    horizontal_scroll_policy = "never"
 }
 
 data.raw["gui-style"].default["tnp_stationlist_stationlisttable"] = {
@@ -108,5 +110,6 @@ data.raw["gui-style"].default["tnp_stationlist_stationlistentry"] = {
     type = "button_style",
     parent = "button",
     horizontal_align = "left",
-    width = 310
+    natural_width = 324,
+    horizontally_squashable = "on"
 }
