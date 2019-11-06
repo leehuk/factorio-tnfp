@@ -132,6 +132,7 @@ data.raw["gui-style"].default["tnp_stationlist_stationlistrow"] = {
     visible = true,
     height = 28,
     natural_width = 324,
+    horizontal_spacing = 1,
     horizontally_squashable = "on"
 }
 
@@ -142,4 +143,28 @@ data.raw["gui-style"].default["tnp_stationlist_stationlistentry"] = {
     height = 28,
     natural_width = 324,
     horizontally_squashable = "on"
+}
+
+data.raw["gui-style"].default["tnp_stationlist_stationlistpin"] = {
+    type = "button_style",
+    parent = "button",
+    horizontal_align = "center",
+    vertical_align = "center",
+    height = 28,
+    width = 28,
+    scalable = false,
+    padding = 2,
+    margin = 0
+}
+
+data.raw["gui-style"].default["tnp_stationlist_stationlistpinned"] = {
+    type = "button_style",
+    parent = "dark_button",
+    horizontal_align = "center",
+    vertical_align = "center",
+    height = 28,
+    width = 28,
+    scalable = false,
+    padding = 2,
+    margin = 0
 }
