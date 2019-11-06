@@ -125,7 +125,8 @@ function tnp_gui_stationlist(player, train)
         name = "tnp-stationlist-search",
         type = "textfield",
         style = "tnp_stationlist_search",
-        selectable = true
+        selectable = true,
+        clear_and_focus_on_right_click = true
     })
 
     if config['tnp-stationlist-focussearch'].value == true then
