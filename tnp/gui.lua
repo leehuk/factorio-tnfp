@@ -59,31 +59,49 @@ function tnp_gui_stationlist(player, train)
     })
     tnp_state_gui_set(gui_close, player, 'close', true)
 
+    gui_top.add({
+        name = "tnp-stationlist-heading-line",
+        type = "line",
+        direction = "horizontal"
+    })
+
     -- Station Type Frame
     local gui_stationtype_area = gui_top.add({
         name = "tnp-stationlist-stationtypearea",
         type = "flow",
-        direction = "vertical",
+        direction = "horizontal",
         style = "tnp_stationlist_stationtypearea"
     })
-    local gui_stationtype_tnfp = gui_stationtype_area.add({
-        name = "tnp-stationlist-stationtypetnfp",
-        type = "radiobutton",
-        caption = {"tnp_gui_stationlist_typetnfp"},
-        state = false,
-        style = "tnp_stationlist_stationtyperadio"
+    gui_stationtype_area.add({
+        name = "tnp-stationlist-stationtypetext",
+        type = "label",
+        caption = {"tnp_gui_stationlist_stationtype"},
+        style = "tnp_stationlist_stationtypetext"
     })
-    local gui_stationtype_train = gui_stationtype_area.add({
+    local gui_stationtype_table = gui_stationtype_area.add({
+        name = "tnp-stationlist-stationtypetable",
+        type = "table",
+        column_count = 3,
+        style = "tnp_stationlist_stationtypetable"
+    })
+    local gui_stationtype_train = gui_stationtype_table.add({
         name = "tnp-stationlist-stationtypetrain",
         type = "radiobutton",
-        caption = {"tnp_gui_stationlist_typetrain"},
+        caption = {"tnp_gui_stationlist_stationtype_schedule"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
-    local gui_stationtype_all = gui_stationtype_area.add({
+    local gui_stationtype_tnfp = gui_stationtype_table.add({
+        name = "tnp-stationlist-stationtypetnfp",
+        type = "radiobutton",
+        caption = {"tnp_gui_stationlist_stationtype_tnfp"},
+        state = false,
+        style = "tnp_stationlist_stationtyperadio"
+    })
+    local gui_stationtype_all = gui_stationtype_table.add({
         name = "tnp-stationlist-stationtypeall",
         type = "radiobutton",
-        caption = {"tnp_gui_stationlist_typeall"},
+        caption = {"tnp_gui_stationlist_stationtype_all"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
@@ -299,9 +317,9 @@ end
 --   Switches the type of stationlist shown
 function tnp_gui_stationlist_switch(player, element)
     -- First, we need to switch off the other radio buttons
-    local gui_stationtype_area = element.parent
-    if gui_stationtype_area.name == "tnp-stationlist-stationtypearea" then
-        for _, child in pairs(gui_stationtype_area.children) do
+    local gui_stationtype_table = element.parent
+    if gui_stationtype_table.name == "tnp-stationlist-stationtypetable" then
+        for _, child in pairs(gui_stationtype_table.children) do
             if child.index ~= element.index then
                 child.state = false
             end
@@ -309,7 +327,7 @@ function tnp_gui_stationlist_switch(player, element)
     end
 
     -- Now we need to sort the scroll areas out
-    local gui_top = gui_stationtype_area.parent
+    local gui_top = gui_stationtype_table.parent.parent
     for _, child in pairs(gui_top.children) do
         if child.name == "tnp-stationlist-stationlisttnfp" then
             if element.name == "tnp-stationlist-stationtypetnfp" then

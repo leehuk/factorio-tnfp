@@ -65,24 +65,44 @@ data.raw["gui-style"].default["tnp_stationlist_headingbutton_close"] = {
 }
 
 data.raw["gui-style"].default["tnp_stationlist_stationtypearea"] = {
-    type = "vertical_flow_style",
-    parent = "vertical_flow",
+    type = "horizontal_flow_style",
+    parent = "horizontal_flow",
     visible = true,
-    height = 72,
+    height = 20,
     width = 332
+}
+
+data.raw["gui-style"].default["tnp_stationlist_stationtypetext"] = {
+    type = "label_style",
+    font = "default-bold",
+    single_line = true,
+    horizontal_align = "left",
+    vertical_align = "center",
+    cell_padding = 0,
+    left_padding = 4
+}
+
+data.raw["gui-style"].default["tnp_stationlist_stationtypetable"] = {
+    type = "table_style",
+    vertical_spacing = 0,
+    draw_vertical_lines = true,
+    natural_width = 332,
+    horizontally_squashable = "on"
 }
 
 data.raw["gui-style"].default["tnp_stationlist_stationtyperadio"] = {
     type = "radiobutton_style",
-    parent = "radiobutton"
+    parent = "radiobutton",
+    horizontally_stretchable = "on"
 }
 
 data.raw["gui-style"].default["tnp_stationlist_searcharea"] = {
     type = "vertical_flow_style",
     parent = "vertical_flow",
     visible = true,
-    height = 30,
-    width = 332
+    height = 34,
+    width = 332,
+    bottom_padding = 4
 }
 
 data.raw["gui-style"].default["tnp_stationlist_search"] = {
@@ -95,7 +115,7 @@ data.raw["gui-style"].default["tnp_stationlist_search"] = {
 
 data.raw["gui-style"].default["tnp_stationlist_stationlistscroll"] = {
     type = "scroll_pane_style",
-    height = 362,
+    height = 404,
     width = 332,
     vertical_scroll_policy = "auto-and-reserve-space",
     horizontal_scroll_policy = "never"
