@@ -200,26 +200,8 @@ function tnp_gui_stationlist(player, train)
     end
     table.sort(stations_key)
 
-    for i, station in ipairs(stations_key) do
-        local caption = station
-        if stations_map_count[station] > 1 then
-            caption = caption .. " (" .. stations_map_count[station] .. ")"
-        end
-
-        local gui_row = gui_stationtable_tnfp.add({
-            name = "tnp-stationlist-rowtnfp-" .. i,
-            type = "flow",
-            direction = "horizontal",
-            style = "tnp_stationlist_stationlistrow"
-        })
-        local gui_button = gui_row.add({
-            name = "tnp-stationlist-desttnfp-" .. i,
-            type = "button",
-            caption = caption,
-            style = "tnp_stationlist_stationlistentry"
-        })
-
-        tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
+    for i, stationname in ipairs(stations_key) do
+        tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false)
     end
 
     -- Secondly and thirdly, the stops this train has and the all list.  Both use the same data.
@@ -243,55 +225,47 @@ function tnp_gui_stationlist(player, train)
     end
     table.sort(stations_key)
 
-    for i, station in ipairs(stations_key) do
+    for i, stationname in ipairs(stations_key) do
         -- The trains schedule is not a map to entities -- its just a set of string station names, so
         -- in order to fit our entity flow we'd have to map each one back to the entity.  Given we're
         -- looping over all train stops anyway, looping over the trains isnt unreasonable.
-        local trains = stations_map[station].get_train_stop_trains()
+        local trains = stations_map[stationname].get_train_stop_trains()
         if trains then
             for _, stationtrain in pairs(trains) do
                 if train.id == stationtrain.id then
-                    local caption = station
-                    if stations_map_count[station] > 1 then
-                        caption = caption .. " (" .. stations_map_count[station] .. ")"
-                    end
-
-                    local gui_row = gui_stationtable_train.add({
-                        name = "tnp-stationlist-rowtrain-" .. i,
-                        type = "flow",
-                        direction = "horizontal",
-                        style = "tnp_stationlist_stationlistrow"
-                    })
-                    local gui_button = gui_row.add({
-                        name = "tnp-stationlist-desttrain-" .. i,
-                        type = "button",
-                        caption = caption,
-                        style = "tnp_stationlist_stationlistentry"
-                    })
-                    tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
+                    tnp_gui_stationlist_addentry(player, gui_stationtable_train, "train", i, stations_map[stationname], stations_map_count[stationname], false)
                 end
             end
         end
 
-        local caption = station
-        if stations_map_count[station] > 1 then
-            caption = caption .. " (" .. stations_map_count[station] .. ")"
+        if tnp_state_stationpins_check(player, stations_map[stationname]) ~= true then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], false)
         end
-
-        local gui_row = gui_stationtable_all.add({
-            name = "tnp-stationlist-rowall-" .. i,
-            type = "flow",
-            direction = "horizontal",
-            style = "tnp_stationlist_stationlistrow"
-        })
-        local gui_button = gui_row.add({
-            name = "tnp-stationlist-destall-" .. i,
-            type = "button",
-            caption = caption,
-            style = "tnp_stationlist_stationlistentry"
-        })
-        tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
     end
+end
+
+-- tnp_gui_stationlist_addentry()
+--   Adds an entry to a given stationlist table
+function tnp_gui_stationlist_addentry(player, stationtable, tablename, idx, station, count, pinned)
+    local caption = station.backer_name
+    if count > 1 then
+        caption = caption .. " (" .. count .. ")"
+    end
+
+    local gui_row = stationtable.add({
+        name = "tnp-stationlist-row" .. tablename .. "-" .. idx,
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_stationlistrow"
+    })
+
+    local gui_button = gui_row.add({
+        name = "tnp-stationlist-dest" .. tablename .. "-" .. idx,
+        type = "button",
+        caption = caption,
+        style = "tnp_stationlist_stationlistentry"
+    })
+    tnp_state_gui_set(gui_button, player, 'station', station)
 end
 
 -- tnp_gui_stationlist_close()
