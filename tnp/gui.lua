@@ -205,7 +205,13 @@ function tnp_gui_stationlist(player, train)
             caption = caption .. " (" .. stations_map_count[station] .. ")"
         end
 
-        local gui_button = gui_stationtable_tnfp.add({
+        local gui_row = gui_stationtable_tnfp.add({
+            name = "tnp-stationlist-rowtnfp-" .. i,
+            type = "flow",
+            direction = "horizontal",
+            style = "tnp_stationlist_stationlistrow"
+        })
+        local gui_button = gui_row.add({
             name = "tnp-stationlist-desttnfp-" .. i,
             type = "button",
             caption = caption,
@@ -249,7 +255,13 @@ function tnp_gui_stationlist(player, train)
                         caption = caption .. " (" .. stations_map_count[station] .. ")"
                     end
 
-                    local gui_button = gui_stationtable_train.add({
+                    local gui_row = gui_stationtable_train.add({
+                        name = "tnp-stationlist-rowtrain-" .. i,
+                        type = "flow",
+                        direction = "horizontal",
+                        style = "tnp_stationlist_stationlistrow"
+                    })
+                    local gui_button = gui_row.add({
                         name = "tnp-stationlist-desttrain-" .. i,
                         type = "button",
                         caption = caption,
@@ -265,7 +277,13 @@ function tnp_gui_stationlist(player, train)
             caption = caption .. " (" .. stations_map_count[station] .. ")"
         end
 
-        local gui_button = gui_stationtable_all.add({
+        local gui_row = gui_stationtable_all.add({
+            name = "tnp-stationlist-rowall-" .. i,
+            type = "flow",
+            direction = "horizontal",
+            style = "tnp_stationlist_stationlistrow"
+        })
+        local gui_button = gui_row.add({
             name = "tnp-stationlist-destall-" .. i,
             type = "button",
             caption = caption,
@@ -302,11 +320,12 @@ function tnp_gui_stationlist_search(player, element)
     for _, stationlist in pairs(gui_top.children) do
         if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" then
             local stationtable = stationlist.children[1]
-            for _, station in pairs(stationtable.children) do
+            for _, row in pairs(stationtable.children) do
+                local station = row.children[1]
                 if search == "" or station.caption:lower():find(search, 1, true) ~= nil then
-                    station.visible = true
+                    row.visible = true
                 else
-                    station.visible = false
+                    row.visible = false
                 end
             end
         end

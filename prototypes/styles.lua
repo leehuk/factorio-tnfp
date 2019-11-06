@@ -126,10 +126,20 @@ data.raw["gui-style"].default["tnp_stationlist_stationlisttable"] = {
     vertical_spacing = 0
 }
 
+data.raw["gui-style"].default["tnp_stationlist_stationlistrow"] = {
+    type = "horizontal_flow_style",
+    parent = "horizontal_flow",
+    visible = true,
+    height = 28,
+    natural_width = 324,
+    horizontally_squashable = "on"
+}
+
 data.raw["gui-style"].default["tnp_stationlist_stationlistentry"] = {
     type = "button_style",
     parent = "button",
     horizontal_align = "left",
+    height = 28,
     natural_width = 324,
     horizontally_squashable = "on"
 }
