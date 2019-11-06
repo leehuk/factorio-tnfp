@@ -27,6 +27,8 @@ function tnp_handle_gui_click(event)
         tnp_action_stationselect_railtoolmap(player)
     elseif string.find(event.element.name, "tnp-stationlist-dest", 1, true) ~= nil then
         tnp_action_stationselect_redispatch(player, event.element)
+    elseif string.find(event.element.name, "tnp-stationlist-pin", 1, true) ~= nil then
+        tnp_action_stationselect_pin(player, event.element)
     end
 end
 

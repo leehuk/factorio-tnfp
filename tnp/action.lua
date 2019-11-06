@@ -286,6 +286,18 @@ function tnp_action_stationselect_cancel(player)
     tnp_request_cancel(player, train, nil)
 end
 
+-- tnp_action_stationselect_pin()
+--   Actions pinning a station in the stationselect list
+function tnp_action_stationselect_pin(player, gui)
+    local station = tnp_state_gui_get(gui, player, 'pinstation')
+
+    if tnp_state_stationpins_check(player, station) then
+        tnp_state_stationpins_delete(player, station)
+    else
+        tnp_state_stationpins_set(player, station)
+    end
+end
+
 function tnp_action_stationselect_railtoolmap(player)
     tnp_gui_stationlist_close(player)
     player.open_map(player.position)

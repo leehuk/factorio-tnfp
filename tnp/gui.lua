@@ -225,6 +225,13 @@ function tnp_gui_stationlist(player, train)
     end
     table.sort(stations_key)
 
+    -- Add pinned stations first to the top of the all list
+    for i, stationname in ipairs(stations_key) do
+        if tnp_state_stationpins_check(player, stations_map[stationname]) == true then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], true)
+        end
+    end
+
     for i, stationname in ipairs(stations_key) do
         -- The trains schedule is not a map to entities -- its just a set of string station names, so
         -- in order to fit our entity flow we'd have to map each one back to the entity.  Given we're
@@ -266,6 +273,21 @@ function tnp_gui_stationlist_addentry(player, stationtable, tablename, idx, stat
         style = "tnp_stationlist_stationlistentry"
     })
     tnp_state_gui_set(gui_button, player, 'station', station)
+
+    if tablename == "all" then
+        local pinstyle = "tnp_stationlist_stationlistpin"
+        if pinned == true then
+            pinstyle = "tnp_stationlist_stationlistpinned"
+        end
+
+        local gui_pin_button = gui_row.add({
+            name = "tnp-stationlist-pinall-" .. idx,
+            type = "sprite-button",
+            sprite = "tnp_button_stationlist_pin",
+            style = pinstyle
+        })
+        tnp_state_gui_set(gui_pin_button, player, 'pinstation', station)
+    end
 end
 
 -- tnp_gui_stationlist_close()
