@@ -182,29 +182,7 @@ function tnp_gui_stationlist(player, train)
         gui_stationlist_all.visible = true
     end
 
-    -- Ok, populate the trains station lists.
-    -- First up, TNfP Stations
-    local stations_unsorted = tnp_stop_getall(player)
-    local stations_key = {}
-    local stations_map = {}
-    local stations_map_count = {}
-
-    for _, station in pairs(stations_unsorted) do
-        if not stations_map[station.backer_name] then
-            table.insert(stations_key, station.backer_name)
-            stations_map[station.backer_name] = station
-            stations_map_count[station.backer_name] = 1
-        else
-            stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
-        end
-    end
-    table.sort(stations_key)
-
-    for i, stationname in ipairs(stations_key) do
-        tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false)
-    end
-
-    -- Secondly and thirdly, the stops this train has and the all list.  Both use the same data.
+    -- Collate a full list of all stops, so we can sort them alphabetically
     local stations_unsorted = player.surface.find_entities_filtered({
         type = "train-stop"
     })
@@ -232,6 +210,8 @@ function tnp_gui_stationlist(player, train)
         end
     end
 
+    -- Now iterate over the list of stations which are in alphabetical order, and add them to each
+    -- relevant list as we go.
     for i, stationname in ipairs(stations_key) do
         -- The trains schedule is not a map to entities -- its just a set of string station names, so
         -- in order to fit our entity flow we'd have to map each one back to the entity.  Given we're
@@ -243,6 +223,10 @@ function tnp_gui_stationlist(player, train)
                     tnp_gui_stationlist_addentry(player, gui_stationtable_train, "train", i, stations_map[stationname], stations_map_count[stationname], false)
                 end
             end
+        end
+
+        if tnp_stop_check(stations_map[stationname]) then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false)
         end
 
         if tnp_state_stationpins_check(player, stations_map[stationname]) ~= true then
