@@ -296,6 +296,11 @@ function tnp_action_stationselect_pin(player, gui)
     else
         tnp_state_stationpins_set(player, station)
     end
+
+    if player.vehicle and player.vehicle.valid and player.vehicle.train then
+        tnp_gui_stationlist_build(player, player.vehicle.train)
+        tnp_gui_stationlist_search(player)
+    end
 end
 
 function tnp_action_stationselect_railtoolmap(player)
