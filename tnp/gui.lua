@@ -128,6 +128,7 @@ function tnp_gui_stationlist(player, train)
         selectable = true,
         clear_and_focus_on_right_click = true
     })
+    tnp_state_player_set(player, 'gui_stationsearch', gui_stationsearch)
 
     if config['tnp-stationlist-focussearch'].value == true then
         gui_stationsearch.focus()
@@ -316,6 +317,12 @@ end
 -- tnp_gui_stationlist_search()
 --   Handles filtering the list of stations in the stationselect
 function tnp_gui_stationlist_search(player, element)
+    element = element or tnp_state_player_get(player, 'gui_stationsearch')
+
+    if not element or not element.valid then
+        return
+    end
+
     local gui_stationsearch_area = element.parent
     local gui_top = gui_stationsearch_area.parent
     local search = element.text:lower()

@@ -2,6 +2,7 @@
 State Table:
     dynamicstop             = LuaElement, dynamic stop we're tracking
     gui                     = LuaGuiElement, root gui element we're tracking
+    gui_stationsearch       = LuaGuiElement, search element in a station select dialog
     gui_stationtableall     = LuaGuiElement, station table element we're tracking
     gui_stationtabletrain   = LuaGuiElement, station table element we're tracking
     gui_stationtabletnfp    = LuaGuiElement, station table element we're tracking
@@ -30,6 +31,10 @@ function _tnp_state_player_prune()
                 global.player_data[id]['gui'] = nil
             end
 
+            if data.gui_stationsearch and not data.gui_stationsearch.valid then
+                global.player_data[id]['gui_stationsearch'] = nil
+            end
+
             if data.gui_stationtableall and not data.gui_stationtableall.valid then
                 global.player_data[id]['gui_stationtableall'] = nil
             end
@@ -43,7 +48,7 @@ function _tnp_state_player_prune()
             end
 
             local xdata = global.player_data[id]
-            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and not xdata['gui_stationtableall'] and not xdata['gui_stationtabletrain'] and not xdata['gui_stationtabletnfp'] then
+            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and not xdata['gui_stationsearch'] and not xdata['gui_stationtableall'] and not xdata['gui_stationtabletrain'] and not xdata['gui_stationtabletnfp'] then
                 global.player_data[id] = nil
             end
         end
