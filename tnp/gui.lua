@@ -168,11 +168,15 @@ function tnp_gui_stationlist(player, train)
         visible = false
     })
     local gui_stationtable_all = gui_stationlist_all.add({
-        name = "tnp-stationlist-stationtabletnfp",
+        name = "tnp-stationlist-stationtableall",
         type = "table",
         column_count = 1,
         style = "tnp_stationlist_stationlisttable"
     })
+
+    tnp_state_player_set(player, 'gui_stationtableall', gui_stationtable_all)
+    tnp_state_player_set(player, 'gui_stationtabletnfp', gui_stationtable_tnfp)
+    tnp_state_player_set(player, 'gui_stationtabletrain', gui_stationtable_train)
 
     if gui_stationtype_tnfp.state == true then
         gui_stationlist_tnfp.visible = true
@@ -180,6 +184,20 @@ function tnp_gui_stationlist(player, train)
         gui_stationlist_train.visible = true
     elseif gui_stationtype_all.state == true then
         gui_stationlist_all.visible = true
+    end
+
+    tnp_gui_stationlist_build(player, train)
+end
+
+-- tnp_gui_stationlist_build()
+--   Loops over all train stations to build the relevant gui tables
+function tnp_gui_stationlist_build(player, train)
+    local gui_stationtable_all = tnp_state_player_get(player, 'gui_stationtableall')
+    local gui_stationtable_tnfp = tnp_state_player_get(player, 'gui_stationtabletnfp')
+    local gui_stationtable_train = tnp_state_player_get(player, 'gui_stationtabletrain')
+
+    if not gui_stationtable_all or not gui_stationtable_all.valid or not gui_stationtable_tnfp or not gui_stationtable_tnfp.valid or not gui_stationtable_train or not gui_stationtable_train.valid then
+        return
     end
 
     -- Collate a full list of all stops, so we can sort them alphabetically
@@ -202,6 +220,10 @@ function tnp_gui_stationlist(player, train)
         end
     end
     table.sort(stations_key)
+
+    gui_stationtable_all.clear()
+    gui_stationtable_tnfp.clear()
+    gui_stationtable_train.clear()
 
     -- Add pinned stations first to the top of the all list
     for i, stationname in ipairs(stations_key) do

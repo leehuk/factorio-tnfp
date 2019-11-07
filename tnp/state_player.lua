@@ -1,9 +1,12 @@
 --[[
 State Table:
-    dynamicstop = LuaElement, dynamic stop we're tracking
-    gui         = LuaGuiElement, root gui element we're tracking
-    player      = LuaPlayer
-    train       = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
+    dynamicstop             = LuaElement, dynamic stop we're tracking
+    gui                     = LuaGuiElement, root gui element we're tracking
+    gui_stationtableall     = LuaGuiElement, station table element we're tracking
+    gui_stationtabletrain   = LuaGuiElement, station table element we're tracking
+    gui_stationtabletnfp    = LuaGuiElement, station table element we're tracking
+    player                  = LuaPlayer
+    train                   = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
 ]]
 
 -- _tnp_state_player_prune()
@@ -27,7 +30,20 @@ function _tnp_state_player_prune()
                 global.player_data[id]['gui'] = nil
             end
 
-            if not global.player_data[id]['dynamicstop'] and not global.player_data[id]['train'] and not global.player_data[id]['gui'] then
+            if data.gui_stationtableall and not data.gui_stationtableall.valid then
+                global.player_data[id]['gui_stationtableall'] = nil
+            end
+
+            if data.gui_stationtabletrain and not data.gui_stationtabletrain.valid then
+                global.player_data[id]['gui_stationtabletrain'] = nil
+            end
+
+            if data.gui_stationtabletnfp and not data.gui_stationtabletnfp.valid then
+                global.player_data[id]['gui_stationtabletnfp'] = nil
+            end
+
+            local xdata = global.player_data[id]
+            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and not xdata['gui_stationtableall'] and not xdata['gui_stationtabletrain'] and not xdata['gui_stationtabletnfp'] then
                 global.player_data[id] = nil
             end
         end
