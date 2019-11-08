@@ -52,7 +52,9 @@ function tnp_handle_input(event)
     if event.input_name == "tnp-handle-request" then
         tnp_handle_request(event, false)
     elseif event.input_name == "tnp-handle-railtool" then
-        tnp_handle_railtool(event, false)
+        tnp_handle_railtool(event, false, false)
+    elseif event.input_name == "tnp-handle-railtool-map" then
+        tnp_handle_railtool(event, false, true)
     elseif event.input_name == "tnp-handle-train-manual" then
         tnp_handle_train_manual(event)
     end
@@ -82,11 +84,15 @@ end
 
 -- tnp_handle_railtool()
 --   Handles a request to provide a railtool
-function tnp_handle_railtool(event, shortcut)
+function tnp_handle_railtool(event, shortcut, openmap)
     local player = game.players[event.player_index]
 
     if not player.valid then
         return
+    end
+
+    if openmap then
+        player.open_map(player.position)
     end
 
     tnp_action_railtool(player)
@@ -143,7 +149,7 @@ function tnp_handle_shortcut(event)
     if event.prototype_name == "tnp-handle-request" then
         tnp_handle_request(event, true)
     elseif event.prototype_name == "tnp-handle-railtool" then
-        tnp_handle_railtool(event, true)
+        tnp_handle_railtool(event, true, false)
     end
 end
 

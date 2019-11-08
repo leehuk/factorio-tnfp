@@ -12,6 +12,12 @@ data:extend({
         consuming = "none"
     },
     {
+        name = "tnp-handle-railtool-map",
+        type = "custom-input",
+        key_sequence = "",
+        consuming = "none"
+    },
+    {
         name = "tnp-handle-train-manual",
         type = "custom-input",
         key_sequence = "SHIFT + ALT + M",
