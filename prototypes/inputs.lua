@@ -20,7 +20,7 @@ data:extend({
     {
         name = "tnp-handle-train-manual",
         type = "custom-input",
-        key_sequence = "SHIFT + ALT + M",
+        key_sequence = "",
         consuming = "none"
     }
 })
