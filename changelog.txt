@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.6.0
+Date: 2019-11-08
+  Changes:
+    - Add the ability to pin stations to the top of the 'All Stations' view
+    - Add a configurable keyboard shortcut for setting the current train to manual mode
+    - Add a configurable keyboard shortcut for providing a railtool and opening the map
+    - Right clicking the station selects search bar will now clear the search field
+    - Rework the station select gui so its more compact and cleaner
+    - Rework the logic when a player boards/disembarks a train:
+      - Exiting a train after it arrives at an onward destination is now treated the same as
+        exiting whilst on the way
+      - Add a special handler so if a trains onward destination is already in its schedule and its
+        a tnfp managed train, it will just follow that wait condition and will not resume its
+        previous schedule
+      - Split completion messages so its clearer what a train will do next
+---------------------------------------------------------------------------------------------------
 Version: 0.5.1
 Date: 2019-10-07
   Changes:

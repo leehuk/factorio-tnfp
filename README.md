@@ -18,6 +18,7 @@ The station select dialog provides a quick way of moving between stations and ca
 
 * Quickly filter between stations in the trains schedules, TNfP designated stations or all stations.
 * Filter the list of stations further via the search bar.
+* Pin stations to the top of the 'all stations' list.
 * Selecting a station will temporarily add it to the trains schedule and dispatch the train there, where it will wait for the player to exit before resuming its previous schedule.
 * The railtool button will provide a railtool and open the map, allowing the train to be dispatched to any valid rail segment.
 * Mod setting to control the default filter
@@ -29,6 +30,12 @@ If one or more trains are assigned into a TNfP network they can be automatically
 
 * Request TNfP Train (default ALT-P) will dispatch a train to the nearest valid train stop.  If a request is active, selecting it again will cancel the request.
 * Provide TNfP Rail Tool (default SHIFT-ALT-P) will provide a railtool under the cursor, which can be used to select a rail segment to create a temporary stop.
+* Provide TNfP Rail Tool and Open Map (no default) will provide a railtool under the cursor and open the map.
+
+### Misc
+Miscellaneous features:
+
+* Adds a custom input control for switching the current train to manual mode.
 
 ### TNfP Network Creation
 Trains are available for players if they have a train stop marked for TNfP use anywhere in their schedule, which is done via a single combinator signal.
