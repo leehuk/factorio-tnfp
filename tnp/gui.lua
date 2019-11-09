@@ -59,31 +59,49 @@ function tnp_gui_stationlist(player, train)
     })
     tnp_state_gui_set(gui_close, player, 'close', true)
 
+    gui_top.add({
+        name = "tnp-stationlist-heading-line",
+        type = "line",
+        direction = "horizontal"
+    })
+
     -- Station Type Frame
     local gui_stationtype_area = gui_top.add({
         name = "tnp-stationlist-stationtypearea",
         type = "flow",
-        direction = "vertical",
+        direction = "horizontal",
         style = "tnp_stationlist_stationtypearea"
     })
-    local gui_stationtype_tnfp = gui_stationtype_area.add({
-        name = "tnp-stationlist-stationtypetnfp",
-        type = "radiobutton",
-        caption = {"tnp_gui_stationlist_typetnfp"},
-        state = false,
-        style = "tnp_stationlist_stationtyperadio"
+    gui_stationtype_area.add({
+        name = "tnp-stationlist-stationtypetext",
+        type = "label",
+        caption = {"tnp_gui_stationlist_stationtype"},
+        style = "tnp_stationlist_stationtypetext"
     })
-    local gui_stationtype_train = gui_stationtype_area.add({
+    local gui_stationtype_table = gui_stationtype_area.add({
+        name = "tnp-stationlist-stationtypetable",
+        type = "table",
+        column_count = 3,
+        style = "tnp_stationlist_stationtypetable"
+    })
+    local gui_stationtype_train = gui_stationtype_table.add({
         name = "tnp-stationlist-stationtypetrain",
         type = "radiobutton",
-        caption = {"tnp_gui_stationlist_typetrain"},
+        caption = {"tnp_gui_stationlist_stationtype_schedule"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
-    local gui_stationtype_all = gui_stationtype_area.add({
+    local gui_stationtype_tnfp = gui_stationtype_table.add({
+        name = "tnp-stationlist-stationtypetnfp",
+        type = "radiobutton",
+        caption = {"tnp_gui_stationlist_stationtype_tnfp"},
+        state = false,
+        style = "tnp_stationlist_stationtyperadio"
+    })
+    local gui_stationtype_all = gui_stationtype_table.add({
         name = "tnp-stationlist-stationtypeall",
         type = "radiobutton",
-        caption = {"tnp_gui_stationlist_typeall"},
+        caption = {"tnp_gui_stationlist_stationtype_all"},
         state = false,
         style = "tnp_stationlist_stationtyperadio"
     })
@@ -107,8 +125,10 @@ function tnp_gui_stationlist(player, train)
         name = "tnp-stationlist-search",
         type = "textfield",
         style = "tnp_stationlist_search",
-        selectable = true
+        selectable = true,
+        clear_and_focus_on_right_click = true
     })
+    tnp_state_player_set(player, 'gui_stationsearch', gui_stationsearch)
 
     if config['tnp-stationlist-focussearch'].value == true then
         gui_stationsearch.focus()
@@ -149,11 +169,15 @@ function tnp_gui_stationlist(player, train)
         visible = false
     })
     local gui_stationtable_all = gui_stationlist_all.add({
-        name = "tnp-stationlist-stationtabletnfp",
+        name = "tnp-stationlist-stationtableall",
         type = "table",
         column_count = 1,
         style = "tnp_stationlist_stationlisttable"
     })
+
+    tnp_state_player_set(player, 'gui_stationtableall', gui_stationtable_all)
+    tnp_state_player_set(player, 'gui_stationtabletnfp', gui_stationtable_tnfp)
+    tnp_state_player_set(player, 'gui_stationtabletrain', gui_stationtable_train)
 
     if gui_stationtype_tnfp.state == true then
         gui_stationlist_tnfp.visible = true
@@ -163,41 +187,21 @@ function tnp_gui_stationlist(player, train)
         gui_stationlist_all.visible = true
     end
 
-    -- Ok, populate the trains station lists.
-    -- First up, TNfP Stations
-    local stations_unsorted = tnp_stop_getall(player)
-    local stations_key = {}
-    local stations_map = {}
-    local stations_map_count = {}
+    tnp_gui_stationlist_build(player, train)
+end
 
-    for _, station in pairs(stations_unsorted) do
-        if not stations_map[station.backer_name] then
-            table.insert(stations_key, station.backer_name)
-            stations_map[station.backer_name] = station
-            stations_map_count[station.backer_name] = 1
-        else
-            stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
-        end
-    end
-    table.sort(stations_key)
+-- tnp_gui_stationlist_build()
+--   Loops over all train stations to build the relevant gui tables
+function tnp_gui_stationlist_build(player, train)
+    local gui_stationtable_all = tnp_state_player_get(player, 'gui_stationtableall')
+    local gui_stationtable_tnfp = tnp_state_player_get(player, 'gui_stationtabletnfp')
+    local gui_stationtable_train = tnp_state_player_get(player, 'gui_stationtabletrain')
 
-    for i, station in ipairs(stations_key) do
-        local caption = station
-        if stations_map_count[station] > 1 then
-            caption = caption .. " (" .. stations_map_count[station] .. ")"
-        end
-
-        local gui_button = gui_stationtable_tnfp.add({
-            name = "tnp-stationlist-desttnfp-" .. i,
-            type = "button",
-            caption = caption,
-            style = "tnp_stationlist_stationlistentry"
-        })
-
-        tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
+    if not gui_stationtable_all or not gui_stationtable_all.valid or not gui_stationtable_tnfp or not gui_stationtable_tnfp.valid or not gui_stationtable_train or not gui_stationtable_train.valid then
+        return
     end
 
-    -- Secondly and thirdly, the stops this train has and the all list.  Both use the same data.
+    -- Collate a full list of all stops, so we can sort them alphabetically
     local stations_unsorted = player.surface.find_entities_filtered({
         type = "train-stop"
     })
@@ -218,42 +222,78 @@ function tnp_gui_stationlist(player, train)
     end
     table.sort(stations_key)
 
-    for i, station in ipairs(stations_key) do
+    gui_stationtable_all.clear()
+    gui_stationtable_tnfp.clear()
+    gui_stationtable_train.clear()
+
+    -- Add pinned stations first to the top of the all list
+    for i, stationname in ipairs(stations_key) do
+        if tnp_state_stationpins_check(player, stations_map[stationname]) == true then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], true)
+        end
+    end
+
+    -- Now iterate over the list of stations which are in alphabetical order, and add them to each
+    -- relevant list as we go.
+    for i, stationname in ipairs(stations_key) do
         -- The trains schedule is not a map to entities -- its just a set of string station names, so
         -- in order to fit our entity flow we'd have to map each one back to the entity.  Given we're
         -- looping over all train stops anyway, looping over the trains isnt unreasonable.
-        local trains = stations_map[station].get_train_stop_trains()
+        local trains = stations_map[stationname].get_train_stop_trains()
         if trains then
             for _, stationtrain in pairs(trains) do
                 if train.id == stationtrain.id then
-                    local caption = station
-                    if stations_map_count[station] > 1 then
-                        caption = caption .. " (" .. stations_map_count[station] .. ")"
-                    end
-
-                    local gui_button = gui_stationtable_train.add({
-                        name = "tnp-stationlist-desttrain-" .. i,
-                        type = "button",
-                        caption = caption,
-                        style = "tnp_stationlist_stationlistentry"
-                    })
-                    tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
+                    tnp_gui_stationlist_addentry(player, gui_stationtable_train, "train", i, stations_map[stationname], stations_map_count[stationname], false)
                 end
             end
         end
 
-        local caption = station
-        if stations_map_count[station] > 1 then
-            caption = caption .. " (" .. stations_map_count[station] .. ")"
+        if tnp_stop_check(stations_map[stationname]) then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false)
         end
 
-        local gui_button = gui_stationtable_all.add({
-            name = "tnp-stationlist-destall-" .. i,
-            type = "button",
-            caption = caption,
-            style = "tnp_stationlist_stationlistentry"
+        if tnp_state_stationpins_check(player, stations_map[stationname]) ~= true then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], false)
+        end
+    end
+end
+
+-- tnp_gui_stationlist_addentry()
+--   Adds an entry to a given stationlist table
+function tnp_gui_stationlist_addentry(player, stationtable, tablename, idx, station, count, pinned)
+    local caption = station.backer_name
+    if count > 1 then
+        caption = caption .. " (" .. count .. ")"
+    end
+
+    local gui_row = stationtable.add({
+        name = "tnp-stationlist-row" .. tablename .. "-" .. idx,
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_stationlistrow"
+    })
+
+    local gui_button = gui_row.add({
+        name = "tnp-stationlist-dest" .. tablename .. "-" .. idx,
+        type = "button",
+        caption = caption,
+        style = "tnp_stationlist_stationlistentry"
+    })
+    tnp_state_gui_set(gui_button, player, 'station', station)
+
+    if tablename == "all" then
+        local pinstyle = "tnp_stationlist_stationlistpin"
+        if pinned == true then
+            pinstyle = "tnp_stationlist_stationlistpinned"
+        end
+
+        local gui_pin_button = gui_row.add({
+            name = "tnp-stationlist-pinall-" .. idx,
+            type = "sprite-button",
+            sprite = "tnp_button_stationlist_pin",
+            style = pinstyle
         })
-        tnp_state_gui_set(gui_button, player, 'station', stations_map[station])
+        tnp_state_gui_set(gui_pin_button, player, 'pinstation', station)
     end
 end
 
@@ -277,6 +317,12 @@ end
 -- tnp_gui_stationlist_search()
 --   Handles filtering the list of stations in the stationselect
 function tnp_gui_stationlist_search(player, element)
+    element = element or tnp_state_player_get(player, 'gui_stationsearch')
+
+    if not element or not element.valid then
+        return
+    end
+
     local gui_stationsearch_area = element.parent
     local gui_top = gui_stationsearch_area.parent
     local search = element.text:lower()
@@ -284,11 +330,12 @@ function tnp_gui_stationlist_search(player, element)
     for _, stationlist in pairs(gui_top.children) do
         if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" then
             local stationtable = stationlist.children[1]
-            for _, station in pairs(stationtable.children) do
+            for _, row in pairs(stationtable.children) do
+                local station = row.children[1]
                 if search == "" or station.caption:lower():find(search, 1, true) ~= nil then
-                    station.visible = true
+                    row.visible = true
                 else
-                    station.visible = false
+                    row.visible = false
                 end
             end
         end
@@ -299,9 +346,9 @@ end
 --   Switches the type of stationlist shown
 function tnp_gui_stationlist_switch(player, element)
     -- First, we need to switch off the other radio buttons
-    local gui_stationtype_area = element.parent
-    if gui_stationtype_area.name == "tnp-stationlist-stationtypearea" then
-        for _, child in pairs(gui_stationtype_area.children) do
+    local gui_stationtype_table = element.parent
+    if gui_stationtype_table.name == "tnp-stationlist-stationtypetable" then
+        for _, child in pairs(gui_stationtype_table.children) do
             if child.index ~= element.index then
                 child.state = false
             end
@@ -309,7 +356,7 @@ function tnp_gui_stationlist_switch(player, element)
     end
 
     -- Now we need to sort the scroll areas out
-    local gui_top = gui_stationtype_area.parent
+    local gui_top = gui_stationtype_table.parent.parent
     for _, child in pairs(gui_top.children) do
         if child.name == "tnp-stationlist-stationlisttnfp" then
             if element.name == "tnp-stationlist-stationtypetnfp" then

@@ -151,51 +151,54 @@ function tnp_action_player_railtool(player, entities)
     end
 end
 
--- tnp_action_player_vehicle()
---   Handles actions from a player entering/exiting a vehicle
-function tnp_action_player_vehicle(player, vehicle)
-    local train = tnp_state_player_get(player, 'train')
+-- tnp_action_player_train()
+--   Handles actions from a player entering/exiting a train
+function tnp_action_player_train(player, train)
+    if player.vehicle then
+        -- Player has entered a train.  First check if we're tracking the player at all.
+        if tnp_state_player_query(player) then
+            local player_train = tnp_state_player_get(player, 'train')
 
-    -- Player has entered a non-train vehicle, or we're not actually tracking them
-    if vehicle and not vehicle.train or not train then
-        return
-    end
+            if not player_train or not player_train.valid then
+                -- The train we were tracking for this player is now invalid, cancel what we can.
+                tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_cancelled_invalid"})
+                tnp_request_cancel(player, player_train, nil)
 
-    if vehicle then
-        -- Player has entered a vehicle.
+            elseif not tnp_state_train_query(train) then
+                -- Player has boarded a train that we are not tracking for them.  For now, cancel the request.
+                tnp_train_enact(player_train, true, nil, nil, nil)
+                tnp_request_cancel(player, player_train, {"tnp_train_cancelled_wrongtrain"})
 
-        if not train.valid then
-            -- The train we were tracking is now invalid, and will have a limbo schedule unfortunately.
-            tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_cancelled_invalid"})
-            tnp_request_cancel(player, nil, nil)
-        elseif train.id ~= vehicle.train.id then
-            -- Player has boarded a different train.  Send the other train away (optional?)
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_cancelled_wrongtrain"})
-        else
-            -- Player has successfully boarded their tnp train
-            local status = tnp_state_train_get(train, 'status')
+            elseif player_train.id ~= train.id then
+                -- Player has boarded a train we are tracking, but not for them.
+                tnp_train_enact(player_train, true, nil, nil, nil)
+                tnp_request_cancel(player, player_train, {"tnp_train_cancelled_wrongtrain"})
 
-            -- Player has boarded the train whilst we're dispatching -- treat that as an arrival.
-            if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
-                tnp_action_train_arrival(player, train)
+            else
+                -- Player has successfully boarded their tnfp train
+                local status = tnp_state_train_get(train, 'status')
+
+                -- Player has boarded the train whilst we're dispatching -- treat that as an arrival.
+                if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
+                    tnp_action_train_arrival(player, train)
+                end
+
+                tnp_action_player_board(player, train)
             end
 
-            tnp_action_player_board(player, train)
+        elseif tnp_state_train_query(train) then
+            -- We were not tracking this player -- but we are tracking the train they've entered.  For now, simply report it as stolen
+            -- and cleanup.
+            local train_player = tnp_state_train_get(train, 'player')
+            tnp_request_cancel(train_player, train, {"tnp_train_cancelled_stolen", player.name})
+            tnp_train_enact(train, true, nil, nil, nil)
         end
-    else
-        -- Player has exited a vehicle -- this could be anything.
+    elseif tnp_state_train_query(train) then
+        -- Player has exited a train that we are tracking.
+        local status = tnp_state_train_get(train, 'status')
 
         -- Attempt to close the stationlist regardless, just in case the players exited the train we sent
         tnp_gui_stationlist_close(player)
-
-        -- We were tracking a train, but its no longer valid
-        if not train.valid then
-            tnp_request_cancel(player, train, nil)
-            return
-        end
-
-        local status = tnp_state_train_get(train, 'status')
 
         -- It shouldn't be possible to exit a vehicle in a dispatching/dispatched status, as entering the vehicle
         -- would have triggered the boarding event.  We dont need to handle redispatched, as thats done via station
@@ -204,8 +207,34 @@ function tnp_action_player_vehicle(player, vehicle)
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, {"tnp_train_cancelled"})
         elseif status == tnpdefines.train.status.redispatched then
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_complete"})
+            if tnp_state_train_get(train, 'keep_schedule') then
+                local station = tnp_state_train_get(train, 'station')
+
+                local target = "?"
+                if station and station.valid then
+                    target = station.backer_name
+                end
+
+                tnp_request_cancel(player, train, {"tnp_train_complete_continue", target})
+            else
+                tnp_train_enact(train, true, nil, nil, nil)
+                tnp_request_cancel(player, train, {"tnp_train_complete_resume"})
+            end
+        elseif status == tnpdefines.train.status.rearrived then
+            if tnp_state_train_get(train, 'keep_schedule') then
+                local station = tnp_state_train_get(train, 'station')
+
+                local target = "?"
+                if station and station.valid then
+                    target = station.backer_name
+                end
+
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_remain", target})
+                tnp_request_cancel(player, train, nil)
+            else
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_resume"})
+                tnp_train_enact(train, true, nil, nil, nil)
+            end
         end
     end
 end
@@ -255,6 +284,23 @@ function tnp_action_stationselect_cancel(player)
     -- We're still tracking a request at this point we need to cancel, though theres no
     -- schedule to amend.
     tnp_request_cancel(player, train, nil)
+end
+
+-- tnp_action_stationselect_pin()
+--   Actions pinning a station in the stationselect list
+function tnp_action_stationselect_pin(player, gui)
+    local station = tnp_state_gui_get(gui, player, 'pinstation')
+
+    if tnp_state_stationpins_check(player, station) then
+        tnp_state_stationpins_delete(player, station)
+    else
+        tnp_state_stationpins_set(player, station)
+    end
+
+    if player.vehicle and player.vehicle.valid and player.vehicle.train then
+        tnp_gui_stationlist_build(player, player.vehicle.train)
+        tnp_gui_stationlist_search(player)
+    end
 end
 
 function tnp_action_stationselect_railtoolmap(player)
@@ -535,6 +581,10 @@ function tnp_action_train_statechange(train)
             -- Train had arrived, but we still need to restore the schedule.
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, {"tnp_train_cancelled_manual"})
+
+        elseif status == tnpdefines.train.status.rearrived then
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_request_cancel(player, train, {"tnp_train_complete_manual"})
         end
     end
 end

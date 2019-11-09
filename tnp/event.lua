@@ -27,6 +27,8 @@ function tnp_handle_gui_click(event)
         tnp_action_stationselect_railtoolmap(player)
     elseif string.find(event.element.name, "tnp-stationlist-dest", 1, true) ~= nil then
         tnp_action_stationselect_redispatch(player, event.element)
+    elseif string.find(event.element.name, "tnp-stationlist-pin", 1, true) ~= nil then
+        tnp_action_stationselect_pin(player, event.element)
     end
 end
 
@@ -50,7 +52,11 @@ function tnp_handle_input(event)
     if event.input_name == "tnp-handle-request" then
         tnp_handle_request(event, false)
     elseif event.input_name == "tnp-handle-railtool" then
-        tnp_handle_railtool(event, false)
+        tnp_handle_railtool(event, false, false)
+    elseif event.input_name == "tnp-handle-railtool-map" then
+        tnp_handle_railtool(event, false, true)
+    elseif event.input_name == "tnp-handle-train-manual" then
+        tnp_handle_train_manual(event)
     end
 end
 
@@ -78,11 +84,15 @@ end
 
 -- tnp_handle_railtool()
 --   Handles a request to provide a railtool
-function tnp_handle_railtool(event, shortcut)
+function tnp_handle_railtool(event, shortcut, openmap)
     local player = game.players[event.player_index]
 
     if not player.valid then
         return
+    end
+
+    if openmap then
+        player.open_map(player.position)
     end
 
     tnp_action_railtool(player)
@@ -139,7 +149,7 @@ function tnp_handle_shortcut(event)
     if event.prototype_name == "tnp-handle-request" then
         tnp_handle_request(event, true)
     elseif event.prototype_name == "tnp-handle-railtool" then
-        tnp_handle_railtool(event, true)
+        tnp_handle_railtool(event, true, false)
     end
 end
 
@@ -162,30 +172,35 @@ end
 --   Handles a player entering or exiting a vehicle
 function tnp_handle_player_vehicle(event)
     local player = game.players[event.player_index]
+    local vehicle = event.entity
+
+    if not player.valid or not vehicle or not vehicle.valid then
+        return
+    end
+
+    -- This is a non-train vehicle
+    if not vehicle.train then
+        return
+    end
+
+    tnp_action_player_train(player, vehicle.train)
+end
+
+-- tnp_handle_train_manual()
+--   Handles a player requesting a train is switched to manual mode
+function tnp_handle_train_manual(event)
+    local player = game.players[event.player_index]
 
     if not player.valid then
         return
     end
 
-    -- This player doesnt have a request outstanding
-    if not tnp_state_player_query(player) then
-        -- Check whether they've stolen a tnp assigned train
-        if event.entity and event.entity.train and tnp_state_train_query(event.entity.train) then
-            local train = event.entity.train
-            local train_player = tnp_state_train_get(train, 'player')
-
-            if train_player and (not train_player.valid or train_player.index ~= player.index) then
-                tnp_train_enact(train, true, nil, nil, nil)
-                tnp_request_cancel(train_player, train, {"tnp_train_cancelled_stolen", player.name})
-            end
-        end
-
+    if not player.vehicle or not player.vehicle.valid or not player.vehicle.train then
         return
     end
 
-    tnp_action_player_vehicle(player, player.vehicle)
+    player.vehicle.train.manual_mode = true
 end
-
 
 -- tnp_handle_train_schedulechange()
 --   Handles a trains schedule being changed

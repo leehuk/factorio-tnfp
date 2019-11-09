@@ -183,6 +183,12 @@ function tnp_request_redispatch(player, target, train)
 
         schedule.current = #schedule.records
     else
+        -- Its a tnp train being redispatched to a station already in its schedule -- so make an extra
+        -- effort to keep it there once complete
+        if tnp_train_check(player, train) then
+            tnp_state_train_set(train, 'keep_schedule', true)
+        end
+
         schedule.current = schedule_found
     end
 
@@ -201,6 +207,8 @@ function tnp_request_setup(player, target, train, status)
 
     tnp_state_train_set(train, 'status', status)
     tnp_train_info_save(train)
+
+    tnp_state_train_delete(train, 'keep_schedule')
 
     player.set_shortcut_toggled('tnp-handle-request', true)
 end
