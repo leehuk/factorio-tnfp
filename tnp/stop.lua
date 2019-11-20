@@ -28,11 +28,13 @@ function tnp_stop_danger(stop)
     end
 
     -- TSM (Train Supply Manager)
-    -- Supplier train stops are always dangerous, provider train stops are safe.
+    -- Supplier train stops are always dangerous as they rewrite schedules.
+    -- Provider train stops in theory are safe, but the tsm train counters only update if the stop a train is
+    -- departing from is the previous one in its schedule.. which isnt true for tnp.
     if stop.name == "subscriber-train-stop" then
         return true
     elseif stop.name == "publisher-train-stop" then
-        return false
+        return true
     end
 
     -- LTN (Logistic Train Network)
