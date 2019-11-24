@@ -195,11 +195,18 @@ function tnp_handle_train_manual(event)
         return
     end
 
-    if not player.vehicle or not player.vehicle.valid or not player.vehicle.train then
-        return
+    -- If the player is on a train, thats the one to use -- but we also allow the shortcut for
+    -- a tnp train thats just arrived.
+    if player.vehicle ~= nil and player.vehicle.valid and player.vehicle.train ~= nil then
+        player.vehicle.train.manual_mode = true
+    elseif tnp_state_player_query(player) then
+        local train = tnp_state_player_get(player, 'train')
+        if train and tnp_state_train_query(train) then
+            if tnp_state_train_get(train, 'status') == tnpdefines.train.status.arrived then
+                train.manual_mode = true
+            end
+        end
     end
-
-    player.vehicle.train.manual_mode = true
 end
 
 -- tnp_handle_train_schedulechange()
