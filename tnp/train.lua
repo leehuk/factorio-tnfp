@@ -71,37 +71,26 @@ function tnp_train_find(player, target)
     local tnp_train = nil
     local tnp_train_distance = 0
 
-    repeat
-        local tnp_cand = tnp_trains[#tnp_trains]
-        table.remove(tnp_trains)
+    for i, tnp_cand in ipairs(tnp_trains) do
+        -- Do not schedule invalid trains or trains that already have passengers
+        if tnp_cand.front_rail and tnp_cand.back_rail and (tnp_cand.passengers == nil or #tnp_cand.passengers == 0) then
+            -- Do not schedule trains assigned to other players
+            local scheduled_player = tnp_state_train_get(tnp_cand, 'player')
+            if not scheduled_player or (scheduled_player.valid and scheduled_player.index == player.index) then
+                -- If we dont know where we're dispatching to, just use the first one
+                if not target then
+                    return tnp_cand
+                end
 
-        if not tnp_cand.front_rail or not tnp_cand.back_rail then
-            break
-        end
-
-        -- Do not schedule trains assigned to other players
-        local scheduled_player = tnp_state_train_get(tnp_cand, 'player')
-        if scheduled_player and (not scheduled_player.valid or scheduled_player.index ~= player.index) then
-            break
-        end
-
-        -- Do not scheduled trains other players are the passenger of
-        if tnp_cand.passengers and #tnp_cand.passengers > 0 then
-            break
-        end
-
-        local distance = 0
-        -- If we dont know where we're dispatching to, accept the train choice will be random.
-        if target then
-            distance = tnp_math_distance(target.position, tnp_cand.front_rail.position)
-            if tnp_train and distance >= tnp_train_distance then
-                break
+                -- Otherwise check if this is closer than the previous best option (or is the first) and set that as the pending return
+                local cand_distance = tnp_math_distance(target.position, tnp_cand.front_rail.position)
+                if tnp_train == nil or cand_distance < tnp_train_distance then
+                    tnp_train = tnp_cand
+                    tnp_train_distance = cand_distance
+                end
             end
         end
-
-        tnp_train = tnp_cand
-        tnp_train_distance = distance
-    until #tnp_trains == 0
+    end
 
     return tnp_train
 end
