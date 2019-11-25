@@ -388,6 +388,29 @@ function tnp_gui_stationlist_search(player, element)
     end
 end
 
+function tnp_gui_stationlist_search_confirm(player, element)
+    element = element or tnp_state_player_get(player, 'gui_stationsearch')
+
+    if not element or not element.valid then
+        return
+    end
+
+    local gui_stationsearch_area = element.parent
+    local gui_top = gui_stationsearch_area.parent
+
+    for _, stationlist in pairs(gui_top.children) do
+        if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" then
+            local stationtable = stationlist.children[1]
+            for _, row in pairs(stationtable.children) do
+                if row and row.valid and row.visible then
+                    local station = row.children[1]
+                    return tnp_action_stationselect_redispatch(player, station)
+                end
+            end
+        end
+    end
+end
+
 -- tnp_gui_stationlist_switch()
 --   Switches the type of stationlist shown
 function tnp_gui_stationlist_switch(player, element)
