@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.0
+Date: 2019-11-25
+  Changes:
+    - Add 'TNfP Home Station' virtual signal.  Stations with this signal will be pinned at the
+      very top of the Station Select dialog, above normal pinned stations
+    - Pressing enter to submit the search field in the Station Select dialog will now dispatch
+      to the first station in the list [Github PR from coderanger]
+    - Fix the closest train detection logic when dispatching [Github PR from coderanger]
+    - Provide candidate rails to closest train detection logic for temporary stations
+    - Allow manual mode shortcut to apply to trains that have just arrived after dispatch
+    - Block TSM requester stations from dispatch to avoid breaking the TSM train counter
+---------------------------------------------------------------------------------------------------
 Version: 0.6.0
 Date: 2019-11-08
   Changes:
