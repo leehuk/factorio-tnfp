@@ -226,10 +226,44 @@ function tnp_gui_stationlist_build(player, train)
     gui_stationtable_tnfp.clear()
     gui_stationtable_train.clear()
 
-    -- Add pinned stations first to the top of the all list
+    -- For optimisation we want to make as few passes over the circuit network as possible, so we loop once
+    -- over our list to collate all the special statuses a stop may have affecting the gui.
+    local stations_added = {}
+    local stations_pinned = {}
+    local stations_tnfp = {}
+    local stations_tnfphome = {}
+
     for i, stationname in ipairs(stations_key) do
-        if tnp_state_stationpins_check(player, stations_map[stationname]) == true then
-            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], true)
+        local is_tnp = tnp_stop_check(stations_map[stationname])
+        if is_tnp == 2 then
+            -- Home stations are not marked as pinned, or normal tnfp stations.
+            stations_tnfphome[i] = true
+        else
+            if is_tnp == 1 then
+                stations_tnfp[i] = true
+            end
+
+            if tnp_state_stationpins_check(player, stations_map[stationname]) == true then
+                stations_pinned[i] = true
+            end
+        end
+    end
+
+    -- Add home stations first to the top of the tnp and all lists
+    for i, stationname in ipairs(stations_key) do
+        if stations_tnfphome[i] == true then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false, true)
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], false, true)
+
+            stations_added[i] = true
+        end
+    end
+
+    -- Then add pinned stations to the top of the all list
+    for i, stationname in ipairs(stations_key) do
+        if stations_pinned[i] == true then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], true, false)
+            stations_added[i] = true
         end
     end
 
@@ -243,24 +277,24 @@ function tnp_gui_stationlist_build(player, train)
         if trains then
             for _, stationtrain in pairs(trains) do
                 if train.id == stationtrain.id then
-                    tnp_gui_stationlist_addentry(player, gui_stationtable_train, "train", i, stations_map[stationname], stations_map_count[stationname], false)
+                    tnp_gui_stationlist_addentry(player, gui_stationtable_train, "train", i, stations_map[stationname], stations_map_count[stationname], false, false)
                 end
             end
         end
 
-        if tnp_stop_check(stations_map[stationname]) then
-            tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false)
-        end
+        if stations_added[i] == nil then
+            if stations_tnfp[i] == true then
+                tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false, false)
+            end
 
-        if tnp_state_stationpins_check(player, stations_map[stationname]) ~= true then
-            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], false)
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], false, false)
         end
     end
 end
 
 -- tnp_gui_stationlist_addentry()
 --   Adds an entry to a given stationlist table
-function tnp_gui_stationlist_addentry(player, stationtable, tablename, idx, station, count, pinned)
+function tnp_gui_stationlist_addentry(player, stationtable, tablename, idx, station, count, pinned, home)
     local caption = station.backer_name
     if count > 1 then
         caption = caption .. " (" .. count .. ")"
@@ -281,7 +315,19 @@ function tnp_gui_stationlist_addentry(player, stationtable, tablename, idx, stat
     })
     tnp_state_gui_set(gui_button, player, 'station', station)
 
-    if tablename == "all" then
+    if tablename == "train" then
+        return
+    end
+
+    if home == true then
+        local gui_home_button = gui_row.add({
+            name = "tnp-stationlist-pinhome-" .. idx,
+            type = "sprite-button",
+            sprite = "tnp_button_stationlist_home",
+            style = "tnp_stationlist_stationlisthome",
+            enabled = false
+        })
+    elseif tablename == "all" then
         local pinstyle = "tnp_stationlist_stationlistpin"
         if pinned == true then
             pinstyle = "tnp_stationlist_stationlistpinned"

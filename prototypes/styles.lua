@@ -168,3 +168,15 @@ data.raw["gui-style"].default["tnp_stationlist_stationlistpinned"] = {
     padding = 2,
     margin = 0
 }
+
+data.raw["gui-style"].default["tnp_stationlist_stationlisthome"] = {
+    type = "button_style",
+    parent = "dark_button",
+    horizontal_align = "center",
+    vertical_align = "center",
+    height = 28,
+    width = 28,
+    scalable = false,
+    padding = 2,
+    margin = 0
+}

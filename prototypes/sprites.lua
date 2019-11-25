@@ -14,6 +14,13 @@ data:extend({
         width = 24
     },
     {
+        name = "tnp_button_stationlist_home",
+        type = "sprite",
+        filename = "__TrainNetworkForPlayers__/graphics/icons/home-16.png",
+        height = 16,
+        width = 16
+    },
+    {
         name = "tnp_button_stationlist_pin",
         type = "sprite",
         filename = "__TrainNetworkForPlayers__/graphics/icons/pin-16.png",
