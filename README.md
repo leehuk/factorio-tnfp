@@ -16,12 +16,13 @@ The station select dialog provides a quick way of moving between stations and ca
 &nbsp;
 ![TNfP Station Select Search](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-stationselect-search.jpg)
 
-* Quickly filter between stations in the trains schedules, TNfP designated stations or all stations.
-* Filter the list of stations further via the search bar.
-* Pin stations to the top of the 'all stations' list.
 * Selecting a station will temporarily add it to the trains schedule and dispatch the train there, where it will wait for the player to exit before resuming its previous schedule.
+* Quickly filter between stations in the trains schedules, TNfP designated stations or all stations.  Mod setting controls the default.
+* Filter the list of stations further via the search bar.
+* Submit the search bar with enter, and the first station in the list will be selected.
+* Home stations can be pinned to the very top of the 'all stations' and 'tnfp stations' lists via a circuit signal.
+* Any station can be pinned to the top of the 'all stations' list via the GUI.
 * The railtool button will provide a railtool and open the map, allowing the train to be dispatched to any valid rail segment.
-* Mod setting to control the default filter
 
 ### TNfP Network
 If one or more trains are assigned into a TNfP network they can be automatically dispatched to the players location using the two shortcuts:
@@ -35,7 +36,7 @@ If one or more trains are assigned into a TNfP network they can be automatically
 ### Misc
 Miscellaneous features:
 
-* Adds a custom input control for switching the current train to manual mode.
+* Adds a custom input control for switching the current train to manual mode.  This also works for a train which has just arrived after dispatch.
 
 ### TNfP Network Creation
 Trains are available for players if they have a train stop marked for TNfP use anywhere in their schedule, which is done via a single combinator signal.
@@ -63,13 +64,20 @@ The railtool provides a way of creating temporary train stops and is used by sel
 * When not onboard a train, a new temporary stop will be created and a player train will be dispatched there from the TNfP network.
 * To remove a rail tool from your inventory, drop it on the ground near the player (default 'z') and it will be automatically destroyed.
 
+### TNfP Home Station
+The 'TNfP Home Station' is an additional circuit signal found under 'Signals'.  When this signal is provided to a train stop, that train stop becomes marked as a home station.
+
+![TNfP Combinator Home](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-combinator-home.jpg)
+
+Home stations appear at the very top of the 'all stations' and 'tnfp stations' lists in the Station Select Dialog above pinned stations, allowing them to be quickly selected for dispatch.
+
 ### Important Notes
 This mod should be mostly stable for both single player and multiplayer.  Bug reports, feature requests or any comments are preferred via [github.com](https://github.com/leehuk/factorio-tnfp/) or via the forum.  Please include the crash log and version information about both factorio and the mod in bug reports.
 
 TNfP should be compatible with all mods relating to trains, providing they don't change train schedules or add custom types of train stops.  When used with mods which add custom types of train stops, TNfP will work as follows:
 
 * LTN (Logistic Train Network): TNfP will dispatch to any stop except depots, which are ignored due to conflicts with scheduling trains.  (Thanks to Optera for assistance).
-* TSM (Train Supply Manager): TNfP will dispatch to 'Requester' stops, but will completely ignore 'Supplier' stops due to conflicts with scheduling trains.
+* TSM (Train Supply Manager): TNfP will completely ignore TSM stops.  Suppliers conflict by altering trains schedules, and requesters conflict as TNfP interferes with the train counter logic.
 * Default: TNfP uses a configuration option controlling whether stops are considered safe to dispatch to (and thus ignored) or not.
 
 ### Technical Information
@@ -102,6 +110,8 @@ If the station selection dialog is closed or the player exits the train, it will
 #### Redispatch Behaviour
 
 When a player has selected an onward destination, TNfP will add the new station with a standard station wait condition of 'Passenger Not Present'.  This station will then remain in the schedule until it becomes true (i.e. the passenger leaves the train), or the passenger selects another onward destination.
+
+If the station is already in the trains schedule, the station wait conditions will not be altered.  Additionally if it is a tnfp train and the redispatch station is already in the trains schedule, it will not resume its previous schedule on arrival but will instead remain at the redispatch station under its normal wait conditions.
 
 #### Temporary Station Cleanup
 
