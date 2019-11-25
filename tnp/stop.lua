@@ -1,21 +1,27 @@
 -- tnp_stop_check()
---   Validates if a stop is assigned for tnp
+--   Validates if a stop is assigned for tnp, returning false/1/2 if not assigned, assigned, or home station.
 function tnp_stop_check(stop)
     -- tnp can only be assigned to vanilla stops
     if stop.name ~= "train-stop" then
         return false
     end
 
+    local result = false
+
     local signals = stop.get_merged_signals(defines.circuit_connector_id.combinator_input)
     if signals then
         for _, signal in pairs(signals) do
-            if signal.signal.type == "virtual" and signal.signal.name == "tnp-station" then
-                return true
+            if signal.signal.type == "virtual" then
+                if signal.signal.name == "tnp-station" then
+                    result = 1
+                elseif signal.signal.name == "tnp-station-home" then
+                    result = 2
+                end
             end
         end
     end
 
-    return false
+    return result
 end
 
 -- tnp_stop_danger(stop)
@@ -28,11 +34,13 @@ function tnp_stop_danger(stop)
     end
 
     -- TSM (Train Supply Manager)
-    -- Supplier train stops are always dangerous, provider train stops are safe.
+    -- Supplier train stops are always dangerous as they rewrite schedules.
+    -- Provider train stops in theory are safe, but the tsm train counters only update if the stop a train is
+    -- departing from is the previous one in its schedule.. which isnt true for tnp.
     if stop.name == "subscriber-train-stop" then
         return true
     elseif stop.name == "publisher-train-stop" then
-        return false
+        return true
     end
 
     -- LTN (Logistic Train Network)
@@ -78,7 +86,7 @@ function tnp_stop_find(player)
                     table.insert(valid_stops_train, ent)
                 end
             else
-                if tnp_stop_check(ent) then
+                if tnp_stop_check(ent) ~= false then
                     table.insert(valid_stops_tnp, ent)
                 elseif tnp_stop_danger(ent) == false then
                     table.insert(valid_stops_std, ent)
@@ -108,7 +116,7 @@ function tnp_stop_getall(player)
         name = "train-stop"
     })
     for _, ent in pairs(entities) do
-        if tnp_stop_check(ent) then
+        if tnp_stop_check(ent) ~= false then
             table.insert(tnp_stops, ent)
         end
     end

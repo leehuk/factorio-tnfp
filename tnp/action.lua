@@ -105,7 +105,13 @@ function tnp_action_player_railtool(player, entities)
     if player.vehicle and player.vehicle.train then
         train = player.vehicle.train
     elseif not train then
-        train = tnp_train_find(player, target)
+        if target ~= nil then
+            train = tnp_train_find(player, target)
+        elseif #valid_rails > 0 then
+            train = tnp_train_find(player, valid_rails[1])
+        else
+            train = tnp_train_find(player, nil)
+        end
     end
 
     if not train then
