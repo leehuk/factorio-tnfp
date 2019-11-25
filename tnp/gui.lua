@@ -399,7 +399,7 @@ function tnp_gui_stationlist_search_confirm(player, element)
     local gui_top = gui_stationsearch_area.parent
 
     for _, stationlist in pairs(gui_top.children) do
-        if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" then
+        if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" and stationlist.visible == true then
             local stationtable = stationlist.children[1]
             for _, row in pairs(stationtable.children) do
                 if row and row.valid and row.visible then
