@@ -42,7 +42,7 @@ function _tnp_state_train_prune()
             global.train_data[id] = nil
         elseif not data.player or not data.player.valid then
             -- The player we were tracking is invalid -- but the trains ok.  Cancel any dispatching.
-            tnp_train_enact(train, true, nil, nil, false)
+            tnp_train_enact(data.train, true, nil, nil, false)
             global.train_data[id] = nil
         end
     end
