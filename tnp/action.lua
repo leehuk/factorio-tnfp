@@ -501,6 +501,7 @@ function tnp_action_train_statechange(train)
 
             local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
             local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
+            local keep_position = tnp_state_train_get(train, 'keep_position')
 
             if not dynamicstop then
                 tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
@@ -519,6 +520,10 @@ function tnp_action_train_statechange(train)
             tnp_state_dynamicstop_set(altstop, 'player', player)
             tnp_state_dynamicstop_set(altstop, 'altstop', nil)
             tnp_request_railtooltest(player, altstop, train)
+
+            if keep_position then
+                tnp_state_train_set(train, 'keep_position', true)
+            end
         end
         -- elseif train.state == defines.train_state.arrive_signal
         -- Train has arrived at a signal.
