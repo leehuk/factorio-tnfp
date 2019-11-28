@@ -95,6 +95,24 @@ function tnp_state_train_query(train)
     return false
 end
 
+-- tnp_state_train_reset()
+--   Resets non-core state information about a LuaTrain
+function tnp_state_train_reset(train)
+    _tnp_state_train_prune()
+
+    if not train.valid then
+        return false
+    end
+
+    if global.train_data[train.id] then
+        local player = global.train_data[train.id]['player']
+
+        global.train_data[train.id] = {}
+        global.train_data[train.id]['train'] = train
+        global.train_data[train.id]['player'] = player
+    end
+end
+
 -- tnp_state_train_set()
 --   Saves state informationa bout a LuaTrain by key
 function tnp_state_train_set(train, key, value)

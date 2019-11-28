@@ -198,6 +198,8 @@ end
 -- tnp_request_setup()
 --   Handles common setup logic for a train
 function tnp_request_setup(player, target, train, status)
+    tnp_state_train_reset(train)
+
     tnp_state_train_set(train, 'player', player)
     tnp_state_player_set(player, 'train', train)
 
@@ -207,8 +209,6 @@ function tnp_request_setup(player, target, train, status)
 
     tnp_state_train_set(train, 'status', status)
     tnp_train_info_save(train)
-
-    tnp_state_train_delete(train, 'keep_schedule')
 
     player.set_shortcut_toggled('tnp-handle-request', true)
 end
