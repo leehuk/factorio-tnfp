@@ -47,6 +47,7 @@ script.on_event(defines.events.on_train_changed_state, tnp_handle_train_statecha
 script.on_event(defines.events.on_train_schedule_changed, tnp_handle_train_schedulechange)
 
 -- Selection Tool Events
+script.on_event(defines.events.on_player_alt_selected_area, tnp_handle_selectiontool_alt)
 script.on_event(defines.events.on_player_selected_area, tnp_handle_selectiontool)
 
 -- Input Handling

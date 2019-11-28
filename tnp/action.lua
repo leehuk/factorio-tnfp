@@ -66,7 +66,7 @@ end
 
 -- tnp_action_player_railtool()
 --   Actions an area selection
-function tnp_action_player_railtool(player, entities)
+function tnp_action_player_railtool(player, entities, altmode)
     local valid_stops = {}
     local valid_rails = {}
 
