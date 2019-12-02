@@ -366,9 +366,9 @@ function tnp_action_train_rearrival(player, train)
     -- restore the schedule if the player disembarks.
     if keep_position then
         tnp_train_enact(train, true, nil, true, nil)
-        tnp_request_cancel(player, train, {"tnp_train_arrived_manual"})
+        tnp_request_cancel(player, train, {"tnp_train_arrived_manual", tnp_train_destinationstring(train)})
     else
-        tnp_request_cancel(player, nil, {"tnp_train_arrived"})
+        tnp_request_cancel(player, nil, {"tnp_train_arrived", tnp_train_destinationstring(train)})
         tnp_state_train_set(train, 'status', tnpdefines.train.status.rearrived)
     end
 end
@@ -564,10 +564,10 @@ function tnp_action_train_statechange(train)
 
                 local keep_position = tnp_state_train_get(train, 'keep_position')
                 if keep_position then
-                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_manual"})
+                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_manual", tnp_train_destinationstring(train)})
                     tnp_train_enact(train, true, nil, true, nil)
                 else
-                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived"})
+                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived", tnp_train_destinationstring(train)})
                 end
             end
 
