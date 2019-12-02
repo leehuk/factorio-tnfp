@@ -215,8 +215,7 @@ function tnp_action_player_train(player, train)
         tnp_gui_stationlist_close(player)
 
         -- It shouldn't be possible to exit a vehicle in a dispatching/dispatched status, as entering the vehicle
-        -- would have triggered the boarding event.  We dont need to handle redispatched, as thats done via station
-        -- wait conditions.
+        -- would have triggered the boarding event, so we just need to handle arrived, redispatched or rearrived.
         if status == tnpdefines.train.status.arrived then
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, {"tnp_train_cancelled"})
@@ -230,6 +229,17 @@ function tnp_action_player_train(player, train)
                 end
 
                 tnp_request_cancel(player, train, {"tnp_train_complete_continue", target})
+            elseif tnp_state_train_get(train, 'keep_position') then
+                -- The player requested the train waits somewhere for them in manual mode, but jumped out before
+                -- we arrived.  For qol, presume the train should continue -- but notify them.
+                local station = tnp_state_train_get(train, 'station')
+
+                local target = "?"
+                if station and station.valid then
+                    target = station.backer_name
+                end
+
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_continue", target})
             else
                 tnp_train_enact(train, true, nil, nil, nil)
                 tnp_request_cancel(player, train, {"tnp_train_complete_resume"})
