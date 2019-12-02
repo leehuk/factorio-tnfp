@@ -18,6 +18,24 @@ function tnp_train_check(player, train)
     return false
 end
 
+-- tnp_train_destinationstring()
+--   Looks up a destination string for a train with validity checks
+function tnp_train_destinationstring(train)
+    local target = "?"
+
+    if not train then
+        return target
+    end
+
+    local station = tnp_state_train_get(train, 'station')
+
+    if station and station.valid then
+        target = station.backer_name
+    end
+
+    return target
+end
+
 -- tnp_train_enact()
 --   Helper function to enact a schedule change and manual mode, including required markers
 function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manual_mode_post)
