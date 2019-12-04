@@ -66,7 +66,7 @@ end
 
 -- tnp_action_player_railtool()
 --   Actions an area selection
-function tnp_action_player_railtool(player, entities)
+function tnp_action_player_railtool(player, entities, altmode)
     local valid_stops = {}
     local valid_rails = {}
 
@@ -132,6 +132,10 @@ function tnp_action_player_railtool(player, entities)
             tnp_request_dispatch(player, target, train)
         end
 
+        if altmode then
+            tnp_state_train_set(train, 'keep_position', true)
+        end
+
         return
     end
 
@@ -151,6 +155,10 @@ function tnp_action_player_railtool(player, entities)
             player.clean_cursor()
         end
         player.close_map()
+
+        if altmode then
+            tnp_state_train_set(train, 'keep_position', true)
+        end
     else
         tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_nolocation"})
         return
@@ -207,21 +215,17 @@ function tnp_action_player_train(player, train)
         tnp_gui_stationlist_close(player)
 
         -- It shouldn't be possible to exit a vehicle in a dispatching/dispatched status, as entering the vehicle
-        -- would have triggered the boarding event.  We dont need to handle redispatched, as thats done via station
-        -- wait conditions.
+        -- would have triggered the boarding event, so we just need to handle arrived, redispatched or rearrived.
         if status == tnpdefines.train.status.arrived then
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_request_cancel(player, train, {"tnp_train_cancelled"})
         elseif status == tnpdefines.train.status.redispatched then
             if tnp_state_train_get(train, 'keep_schedule') then
-                local station = tnp_state_train_get(train, 'station')
-
-                local target = "?"
-                if station and station.valid then
-                    target = station.backer_name
-                end
-
-                tnp_request_cancel(player, train, {"tnp_train_complete_continue", target})
+                tnp_request_cancel(player, train, {"tnp_train_complete_continue", tnp_train_destinationstring(train)})
+            elseif tnp_state_train_get(train, 'keep_position') then
+                -- The player requested the train waits somewhere for them in manual mode, but jumped out before
+                -- we arrived.  For qol, presume the train should continue -- but notify them.
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_continue", tnp_train_destinationstring(train)})
             else
                 tnp_train_enact(train, true, nil, nil, nil)
                 tnp_request_cancel(player, train, {"tnp_train_complete_resume"})
@@ -355,10 +359,18 @@ end
 -- tnp_action_train_rearrival()
 --   Partially fulfils a tnp request, marking a train as successfully arrived after redispatch.
 function tnp_action_train_rearrival(player, train)
-    -- From the players perspective the request is now complete so we need to cancel that side,
-    -- but we must leave the train active as we cant reset its schedule until the player disembarks.
-    tnp_request_cancel(player, nil, {"tnp_train_arrived"})
-    tnp_state_train_set(train, 'status', tnpdefines.train.status.rearrived)
+    local keep_position = tnp_state_train_get(train, 'keep_position')
+
+    -- If we're holding position, we can fully complete the request now as we'll be resetting the
+    -- schedule and switching to manual mode.  Otherwise, we keep the train active so we can
+    -- restore the schedule if the player disembarks.
+    if keep_position then
+        tnp_train_enact(train, true, nil, true, nil)
+        tnp_request_cancel(player, train, {"tnp_train_arrived_manual", tnp_train_destinationstring(train)})
+    else
+        tnp_request_cancel(player, nil, {"tnp_train_arrived", tnp_train_destinationstring(train)})
+        tnp_state_train_set(train, 'status', tnpdefines.train.status.rearrived)
+    end
 end
 
 -- tnp_action_train_schedulechange()
@@ -485,6 +497,7 @@ function tnp_action_train_statechange(train)
 
             local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
             local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
+            local keep_position = tnp_state_train_get(train, 'keep_position')
 
             if not dynamicstop then
                 tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
@@ -503,6 +516,10 @@ function tnp_action_train_statechange(train)
             tnp_state_dynamicstop_set(altstop, 'player', player)
             tnp_state_dynamicstop_set(altstop, 'altstop', nil)
             tnp_request_railtooltest(player, altstop, train)
+
+            if keep_position then
+                tnp_state_train_set(train, 'keep_position', true)
+            end
         end
         -- elseif train.state == defines.train_state.arrive_signal
         -- Train has arrived at a signal.
@@ -543,8 +560,18 @@ function tnp_action_train_statechange(train)
                     tnp_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
                 end
             else
-                tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived"})
+                -- Store destination before actioning the arrival, which will destroy temporary stops
+                local destination = tnp_train_destinationstring(train)
+
                 tnp_action_train_arrival(player, train)
+
+                local keep_position = tnp_state_train_get(train, 'keep_position')
+                if keep_position then
+                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_manual", destination})
+                    tnp_train_enact(train, true, nil, true, nil)
+                else
+                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived", destination})
+                end
             end
 
         elseif status == tnpdefines.train.status.redispatched then

@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.0
+Date: 2019-12-04
+  Changes:
+    - Add support for using the railtool in alternate mode, triggered by holding shift.  Alt mode
+      will change the way dispatch works so on arrival the schedule will still be reset -- but the
+      train will instead switch to manual mode and then remain in place.  Works for both dispatch
+      to the player and a redispatch from onboard a train.
+    - Add station name to arrival messages
+    - Fix that if a trains schedule before redispatch was originally blank, we restore a blank
+      schedule after rearrival.
+    - Fix a potential error in train state pruning
+---------------------------------------------------------------------------------------------------
 Version: 0.7.0
 Date: 2019-11-25
   Changes:

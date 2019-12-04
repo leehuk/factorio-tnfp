@@ -18,18 +18,29 @@ function tnp_train_check(player, train)
     return false
 end
 
+-- tnp_train_destinationstring()
+--   Looks up a destination string for a train with validity checks
+function tnp_train_destinationstring(train)
+    local target = "?"
+
+    if not train then
+        return target
+    end
+
+    local station = tnp_state_train_get(train, 'station')
+
+    if station and station.valid then
+        target = station.backer_name
+    end
+
+    return target
+end
+
 -- tnp_train_enact()
 --   Helper function to enact a schedule change and manual mode, including required markers
 function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manual_mode_post)
     if not train.valid then
         return
-    end
-
-    if schedule_lookup then
-        local info = tnp_state_train_get(train, 'info')
-        if info and info.schedule then
-            schedule = info.schedule
-        end
     end
 
     if manual_mode_pre == false or manual_mode_pre == true then
@@ -42,9 +53,25 @@ function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manu
         end
     end
 
-    if schedule then
+    if schedule_lookup then
+        local info = tnp_state_train_get(train, 'info')
+        if info then
+            if info.schedule then
+                schedule = info.schedule
+            elseif info.schedule_blank then
+                schedule = false
+            end
+        end
+    end
+
+    if schedule ~= nil then
         tnp_state_train_set(train, 'expect_schedulechange', true)
-        train.schedule = util.table.deepcopy(schedule)
+
+        if schedule ~= false then
+            train.schedule = util.table.deepcopy(schedule)
+        else
+            train.schedule = nil
+        end
     end
 
     if manual_mode_post == false or manual_mode_post == true then
@@ -128,6 +155,10 @@ function tnp_train_info_save(train)
         schedule = tnp_train_schedule_copy(train),
         state = train.state
     }
+
+    if not train.schedule or not train.schedule.records or #train.schedule.records == 0 then
+        info['schedule_blank'] = true
+    end
 
     return tnp_state_train_set(train, 'info', info)
 end

@@ -153,7 +153,21 @@ function tnp_handle_selectiontool(event)
     end
 
     if event.item == "tnp-railtool" then
-        tnp_action_player_railtool(player, event.entities)
+        tnp_action_player_railtool(player, event.entities, false)
+    end
+end
+
+-- tnp_handle_selectiontool_alt()
+--   Handles a selection tool being used in alt-mode
+function tnp_handle_selectiontool_alt(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    if event.item == "tnp-railtool" then
+        tnp_action_player_railtool(player, event.entities, true)
     end
 end
 

@@ -4,6 +4,7 @@
         expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
         expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
+        keep_position              = bool, market to remain in position on arrival
         keep_schedule              = bool, marker to not reset the trains schedule when handling completion
         player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         station                    = LuaEntity, train station we're dispatching to
@@ -41,7 +42,7 @@ function _tnp_state_train_prune()
             global.train_data[id] = nil
         elseif not data.player or not data.player.valid then
             -- The player we were tracking is invalid -- but the trains ok.  Cancel any dispatching.
-            tnp_train_enact(train, true, nil, nil, false)
+            tnp_train_enact(data.train, true, nil, nil, false)
             global.train_data[id] = nil
         end
     end
@@ -93,6 +94,24 @@ function tnp_state_train_query(train)
     end
 
     return false
+end
+
+-- tnp_state_train_reset()
+--   Resets non-core state information about a LuaTrain
+function tnp_state_train_reset(train)
+    _tnp_state_train_prune()
+
+    if not train.valid then
+        return false
+    end
+
+    if global.train_data[train.id] then
+        local player = global.train_data[train.id]['player']
+
+        global.train_data[train.id] = {}
+        global.train_data[train.id]['train'] = train
+        global.train_data[train.id]['player'] = player
+    end
 end
 
 -- tnp_state_train_set()

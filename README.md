@@ -54,14 +54,16 @@ To assign trains into a TNfP network:
 When dispatching trains TNfP will find the nearest train which has anywhere in its schedule a train stop receiving the 'TNfP Station' signal.
 
 ### TNfP Rail Tool
-The railtool provides a way of creating temporary train stops and is used by selecting/dragging over an area containing rail segments, from either the standard player view or map view:
+The railtool provides a way of dispatching via the map or player view, with the ability to create a temporary train stop if needed.  It's used by selecting/dragging over an area containing train stations and/or rail segments:
 
 ![TNfP Rail Tool Selection](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-selection.jpg)
 &nbsp;
 ![TNfP Rail Tool Stop](https://leehuk.github.io/factorio-tnfp/docs/images/tnfp-screenshot-railtool-station.jpg)
 
-* When onboard a train a new temporary stop will be created at that location, temporarily added to the trains schedule and dispatched there.
-* When not onboard a train, a new temporary stop will be created and a player train will be dispatched there from the TNfP network.
+* If a valid train stop is found, that is used for dispatch.  If a valid train stop is found, a new temporary stop will be created at that location.
+* When onboard a train the destination is temporarily added to the trains schedule and dispatched there.
+* When not onboard a train a player train will be dispatched there from the TNfP network.
+* When used in alternate mode (by holding shift), the trains arrival behaviour will change so that it instead switches to manual mode instead of resuming its schedule.
 * To remove a rail tool from your inventory, drop it on the ground near the player (default 'z') and it will be automatically destroyed.
 
 ### TNfP Home Station
