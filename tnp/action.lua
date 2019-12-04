@@ -560,14 +560,17 @@ function tnp_action_train_statechange(train)
                     tnp_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
                 end
             else
+                -- Store destination before actioning the arrival, which will destroy temporary stops
+                local destination = tnp_train_destinationstring(train)
+
                 tnp_action_train_arrival(player, train)
 
                 local keep_position = tnp_state_train_get(train, 'keep_position')
                 if keep_position then
-                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_manual", tnp_train_destinationstring(train)})
+                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_manual", destination})
                     tnp_train_enact(train, true, nil, true, nil)
                 else
-                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived", tnp_train_destinationstring(train)})
+                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived", destination})
                 end
             end
 
