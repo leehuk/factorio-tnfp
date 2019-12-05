@@ -67,6 +67,8 @@ function tnp_handle_input(event)
         tnp_handle_request(event, false)
     elseif event.input_name == "tnp-handle-railtool" then
         tnp_handle_railtool(event, false, false)
+    elseif event.input_name == "tnp-handle-railtool-supply" then
+        tnp_handle_railtool_supply(event, false)
     elseif event.input_name == "tnp-handle-railtool-map" then
         tnp_handle_railtool(event, false, true)
     elseif event.input_name == "tnp-handle-train-manual" then
@@ -122,8 +124,10 @@ end
 -- tnp_handle_player_dropped()
 --   Handles a player dropping an object
 function tnp_handle_player_droppeditem(event)
-    if event.entity and event.entity.stack and event.entity.stack.valid and event.entity.stack.valid_for_read and event.entity.stack.name == "tnp-railtool" then
-        event.entity.stack.clear()
+    if event.entity and event.entity.stack and event.entity.stack.valid and event.entity.stack.valid_for_read then
+        if event.entity.stack.name == "tnp-railtool" or event.entity.stack.name == "tnp-railtool-supply" then
+            event.entity.stack.clear()
+        end
     end
 end
 
@@ -141,6 +145,18 @@ function tnp_handle_railtool(event, shortcut, openmap)
     end
 
     tnp_action_railtool(player, "tnp-railtool")
+end
+
+-- tnp_handle_railtool_supply()
+--   Handles a request to provide a supply train railtool
+function tnp_handle_railtool_supply(event, shortcut)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    tnp_action_railtool(player, "tnp-railtool-supply")
 end
 
 -- tnp_handle_request()
@@ -209,6 +225,8 @@ function tnp_handle_shortcut(event)
         tnp_handle_request(event, true)
     elseif event.prototype_name == "tnp-handle-railtool" then
         tnp_handle_railtool(event, true, false)
+    elseif event.prototype_name == "tnp-handle-railtool-supply" then
+        tnp_handle_railtool_supply(event, true)
     end
 end
 

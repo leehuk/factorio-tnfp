@@ -266,6 +266,7 @@ function tnp_action_railtool(player, item)
     local inventory = player.get_main_inventory()
     if inventory then
         inventory.remove({name = "tnp-railtool", count = 999})
+        inventory.remove({name = "tnp-railtool-supply", count = 999})
     end
 
     local result = player.cursor_stack.set_stack({
