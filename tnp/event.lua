@@ -109,7 +109,7 @@ function tnp_handle_railtool(event, shortcut, openmap)
         player.open_map(player.position)
     end
 
-    tnp_action_railtool(player)
+    tnp_action_railtool(player, "tnp-railtool")
 end
 
 -- tnp_handle_request()

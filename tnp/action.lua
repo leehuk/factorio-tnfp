@@ -250,11 +250,13 @@ function tnp_action_player_train(player, train)
 end
 
 -- tnp_action_railtool()
---   Provides the given player with a railtool
-function tnp_action_railtool(player)
-    -- Player already has a railtool in hand.
-    if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
-        return
+--   Provides the given player with a railtool item
+function tnp_action_railtool(player, item)
+    -- Player already has this railtool in hand.
+    if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read then
+        if player.cursor_stack.name == item then
+            return
+        end
     end
 
     if not player.clean_cursor() then
@@ -265,18 +267,11 @@ function tnp_action_railtool(player)
     -- If the player has a railtool in their inventory, throw that one away
     local inventory = player.get_main_inventory()
     if inventory then
-        local railtool = inventory.find_item_stack("tnp-railtool")
-        if railtool then
-            if not player.cursor_stack.swap_stack(railtool) then
-                tnp_message_flytext(player, player.position, {"tnp_railtool_error_swap"})
-            end
-
-            return
-        end
+        inventory.remove({name = "tnp-railtool", count = 999})
     end
 
-	local result = player.cursor_stack.set_stack({
-        name = "tnp-railtool",
+    local result = player.cursor_stack.set_stack({
+        name = item,
         count = 1
     })
     if not result then
@@ -316,7 +311,7 @@ end
 function tnp_action_stationselect_railtoolmap(player)
     tnp_gui_stationlist_close(player)
     player.open_map(player.position)
-    tnp_action_railtool(player)
+    tnp_action_railtool(player, "tnp-railtool")
 end
 
 -- tnp_action_stationselect_redispatch()
