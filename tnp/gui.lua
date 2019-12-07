@@ -259,10 +259,16 @@ function tnp_gui_stationlist_build(player, train)
         end
     end
 
-    -- Then add pinned stations to the top of the all list
+    -- Then add pinned stations to the top of the all and tnfp lists.  The pinning interface isnt available
+    -- inside the tnfp list, but they'll still be promoted.
     for i, stationname in ipairs(stations_key) do
         if stations_pinned[i] == true then
             tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], true, false)
+
+            if stations_tnfp[i] == true then
+                tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], true, false)
+            end
+
             stations_added[i] = true
         end
     end
