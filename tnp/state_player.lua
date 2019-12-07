@@ -19,36 +19,15 @@ function _tnp_state_player_prune()
         elseif not data.player or not data.player.valid then
             global.player_data[id] = nil
         else
-            if data.dynamicstop and not data.dynamicstop.valid then
-                global.player_data[id]['dynamicstop'] = nil
-            end
-
-            if data.train and not data.train.valid then
-                global.player_data[id]['train'] = nil
-            end
-
-            if data.gui and not data.gui.valid then
-                global.player_data[id]['gui'] = nil
-            end
-
-            if data.gui_stationsearch and not data.gui_stationsearch.valid then
-                global.player_data[id]['gui_stationsearch'] = nil
-            end
-
-            if data.gui_stationtableall and not data.gui_stationtableall.valid then
-                global.player_data[id]['gui_stationtableall'] = nil
-            end
-
-            if data.gui_stationtabletrain and not data.gui_stationtabletrain.valid then
-                global.player_data[id]['gui_stationtabletrain'] = nil
-            end
-
-            if data.gui_stationtabletnfp and not data.gui_stationtabletnfp.valid then
-                global.player_data[id]['gui_stationtabletnfp'] = nil
+            local children = {'dynamicstop', 'train', 'gui', 'gui_stationsearch', 'gui_stationtableall', 'gui_stationtabletrain', 'gui_stationtabletnfp'}
+            for _, child in pairs(children) do
+                if data[child] and data[child].valid ~= true then
+                    global.player_data[id][child] = nil
+                end
             end
 
             local xdata = global.player_data[id]
-            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and not xdata['gui_stationsearch'] and not xdata['gui_stationtableall'] and not xdata['gui_stationtabletrain'] and not xdata['gui_stationtabletnfp'] then
+            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] then
                 global.player_data[id] = nil
             end
         end
