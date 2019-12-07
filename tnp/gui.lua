@@ -235,11 +235,11 @@ function tnp_gui_stationlist_build(player, train)
 
     for i, stationname in ipairs(stations_key) do
         local is_tnp = tnp_stop_check(stations_map[stationname])
-        if is_tnp == 2 then
+        if is_tnp.home == true then
             -- Home stations are not marked as pinned, or normal tnfp stations.
             stations_tnfphome[i] = true
         else
-            if is_tnp == 1 then
+            if is_tnp.tnp == true then
                 stations_tnfp[i] = true
             end
 
