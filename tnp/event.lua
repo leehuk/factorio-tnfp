@@ -156,7 +156,15 @@ function tnp_handle_railtool_supply(event, shortcut)
         return
     end
 
-    tnp_action_railtool(player, "tnp-railtool-supply")
+    local supplytrains = tnp_train_getsupply(player)
+    if #supplytrains == 0 then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_invalid"})
+        return
+    end
+
+    tnp_state_player_set(player, 'supplyselected', supplytrains[1])
+    tnp_state_player_set(player, 'supplyselection', supplytrains)
+    --tnp_action_railtool(player, "tnp-railtool-supply")
 end
 
 -- tnp_handle_request()

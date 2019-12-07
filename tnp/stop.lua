@@ -1,10 +1,12 @@
 -- tnp_stop_check()
 --   Validates if a stop is assigned for tnp, returning an array of bool statuses in the form
---   result['tnp' => bool, 'home' => bool]
+--   result[tnp = bool, home = bool, supply = bool, supplyidx = int]
 function tnp_stop_check(stop)
     local result = {
         tnp       = false,
-        home      = false
+        home      = false,
+        supply    = false,
+        supplyidx = 0
     }
 
     -- tnp can only be assigned to vanilla stops
@@ -21,6 +23,10 @@ function tnp_stop_check(stop)
                 end
                 if signal.signal.name == "tnp-station-home" then
                     result.home = true
+                end
+                if signal.signal.name == "tnp-station-supply" then
+                    result.supply = true
+                    result.supplyidx = signal.count
                 end
             end
         end
@@ -129,4 +135,24 @@ function tnp_stop_getall(player)
     end
 
     return tnp_stops
+end
+
+-- tnp_stop_getsupply()
+--   Returns a hash of tnp supply train stops, in the form [{stop = LuaEntity, supplyidx = int}]
+function tnp_stop_getsupply(player)
+    local tnp_stops = {}
+
+    -- tnp train stops must be vanilla train stops, so search by name instead of type
+    local entities = player.surface.find_entities_filtered({
+        name = "train-stop"
+    })
+    for _, ent in pairs(entities) do
+        local is_tnp = tnp_stop_check(ent)
+        if is_tnp.supply == true then
+            tnp_stops[is_tnp.supplyidx] = ent
+        end
+    end
+
+    return tnp_stops
+
 end

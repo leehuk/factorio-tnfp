@@ -144,6 +144,24 @@ function tnp_train_getall(player)
     return tnp_trains
 end
 
+-- tnp_train_getsupply()
+--   Returns an indexed array of all supply trains available to the player
+function tnp_train_getsupply(player)
+    local tnp_trains = {}
+    local tnp_train_ids = {}
+
+    local tnp_stops = tnp_stop_getsupply(player)
+    for i, ent in pairs(tnp_stops) do
+        local train = ent.get_stopped_train()
+        if train and train.valid then
+            table.insert(tnp_trains, train)
+        end
+
+    end
+
+    return tnp_trains
+end
+
 -- tnp_train_info_save()
 --   Collates a trains information for save state, such as manual_mode and schedule
 --
