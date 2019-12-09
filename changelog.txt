@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.1
+Date: 2019-12-09
+  Changes:
+    - Fix an error cleaning up deleted pinned stations
+    - Fix pinned stations not appearing in the 'TNfP Stations' list
+---------------------------------------------------------------------------------------------------
 Version: 0.8.0
 Date: 2019-12-04
   Changes:

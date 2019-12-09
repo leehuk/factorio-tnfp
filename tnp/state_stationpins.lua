@@ -11,9 +11,9 @@ function _tnp_state_stationpins_prune()
         if not ent.player.valid then
             global.stationpins_data[id] = nil
         else
-            for sid, station in pairs(global.stationpins_data[id]['stations']) do
+            for sid, station in pairs(ent.stations) do
                 if not station.valid then
-                    global.stationpins_data['stations'][sid] = nil
+                    global.stationpins_data[id]['stations'][sid] = nil
                 end
             end
         end
