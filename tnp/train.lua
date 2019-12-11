@@ -222,3 +222,13 @@ function tnp_train_schedule_copy(train)
 
     return schedule
 end
+
+-- tnp_train_stationname()
+--   Returns the name of the station a train is currently stopped at, or ? if unknown
+function tnp_train_stationname(train)
+    if not train or not train.valid or not train.station or not train.station.valid then
+        return "?"
+    end
+
+    return train.station.backer_name
+end
