@@ -79,20 +79,21 @@ script.on_load(function()
 end)
 
 script.on_configuration_changed(function(event)
-    if event["mod_changes"] and event["mod_changes"]["TrainNetworkForPlayers"] then
-        if not event["mod_changes"]["TrainNetworkForPlayers"]["version"] then
-            event["mod_changes"]["TrainNetworkForPlayers"]["version"] = "0.4.2"
+    if not event["mod_changes"] or not event["mod_changes"]["TrainNetworkForPlayers"] then
+        return
+    end
 
-            global.dynamicstop_data = global.dynamicstop_data or {}
-            global.gui_data = global.gui_data or {}
-            global.ltnstop_data = global.ltnstop_data or {}
-            global.player_data = global.player_data or {}
-            global.train_data = global.train_data or {}
-        end
+    local old_version = event["mod_changes"]["TrainNetworkForPlayers"]["old_version"] or "0.0.0"
+    local oldv = util.split(old_version, "%.")
+    local newv = util.split(event["mod_changes"]["TrainNetworkForPlayers"]["new_version"], "%.")
 
-        if event["mod_changes"]["TrainNetworkForPlayers"]["version"] == "0.4.2" then
-            event["mod_changes"]["TrainNetworkForPlayers"]["version"] = "0.6.0"
-            global.stationpins_data = global.stationpins_data or {}
-        end
+    -- Old version is < 0.9.0
+    if tonumber(oldv[1]) <= 0 and tonumber(oldv[2]) < 9 then
+        global.dynamicstop_data = global.dynamicstop_data or {}
+        global.gui_data = global.gui_data or {}
+        global.ltnstop_data = global.ltnstop_data or {}
+        global.player_data = global.player_data or {}
+        global.train_data = global.train_data or {}
+        global.stationpins_data = global.stationpins_data or {}
     end
 end)
