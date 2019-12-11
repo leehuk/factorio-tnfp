@@ -2,6 +2,7 @@ tnpdefines = {}
 
 require('util')
 require('tnp/action')
+require('tnp/devent')
 require('tnp/draw')
 require('tnp/dynamicstop')
 require('tnp/event')
@@ -63,6 +64,8 @@ script.on_init(function()
         script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
     end
 
+    devent_populate()
+
     global.dynamicstop_data = global.dynamicstop_data or {}
     global.gui_data = global.gui_data or {}
     global.ltnstop_data = global.ltnstop_data or {}
@@ -72,6 +75,8 @@ script.on_init(function()
 end)
 
 script.on_load(function()
+    devent_activate()
+
     if remote.interfaces["logistic-train-network"] then
         local ltn_stops_updated_event = remote.call("logistic-train-network", "on_stops_updated")
         script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
@@ -89,6 +94,8 @@ script.on_configuration_changed(function(event)
 
     -- Old version is < 0.9.0
     if tonumber(oldv[1]) <= 0 and tonumber(oldv[2]) < 9 then
+        devent_populate()
+
         global.dynamicstop_data = global.dynamicstop_data or {}
         global.gui_data = global.gui_data or {}
         global.ltnstop_data = global.ltnstop_data or {}

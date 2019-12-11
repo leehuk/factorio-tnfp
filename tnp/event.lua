@@ -88,6 +88,14 @@ function tnp_handle_ltn_stops(event)
     end
 end
 
+function tnp_handle_player_cursor_stack_changed(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+end
+
 -- tnp_handle_player_dropped()
 --   Handles a player dropping an object
 function tnp_handle_player_droppeditem(event)
