@@ -7,6 +7,7 @@ State Table:
     gui_stationtabletrain   = LuaGuiElement, station table element we're tracking
     gui_stationtabletnfp    = LuaGuiElement, station table element we're tracking
     player                  = LuaPlayer
+    railtool                = string, item type of railtool we've provided the player
     train                   = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
 ]]
 
@@ -27,11 +28,25 @@ function _tnp_state_player_prune()
             end
 
             local xdata = global.player_data[id]
-            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] then
+            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and xdata['railtool'] == nil then
                 global.player_data[id] = nil
             end
         end
     end
+end
+
+-- tnp_state_player_any()
+--   Checks if we have state information of a given key for any player
+function tnp_state_player_any(key)
+    _tnp_state_player_prune()
+
+    for id, data in pairs(global.player_data) do
+        if data[key] then
+            return true
+        end
+    end
+
+    return false
 end
 
 -- tnp_state_player_delete()

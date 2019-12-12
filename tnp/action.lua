@@ -120,7 +120,7 @@ function tnp_action_player_railtool(player, entities, altmode)
     end
 
     if target then
-        if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
+        if tnp_player_cursorstack(player) == "tnp-railtool" then
             player.clean_cursor()
         end
         player.close_map()
@@ -151,7 +151,7 @@ function tnp_action_player_railtool(player, entities, altmode)
     end
 
     if complete then
-        if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
+        if tnp_player_cursorstack(player) == "tnp-railtool" then
             player.clean_cursor()
         end
         player.close_map()
@@ -253,10 +253,8 @@ end
 --   Provides the given player with a railtool item
 function tnp_action_railtool(player, item)
     -- Player already has this railtool in hand.
-    if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read then
-        if player.cursor_stack.name == item then
-            return
-        end
+    if tnp_player_cursorstack(player) == item then
+        return
     end
 
     if not player.clean_cursor() then
@@ -277,6 +275,9 @@ function tnp_action_railtool(player, item)
     if not result then
         tnp_message_flytext(player, player.position, {"tnp_railtool_error_provide"})
     end
+
+    tnp_state_player_set(player, 'railtool', item)
+    devent_enable("player_cursor_stack_changed")
 end
 
 -- tnp_action_stationselect_cancel()

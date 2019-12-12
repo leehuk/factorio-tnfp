@@ -94,6 +94,29 @@ function tnp_handle_player_cursor_stack_changed(event)
     if not player.valid then
         return
     end
+
+    -- Check if the player was given a railtool
+    local railtool = tnp_state_player_get(player, 'railtool')
+    if railtool then
+        local cursoritem = tnp_player_cursorstack(player)
+
+        if cursoritem == railtool then
+            -- Player still has the railtool we gave them
+            return
+        elseif cursoritem == "tnp-railtool" or cursoritem == "tnp-railtool-supply" then
+            -- Player has changed the type of railtool, but still has one
+            tnp_state_player_set(player, 'railtool', cursoritem)
+            return
+        else
+            -- Player no longer has the railtool
+            tnp_state_player_delete(player, 'railtool')
+        end
+    end
+
+    -- If no-one has any railtools anymore, we can stop listening
+    if not tnp_state_player_any('railtool') then
+        devent_disable("player_cursor_stack_changed")
+    end
 end
 
 -- tnp_handle_player_dropped()
