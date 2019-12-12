@@ -12,15 +12,21 @@ data:extend({
         consuming = "none"
     },
     {
+        name = "tnp-handle-railtool-map",
+        type = "custom-input",
+        key_sequence = "",
+        consuming = "none"
+    },
+    {
         name = "tnp-handle-railtool-supply",
         type = "custom-input",
         key_sequence = "",
         consuming = "none"
     },
     {
-        name = "tnp-handle-railtool-map",
+        name = "tnp-handle-railtool-supply-next",
         type = "custom-input",
-        key_sequence = "",
+        key_sequence = "CONTROL + EQUALS",
         consuming = "none"
     },
     {

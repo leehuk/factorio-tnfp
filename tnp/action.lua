@@ -252,9 +252,16 @@ end
 -- tnp_action_railtool()
 --   Provides the given player with a railtool item
 function tnp_action_railtool(player, item)
-    -- Player already has this railtool in hand.
-    if tnp_player_cursorstack(player) == item then
-        return
+    local cursoritem = tnp_player_cursorstack(player)
+
+    if cursoritem then
+        if cursoritem == item then
+            -- Player already has this railtool in hand.
+            return
+        elseif item == "tnp-railtool" then
+            -- Player is swapping from a supply railtool to normal railtool
+            tnp_supplytrain_clear(player)
+        end
     end
 
     if not player.clean_cursor() then

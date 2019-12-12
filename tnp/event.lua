@@ -69,6 +69,8 @@ function tnp_handle_input(event)
         tnp_handle_railtool(event, false, false)
     elseif event.input_name == "tnp-handle-railtool-supply" then
         tnp_handle_railtool_supply(event, false)
+    elseif event.input_name == "tnp-handle-railtool-supply-next" then
+        tnp_handle_supplytrain_next(event)
     elseif event.input_name == "tnp-handle-railtool-map" then
         tnp_handle_railtool(event, false, true)
     elseif event.input_name == "tnp-handle-train-manual" then
@@ -108,9 +110,19 @@ function tnp_handle_player_cursor_stack_changed(event)
         elseif cursoritem == "tnp-railtool" or cursoritem == "tnp-railtool-supply" then
             -- Player has changed the type of railtool, but still has one
             tnp_state_player_set(player, 'railtool', cursoritem)
+
+            -- Player has switched from a supply train railtool to a normal one
+            if cursoritem == "tnp-railtool" then
+                tnp_supplytrain_clear(player)
+            end
+
             return
         else
             -- Player no longer has the railtool
+            if railtool == "tnp-railtool-supply" then
+                tnp_supplytrain_clear(player)
+            end
+
             tnp_state_player_delete(player, 'railtool')
         end
     end
@@ -156,15 +168,9 @@ function tnp_handle_railtool_supply(event, shortcut)
         return
     end
 
-    local supplytrains = tnp_train_getsupply(player)
-    if #supplytrains == 0 then
-        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_invalid"})
-        return
+    if tnp_supplytrain_select(player) then
+        tnp_action_railtool(player, "tnp-railtool-supply")
     end
-
-    tnp_state_player_set(player, 'supplyselected', supplytrains[1])
-    tnp_state_player_set(player, 'supplyselection', supplytrains)
-    --tnp_action_railtool(player, "tnp-railtool-supply")
 end
 
 -- tnp_handle_request()
@@ -236,6 +242,22 @@ function tnp_handle_shortcut(event)
     elseif event.prototype_name == "tnp-handle-railtool-supply" then
         tnp_handle_railtool_supply(event, true)
     end
+end
+
+-- tnp_handle_supplytrain_next()
+--   Handles a player request to select the next supply train
+function tnp_handle_supplytrain_next(event)
+    local player = game.players[event.player_index]
+
+    if not player or not player.valid then
+        return
+    end
+
+    if not tnp_state_player_get(player, 'supplyselected') then
+        return
+    end
+
+    tnp_supplytrain_select_next(player)
 end
 
 -- tnp_handle_tick_prune()
