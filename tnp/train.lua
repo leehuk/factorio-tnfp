@@ -223,6 +223,47 @@ function tnp_train_schedule_copy(train)
     return schedule
 end
 
+-- tnp_train_schedule_copyamend()
+--   Returns a copy of the trains schedule, amended to add the given station
+function tnp_train_schedule_copyamend(player, train, station, status, temporary)
+    local config = settings.get_player_settings(player)
+
+    local schedule = tnp_train_schedule_copy(train)
+    local schedule_found = tnp_train_schedule_check(schedule, station.backer_name)
+
+    if not schedule then
+        schedule = {}
+        schedule.records = {}
+    end
+
+    if schedule_found == false then
+        local record = {
+            station = station.backer_name,
+            temporary = temporary
+        }
+
+        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
+            record['wait_conditions'] = {{
+                type = "time",
+                compare_type = "or",
+                ticks = config['tnp-train-boarding-timeout'].value*60
+            }}
+        elseif status == tnpdefines.train.status.redispatched then
+            record['wait_conditions'] = {{
+                type="passenger_not_present",
+                compare_type = "or"
+            }}
+        end
+
+        table.insert(schedule.records, record)
+        schedule.current = #schedule.records
+    else
+        schedule.current = schedule_found
+    end
+
+    return schedule
+end
+
 -- tnp_train_stationname()
 --   Returns the name of the station a train is currently stopped at, or ? if unknown
 function tnp_train_stationname(train)
