@@ -20,6 +20,7 @@ require('tnp/state_player')
 require('tnp/state_stationpins')
 require('tnp/state_train')
 require('tnp/stop')
+require('tnp/supplytrain')
 require('tnp/train')
 
 -- Event Handling
@@ -56,6 +57,8 @@ script.on_event(defines.events.on_player_selected_area, tnp_handle_selectiontool
 -- Input Handling
 script.on_event("tnp-handle-railtool", tnp_handle_input)
 script.on_event("tnp-handle-railtool-map", tnp_handle_input)
+script.on_event("tnp-handle-railtool-supply", tnp_handle_input)
+script.on_event("tnp-handle-railtool-supply-next", tnp_handle_input)
 script.on_event("tnp-handle-request", tnp_handle_input)
 script.on_event("tnp-handle-train-manual", tnp_handle_input)
 
