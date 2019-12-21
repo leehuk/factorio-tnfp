@@ -2,6 +2,7 @@ tnpdefines = {}
 
 require('util')
 require('tnp/action')
+require('tnp/action_trainstate')
 require('tnp/devent')
 require('tnp/draw')
 require('tnp/dynamicstop')
