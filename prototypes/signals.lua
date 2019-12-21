@@ -10,7 +10,7 @@ data:extend({
     {
         type = "virtual-signal",
         name = "tnp-station-supply",
-        icon = "__TrainNetworkForPlayers__/graphics/icons/tnp-station.png",
+        icon = "__TrainNetworkForPlayers__/graphics/icons/tnp-station-supply.png",
         icon_size = 32,
         subgroup = "virtual-signal-special",
         order = "z[player-train-network]-b[station-supply]"
