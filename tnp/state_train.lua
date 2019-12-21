@@ -9,6 +9,7 @@
         player                     = LuaPlayer, player requesting the train.  Cross-referenced by tnp_state_player
         station                    = LuaEntity, train station we're dispatching to
         status                     = int, current dispatching status
+        supplymode                 = bool, marker to note this train is a supply train
         timeout_arrival            = int, arrival timeout before cancelling the request
         timeout_railtooltest       = int, timeout before we expect a state change for railtool testing
         train                      = LuaTrain, the train we're tracking

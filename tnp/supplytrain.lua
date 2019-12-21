@@ -1,8 +1,16 @@
 -- tnp_supplytrain_clear()
 --   Clears gui elements and state tracking when a supply train request is cancelled
-function tnp_supplytrain_clear(player)
+function tnp_supplytrain_clear(player, message)
     if not player or not player.valid then
         return
+    end
+
+    if message then
+        tnp_message(tnpdefines.loglevel.standard, player, message)
+    end
+
+    if tnp_player_cursorstack(player) == "tnp-railtool-supply" then
+        player.cursor_stack.clear()
     end
 
     tnp_speechbubble_destroy(player)

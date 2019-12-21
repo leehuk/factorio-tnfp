@@ -214,7 +214,9 @@ function tnp_handle_selectiontool(event)
     end
 
     if event.item == "tnp-railtool" then
-        tnp_action_player_railtool(player, event.entities, false)
+        tnp_action_player_railtool(player, event.entities, false, false)
+    elseif event.item == "tnp-railtool-supply" then
+        tnp_action_player_railtool(player, event.entities, false, true)
     end
 end
 
@@ -228,7 +230,9 @@ function tnp_handle_selectiontool_alt(event)
     end
 
     if event.item == "tnp-railtool" then
-        tnp_action_player_railtool(player, event.entities, true)
+        tnp_action_player_railtool(player, event.entities, true, false)
+    elseif event.item == "tnp-railtool-supply" then
+        tnp_action_player_railtool(player, event.entities, true, true)
     end
 end
 

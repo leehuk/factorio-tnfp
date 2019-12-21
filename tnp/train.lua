@@ -243,7 +243,7 @@ end
 
 -- tnp_train_schedule_copyamend()
 --   Returns a copy of the trains schedule, amended to add the given station
-function tnp_train_schedule_copyamend(player, train, station, status, temporary)
+function tnp_train_schedule_copyamend(player, train, station, status, temporary, supplymode)
     local config = settings.get_player_settings(player)
 
     local schedule = tnp_train_schedule_copy(train)
@@ -260,7 +260,12 @@ function tnp_train_schedule_copyamend(player, train, station, status, temporary)
             temporary = temporary
         }
 
-        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
+        if supplymode then
+            record['wait_conditions'] = {{
+                type = "circuit",
+                compare_type = "or"
+            }}
+        elseif status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             record['wait_conditions'] = {{
                 type = "time",
                 compare_type = "or",

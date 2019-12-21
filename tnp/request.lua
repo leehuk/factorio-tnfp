@@ -1,7 +1,7 @@
 -- tnp_request_assign()
 --   Assigns a parked train to a player, marked as arrived.
 function tnp_request_assign(player, target, train)
-    tnp_request_setup(player, target, train, tnpdefines.train.status.arrived)
+    tnp_request_setup(player, target, train, tnpdefines.train.status.arrived, false)
 
     if target then
         tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_waiting", target.backer_name})
@@ -34,6 +34,25 @@ function tnp_request_cancel(player, train, message)
     end
 end
 
+-- tnp_request_cancel_supply()
+--   Cancels a tnp request and removes all state tracking, accomodating supply mode trains
+function tnp_request_cancel_supply(player, train, supplymode, message)
+    if supplymode then
+        -- This is a supply train, only cancel the train state
+        if player and player.valid and message then
+            tnp_message(tnpdefines.loglevel.standard, player, message)
+        end
+
+        if train then
+            tnp_state_train_delete(train, false)
+        end
+    else
+        -- Standard request -- fall back to standard cancellation
+        tnp_request_cancel(player, train, message)
+    end
+
+end
+
 -- tnp_request_create()
 --   Attempts to create a new request for a tnp train
 function tnp_request_create(player, target)
@@ -59,22 +78,29 @@ function tnp_request_create(player, target)
         tnp_draw_path(player, target)
     end
 
-    tnp_request_dispatch(player, target, train)
+    tnp_request_dispatch(player, target, train, false)
     return true
 end
 
 -- tnp_request_dispatch()
 --   Dispatches a train
-function tnp_request_dispatch(player, target, train)
+function tnp_request_dispatch(player, target, train, supplymode)
     local config = settings.get_player_settings(player)
+    local status = tnpdefines.train.status.dispatching
 
-    tnp_request_setup(player, target, train, tnpdefines.train.status.dispatching)
+    tnp_request_setup(player, target, train, status, supplymode)
     tnp_state_train_set(train, 'timeout_arrival', config['tnp-train-arrival-timeout'].value)
 
-    local schedule = tnp_train_schedule_copyamend(player, train, target, tnpdefines.train.status.dispatching, false)
+    if supplymode then
+        tnp_state_train_set(train, 'keep_position', true)
+    end
+
+    local schedule = tnp_train_schedule_copyamend(player, train, target, status, false, supplymode)
     tnp_train_enact(train, false, schedule, nil, false)
 
-    tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", target.backer_name})
+    if not supplymode then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", target.backer_name})
+    end
 end
 
 -- tnp_request_railtooltest()
@@ -90,7 +116,7 @@ function tnp_request_railtooltest(player, target, train)
         dynamicstatus = tnpdefines.train.status.redispatched
     end
 
-    tnp_request_setup(player, target, train, tnpdefines.train.status.railtooltest)
+    tnp_request_setup(player, target, train, tnpdefines.train.status.railtooltest, false)
     tnp_state_train_set(train, 'timeout_railtooltest', 2)
     tnp_state_train_set(train, 'dynamicstatus', dynamicstatus)
 
@@ -98,7 +124,7 @@ function tnp_request_railtooltest(player, target, train)
         tnp_state_train_set(train, 'timeout_arrival', config['tnp-train-arrival-timeout'].value)
     end
 
-    local schedule = tnp_train_schedule_copyamend(player, train, target, dynamicstatus, true)
+    local schedule = tnp_train_schedule_copyamend(player, train, target, dynamicstatus, true, false)
     -- We force the train into manual mode first, to ensure we generate an on-the-path status
     tnp_train_enact(train, false, schedule, true, false)
 end
@@ -106,7 +132,8 @@ end
 -- tnp_request_redispatch()
 --   Redispatches a train for an onward journey
 function tnp_request_redispatch(player, target, train)
-    tnp_request_setup(player, target, train, tnpdefines.train.status.redispatched)
+    local status = tnpdefines.train.status.redispatched
+    tnp_request_setup(player, target, train, status, false)
 
     -- Its a tnp train being dispatched to a station already in its schedule -- so make an extra
     -- effort to keep it there once complete
@@ -114,17 +141,22 @@ function tnp_request_redispatch(player, target, train)
         tnp_state_train_set(train, 'keep_schedule', true)
     end
 
-    local schedule = tnp_train_schedule_copyamend(player, train, target, tnpdefines.train.status.redispatched, false)
+    local schedule = tnp_train_schedule_copyamend(player, train, target, status, false, false)
     tnp_train_enact(train, false, schedule, nil, false)
 end
 
 -- tnp_request_setup()
 --   Handles common setup logic for a train
-function tnp_request_setup(player, target, train, status)
+function tnp_request_setup(player, target, train, status, supplymode)
     tnp_state_train_reset(train)
 
     tnp_state_train_set(train, 'player', player)
-    tnp_state_player_set(player, 'train', train)
+
+    if supplymode then
+        tnp_state_train_set(train, 'supplymode', true)
+    else
+        tnp_state_player_set(player, 'train', train)
+    end
 
     if target then
         tnp_state_train_set(train, 'station', target)
@@ -133,5 +165,7 @@ function tnp_request_setup(player, target, train, status)
     tnp_state_train_set(train, 'status', status)
     tnp_train_info_save(train)
 
-    player.set_shortcut_toggled('tnp-handle-request', true)
+    if not supplymode then
+        player.set_shortcut_toggled('tnp-handle-request', true)
+    end
 end
