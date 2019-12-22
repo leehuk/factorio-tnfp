@@ -66,20 +66,42 @@ end
 
 -- tnp_action_player_railtool()
 --   Actions an area selection
-function tnp_action_player_railtool(player, entities, altmode)
+function tnp_action_player_railtool(player, entities, altmode, supplymode)
     local valid_stops = {}
     local valid_rails = {}
 
-    -- We need to know what train we're dispatching and cancel any current requests.  Do this early to ensure we cleanup
-    -- any temporary stops etc.
-    local train = tnp_state_player_get(player, 'train')
-    if train then
-        tnp_train_enact(train, true, nil, nil, nil)
-        tnp_request_cancel(player, train, nil)
+    local train
 
-        -- Keep the same train providing its valid though
-        if not train.valid then
-            train = nil
+    if supplymode then
+        train = tnp_state_player_get(player, 'supplyselected')
+
+        if not train or not train.valid then
+            tnp_supplytrain_clear(player, {"tnp_train_invalid"})
+            return
+        end
+
+        if not train.station or not train.station.valid then
+            tnp_supplytrain_clear(player, {"tnp_train_err_supplymoved"})
+            return
+        end
+
+        local trainplayer = tnp_state_train_get(train, 'player')
+        if trainplayer and trainplayer.valid then
+            tnp_supplytrain_clear(player, {"tnp_train_err_supplyassigned"})
+            return
+        end
+    else
+        -- We need to know what train we're dispatching and cancel any current requests.  Do this early to ensure we cleanup
+        -- any temporary stops etc.
+        train = tnp_state_player_get(player, 'train')
+        if train then
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_request_cancel(player, train, nil)
+
+            -- Keep the same train providing its valid though
+            if not train.valid then
+                train = nil
+            end
         end
     end
 
@@ -100,18 +122,25 @@ function tnp_action_player_railtool(player, entities, altmode)
     local target = nil
     if #valid_stops > 0 then
         target = valid_stops[1]
+    elseif supplymode then
+        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_notrainstop"})
+        return
     end
 
-    if player.vehicle and player.vehicle.train then
-        train = player.vehicle.train
-    elseif not train then
-        if target ~= nil then
-            train = tnp_train_find(player, target)
-        elseif #valid_rails > 0 then
-            train = tnp_train_find(player, valid_rails[1])
-        else
-            train = tnp_train_find(player, nil)
+    if not supplymode then
+        if player.vehicle and player.vehicle.train then
+            train = player.vehicle.train
+        elseif not train then
+            if target ~= nil then
+                train = tnp_train_find(player, target)
+            elseif #valid_rails > 0 then
+                train = tnp_train_find(player, valid_rails[1])
+            else
+                train = tnp_train_find(player, nil)
+            end
         end
+    else
+        tnp_supplytrain_clear(player)
     end
 
     if not train then
@@ -119,21 +148,26 @@ function tnp_action_player_railtool(player, entities, altmode)
         return false
     end
 
+    -- Dispatching to a train stop.  Nice and easy
     if target then
-        if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
-            player.clean_cursor()
+        if tnp_player_cursorstack(player) == "tnp-railtool" then
+            player.cursor_stack.clear()
         end
         player.close_map()
 
-        -- The player is on the train, this is a redispatch.
-        if player.vehicle and player.vehicle.train then
-            tnp_action_player_request_boarded(player, player.vehicle.train, target)
+        if supplymode then
+            tnp_request_dispatch(player, target, train, true)
         else
-            tnp_request_dispatch(player, target, train)
-        end
+            -- The player is on the train, this is a redispatch.
+            if player.vehicle and player.vehicle.train then
+                tnp_action_player_request_boarded(player, player.vehicle.train, target)
+            else
+                tnp_request_dispatch(player, target, train, false)
+            end
 
-        if altmode then
-            tnp_state_train_set(train, 'keep_position', true)
+            if altmode then
+                tnp_state_train_set(train, 'keep_position', true)
+            end
         end
 
         return
@@ -151,8 +185,8 @@ function tnp_action_player_railtool(player, entities, altmode)
     end
 
     if complete then
-        if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
-            player.clean_cursor()
+        if tnp_player_cursorstack(player) == "tnp-railtool" then
+            player.cursor_stack.clear()
         end
         player.close_map()
 
@@ -250,11 +284,18 @@ function tnp_action_player_train(player, train)
 end
 
 -- tnp_action_railtool()
---   Provides the given player with a railtool
-function tnp_action_railtool(player)
-    -- Player already has a railtool in hand.
-    if player.cursor_stack and player.cursor_stack.valid and player.cursor_stack.valid_for_read and player.cursor_stack.name == "tnp-railtool" then
-        return
+--   Provides the given player with a railtool item
+function tnp_action_railtool(player, item)
+    local cursoritem = tnp_player_cursorstack(player)
+
+    if cursoritem then
+        if cursoritem == item then
+            -- Player already has this railtool in hand.
+            return
+        elseif item == "tnp-railtool" then
+            -- Player is swapping from a supply railtool to normal railtool
+            tnp_supplytrain_clear(player)
+        end
     end
 
     if not player.clean_cursor() then
@@ -265,23 +306,20 @@ function tnp_action_railtool(player)
     -- If the player has a railtool in their inventory, throw that one away
     local inventory = player.get_main_inventory()
     if inventory then
-        local railtool = inventory.find_item_stack("tnp-railtool")
-        if railtool then
-            if not player.cursor_stack.swap_stack(railtool) then
-                tnp_message_flytext(player, player.position, {"tnp_railtool_error_swap"})
-            end
-
-            return
-        end
+        inventory.remove({name = "tnp-railtool", count = 999})
+        inventory.remove({name = "tnp-railtool-supply", count = 999})
     end
 
-	local result = player.cursor_stack.set_stack({
-        name = "tnp-railtool",
+    local result = player.cursor_stack.set_stack({
+        name = item,
         count = 1
     })
     if not result then
         tnp_message_flytext(player, player.position, {"tnp_railtool_error_provide"})
     end
+
+    tnp_state_player_set(player, 'railtool', item)
+    devent_enable("player_cursor_stack_changed")
 end
 
 -- tnp_action_stationselect_cancel()
@@ -316,7 +354,7 @@ end
 function tnp_action_stationselect_railtoolmap(player)
     tnp_gui_stationlist_close(player)
     player.open_map(player.position)
-    tnp_action_railtool(player)
+    tnp_action_railtool(player, "tnp-railtool")
 end
 
 -- tnp_action_stationselect_redispatch()
@@ -346,14 +384,40 @@ end
 
 -- tnp_action_train_arrival()
 --   Partially fulfils a tnp request, marking a train as successfully arrived.
-function tnp_action_train_arrival(player, train)
-    local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
-    if dynamicstop then
-        tnp_dynamicstop_destroy(player, dynamicstop)
+function tnp_action_train_arrival(player, train, alternate, supplymode)
+    -- Store destination before destroying temporary stops
+    local destination = tnp_train_destinationstring(train)
+
+    if not supplymode then
+        local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
+        if dynamicstop then
+            tnp_dynamicstop_destroy(player, dynamicstop)
+        end
+
+        tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
     end
 
     tnp_state_train_delete(train, 'timeout_arrival')
-    tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
+
+    local keep_position = tnp_state_train_get(train, 'keep_position')
+    if keep_position then
+        tnp_train_enact(train, true, nil, true, nil)
+    end
+
+    -- This is a supply train -- at this point (for now) we're done
+    if supplymode then
+        tnp_state_train_delete(train)
+    end
+
+    if keep_position and alternate then
+        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_alternate_manual", destination})
+    elseif keep_position then
+        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_manual", destination})
+    elseif alternate then
+        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_alternate", destination})
+    else
+        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived", destination})
+    end
 end
 
 -- tnp_action_train_rearrival()
@@ -399,227 +463,16 @@ function tnp_action_train_schedulechange(train, event_player)
 end
 
 -- tnp_action_train_statechange()
---   Performs any checks and actions required when a trains state is changed.
+--   Wrapper function to handle a train changing driving state
 function tnp_action_train_statechange(train)
     local player = tnp_state_train_get(train, 'player')
-    local status = tnp_state_train_get(train, 'status')
 
     if not player or not player.valid then
         tnp_request_cancel(player, train, nil)
         return
     end
 
-    local config = settings.get_player_settings(player)
-
-    -- We have now seen a state change request for one of our railtool tests
-    if status == tnpdefines.train.status.railtooltest then
-        tnp_state_train_delete(train, 'timeout_railtooltest')
-    end
-
-    if train.state == defines.train_state.on_the_path then
-        -- TNfP Train is on the move event
-        if status == tnpdefines.train.status.dispatching then
-            -- This was a train awaiting dispatch
-            tnp_state_train_set(train, 'status', tnpdefines.train.status.dispatched)
-            tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_dispatched"})
-
-        elseif status == tnpdefines.train.status.dispatched then
-            -- This train had stopped for some reason.
-            tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_onway"})
-
-        elseif status == tnpdefines.train.status.arrived then
-            -- Train has now departed after arrival.  This could be a timeout, or someone has manually
-            -- moved it to another station without changing the schedule.
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_cancelled_left"})
-
-        elseif status == tnpdefines.train.status.rearrived then
-            -- Train has now departed after rearrival.  The passenger has either disembarked, or someone
-            -- moved it to another station without changing the schedule.  Either way we just reset
-            -- the schedule.
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, nil)
-
-        elseif status == tnpdefines.train.status.railtooltest then
-            -- The temporary station the railtool is dispatching to works.
-            local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
-            local dynamicstatus = tnp_state_train_get(train, 'dynamicstatus')
-
-            if not dynamicstop then
-                tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
-                return
-            end
-
-            -- We have an alternate stop -- remove that
-            local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
-            if altstop then
-                if altstop.valid then
-                    altstop.destroy()
-                end
-
-                tnp_state_dynamicstop_delete(dynamicstop, 'altstop')
-            end
-
-            tnp_state_train_set(train, 'status', dynamicstatus)
-            tnp_state_train_delete(train, 'dynamicstatus')
-            tnp_state_train_delete(train, 'expect_manualmode')
-
-            if dynamicstatus == tnpdefines.train.status.dispatched then
-                tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", dynamicstop.backer_name})
-            end
-        end
-
-        -- elseif train.state == defines.train_state.path_lost then
-        -- Train has lost its path.  Await defines.train_state.no_path
-        -- elseif train.state == defines.train_state.no_schedule then
-        -- Train has no schedule.  We'll handle this via the on_schedule_changed event
-
-    elseif train.state == defines.train_state.no_path then
-        -- Train has no path.
-        -- If we're actively dispatching the train, we need to cancel it and restore its original schedule.
-        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
-            tnp_train_enact(train, true, nil, nil, false)
-            tnp_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
-
-        -- Train has no path, but we need to restore the schedule anyway.
-        elseif status == tnpdefines.train.status.arrived then
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_cancelled_timeout_boarding"})
-
-        elseif status == tnpdefines.train.status.redispatched then
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_cancelled_nopath"})
-
-        elseif status == tnpdefines.train.status.railtooltest then
-            -- We were attempting to dispatch to a dynamic stop and that failed.  If we have an alternate, try that.
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_state_train_delete(train, 'timeout_arrival')
-
-            local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
-            local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
-            local keep_position = tnp_state_train_get(train, 'keep_position')
-
-            if not dynamicstop then
-                tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
-                return
-            end
-
-            tnp_state_dynamicstop_delete(dynamicstop)
-            dynamicstop.destroy()
-
-            if not altstop then
-                tnp_request_cancel(player, train, {"tnp_train_cancelled_nolocation"})
-                return
-            end
-
-            tnp_state_player_set(player, 'dynamicstop', altstop)
-            tnp_state_dynamicstop_set(altstop, 'player', player)
-            tnp_state_dynamicstop_set(altstop, 'altstop', nil)
-            tnp_request_railtooltest(player, altstop, train)
-
-            if keep_position then
-                tnp_state_train_set(train, 'keep_position', true)
-            end
-        end
-        -- elseif train.state == defines.train_state.arrive_signal
-        -- Train has arrived at a signal.
-
-    elseif train.state == defines.train_state.wait_signal then
-        -- Train is now held at signals
-        tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_heldsignal"})
-
-        -- elseif train.state == defines.train_state.arrive_station then
-        -- Train is arriving at a station, await its actual arrival
-
-    elseif train.state == defines.train_state.wait_station then
-        -- Train has arrived at a station
-
-        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
-            -- This is an arrival to a station, after we've dispatched it.
-            local station = tnp_state_train_get(train, 'station')
-
-            -- The station we were dispatching to is no longer valid
-            if not station or not station.valid then
-                tnp_train_enact(train, true, nil, nil, nil)
-                tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstation"})
-                return
-            end
-
-            -- Our train has arrived at a different station.
-            local station_train = station.get_stopped_train()
-            if not station_train or not station_train.valid or not station_train.id == train.id then
-                if train.station ~= nil and train.station.valid and train.station.backer_name == station.backer_name then
-                    if config['tnp-train-arrival-path'].value then
-                        tnp_draw_path(player, train.station)
-                    end
-
-                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_alternate", station.backer_name})
-                    tnp_action_train_arrival(player, train)
-                else
-                    tnp_train_enact(train, true, nil, nil, false)
-                    tnp_request_cancel(player, train, {"tnp_train_cancelled_wrongstation"})
-                end
-            else
-                -- Store destination before actioning the arrival, which will destroy temporary stops
-                local destination = tnp_train_destinationstring(train)
-
-                tnp_action_train_arrival(player, train)
-
-                local keep_position = tnp_state_train_get(train, 'keep_position')
-                if keep_position then
-                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived_manual", destination})
-                    tnp_train_enact(train, true, nil, true, nil)
-                else
-                    tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_arrived", destination})
-                end
-            end
-
-        elseif status == tnpdefines.train.status.redispatched then
-            -- This was an redispatch station -- so wait for the passenger to disembark
-            tnp_action_train_rearrival(player, train)
-
-        elseif status == tnpdefines.train.status.railtooltest then
-            -- This was a railtool test we didnt get a status update about (?)
-            -- For now, correct the status and re-fire the event.
-            local dynamicstatus = tnp_state_train_get(train, 'dynamicstatus')
-            if not dynamicstatus then
-                -- !!! error??
-                return
-            end
-
-            tnp_state_train_set(train, 'status', dynamicstatus)
-            tnp_action_train_statechange(train)
-        end
-
-    elseif train.state == defines.train_state.manual_control_stop or train.state == defines.train_state.manual_control then
-        -- Train has been switched to manual control.  Handle these together, as if a train is already stopped
-        -- we wont see defines.train_state.manual_control_stop.
-
-        -- Check to see if we made this change ourselves
-        local expect = tnp_state_train_get(train, 'expect_manualmode')
-        if expect then
-            -- if the train is stopping, do not clear the expectation as we will see both manual_control_stop and manual_control
-            if train.state == defines.train_state.manual_control then
-                tnp_state_train_set(train, 'expect_manualmode', false)
-            end
-            return
-        end
-
-        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched or status == tnpdefines.train.status.redispatched then
-            -- If we're dispatching the train, we need to cancel the request and restore its original schedule
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_cancelled_manual"})
-
-        elseif status == tnpdefines.train.status.arrived then
-            -- Train had arrived, but we still need to restore the schedule.
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_cancelled_manual"})
-
-        elseif status == tnpdefines.train.status.rearrived then
-            tnp_train_enact(train, true, nil, nil, nil)
-            tnp_request_cancel(player, train, {"tnp_train_complete_manual"})
-        end
-    end
+    tnp_action_trainstate(player, train)
 end
 
 -- tnp_action_timeout()

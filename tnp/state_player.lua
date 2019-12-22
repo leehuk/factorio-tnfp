@@ -7,6 +7,10 @@ State Table:
     gui_stationtabletrain   = LuaGuiElement, station table element we're tracking
     gui_stationtabletnfp    = LuaGuiElement, station table element we're tracking
     player                  = LuaPlayer
+    railtool                = string, item type of railtool we've provided the player
+    speechbubble            = LuaElement, speechbubble we're tracking
+    supplyselected          = LuaTrain, currently selected supply train
+    supplyselection         = LuaTrain array, priority indexed array of available supply trains
     train                   = LuaTrain, train we're dispatching for the player.  Cross-referenced by tnp_state_train
 ]]
 
@@ -19,40 +23,38 @@ function _tnp_state_player_prune()
         elseif not data.player or not data.player.valid then
             global.player_data[id] = nil
         else
-            if data.dynamicstop and not data.dynamicstop.valid then
-                global.player_data[id]['dynamicstop'] = nil
+            local children = {'dynamicstop', 'train', 'gui', 'gui_stationsearch', 'gui_stationtableall', 'gui_stationtabletrain', 'gui_stationtabletnfp', 'speechbubble'}
+            for _, child in pairs(children) do
+                if data[child] and data[child].valid ~= true then
+                    global.player_data[id][child] = nil
+                end
             end
 
-            if data.train and not data.train.valid then
-                global.player_data[id]['train'] = nil
-            end
-
-            if data.gui and not data.gui.valid then
-                global.player_data[id]['gui'] = nil
-            end
-
-            if data.gui_stationsearch and not data.gui_stationsearch.valid then
-                global.player_data[id]['gui_stationsearch'] = nil
-            end
-
-            if data.gui_stationtableall and not data.gui_stationtableall.valid then
-                global.player_data[id]['gui_stationtableall'] = nil
-            end
-
-            if data.gui_stationtabletrain and not data.gui_stationtabletrain.valid then
-                global.player_data[id]['gui_stationtabletrain'] = nil
-            end
-
-            if data.gui_stationtabletnfp and not data.gui_stationtabletnfp.valid then
-                global.player_data[id]['gui_stationtabletnfp'] = nil
+            if data['supplyselected'] and data['supplyselected'].valid ~= true then
+                global.player_data[id]['supplyselected'] = nil
+                global.player_data[id]['supplyselection'] = nil
             end
 
             local xdata = global.player_data[id]
-            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and not xdata['gui_stationsearch'] and not xdata['gui_stationtableall'] and not xdata['gui_stationtabletrain'] and not xdata['gui_stationtabletnfp'] then
+            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and xdata['railtool'] == nil and not xdata['speechbubble'] and not xdata['supplyselected'] then
                 global.player_data[id] = nil
             end
         end
     end
+end
+
+-- tnp_state_player_any()
+--   Checks if we have state information of a given key for any player
+function tnp_state_player_any(key)
+    _tnp_state_player_prune()
+
+    for id, data in pairs(global.player_data) do
+        if data[key] then
+            return true
+        end
+    end
+
+    return false
 end
 
 -- tnp_state_player_delete()
@@ -67,11 +69,6 @@ function tnp_state_player_delete(player, key)
     if global.player_data[player.index] then
         if key then
             global.player_data[player.index][key] = nil
-
-            -- If we're no longer tracking either a gui or train, clear the entire object.
-            if not global.player_data[player.index]['gui'] and not global.player_data[player.index]['train'] then
-                global.player_data[player.index] = nil
-            end
         else
             global.player_data[player.index] = nil
         end
@@ -101,7 +98,7 @@ function tnp_state_player_query(player)
         return false
     end
 
-    if global.player_data[player.index] then
+    if global.player_data[player.index] and global.player_data[player.index]['train'] then
         return true
     end
 
@@ -123,6 +120,11 @@ function tnp_state_player_set(player, key, value)
         global.player_data[player.index]['player'] = player
     end
 
-    global.player_data[player.index][key] = value
+    if key == 'supplyselection' then
+        global.player_data[player.index][key] = util.table.deepcopy(value)
+    else
+        global.player_data[player.index][key] = value
+    end
+
     return true
 end

@@ -18,6 +18,18 @@ data:extend({
         consuming = "none"
     },
     {
+        name = "tnp-handle-railtool-supply",
+        type = "custom-input",
+        key_sequence = "",
+        consuming = "none"
+    },
+    {
+        name = "tnp-handle-railtool-supply-next",
+        type = "custom-input",
+        key_sequence = "CONTROL + EQUALS",
+        consuming = "none"
+    },
+    {
         name = "tnp-handle-train-manual",
         type = "custom-input",
         key_sequence = "",

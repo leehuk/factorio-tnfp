@@ -1,4 +1,32 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.0
+Date: 2019-12-21
+  Changes:
+    - Add supply train dispatching, so a train full of supplies (e.g. an outpost train, landfill,
+      concrete, etc) can be dispatched to the players location -- independently of tnfp trains
+
+      - Note: Theres been a lot of code cleanup and refactoring in this release so *be cautious*,
+        ensure you have backup saves and maybe the ability to downgrade the mod.  It's been
+        tested to a given degree, but trains are reaaaaally complicated things to interact with
+
+      - First Steps:
+        - Enable 'Provide TNfP Supply Train Rail Tool' in your shortcut bar, or go into the
+          keyboard control settings and define a hotkey for it
+        - In the keyboard control settings set 'Next Supply Train Station' to your preference.  It
+          defaults to CTRL+EQUALS but CTRL+MOUSE_WHEEL_UP is better
+        - Supply stations are added via the 'TNfP Supply Station' virtual signal, in the same way
+          as normal tnfp stations.  The signal value will determine the order they're listed
+          (lowest first)
+        - Ensure you dont have duplicate signal values, it will ignore them
+        - Trains must be in automatic mode waiting at a signalled supply station to be available
+
+      - Usage:
+        - Use the 'Provide TNfP Supply Train Rail Tool hotkey or shortcut to get a special railtool
+        - Select which train you want to dispatch (using the 'Next Supply Train Station' keyboard
+          shortcut, default CTRL+EQUALS)
+        - Drag the railtool over a valid train stop and the train will be dispatched to that
+          location.  On arrival it will switch to manual mode and reset its schedule
+---------------------------------------------------------------------------------------------------
 Version: 0.8.1
 Date: 2019-12-09
   Changes:

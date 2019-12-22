@@ -2,6 +2,8 @@ tnpdefines = {}
 
 require('util')
 require('tnp/action')
+require('tnp/action_trainstate')
+require('tnp/devent')
 require('tnp/draw')
 require('tnp/dynamicstop')
 require('tnp/event')
@@ -9,6 +11,7 @@ require('tnp/direction')
 require('tnp/gui')
 require('tnp/math')
 require('tnp/message')
+require('tnp/misc')
 require('tnp/request')
 require('tnp/state_dynamicstop')
 require('tnp/state_gui')
@@ -17,6 +20,7 @@ require('tnp/state_player')
 require('tnp/state_stationpins')
 require('tnp/state_train')
 require('tnp/stop')
+require('tnp/supplytrain')
 require('tnp/train')
 
 -- Event Handling
@@ -53,6 +57,8 @@ script.on_event(defines.events.on_player_selected_area, tnp_handle_selectiontool
 -- Input Handling
 script.on_event("tnp-handle-railtool", tnp_handle_input)
 script.on_event("tnp-handle-railtool-map", tnp_handle_input)
+script.on_event("tnp-handle-railtool-supply", tnp_handle_input)
+script.on_event("tnp-handle-railtool-supply-next", tnp_handle_input)
 script.on_event("tnp-handle-request", tnp_handle_input)
 script.on_event("tnp-handle-train-manual", tnp_handle_input)
 
@@ -63,6 +69,8 @@ script.on_init(function()
         script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
     end
 
+    devent_populate()
+
     global.dynamicstop_data = global.dynamicstop_data or {}
     global.gui_data = global.gui_data or {}
     global.ltnstop_data = global.ltnstop_data or {}
@@ -72,6 +80,8 @@ script.on_init(function()
 end)
 
 script.on_load(function()
+    devent_activate()
+
     if remote.interfaces["logistic-train-network"] then
         local ltn_stops_updated_event = remote.call("logistic-train-network", "on_stops_updated")
         script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
@@ -79,20 +89,23 @@ script.on_load(function()
 end)
 
 script.on_configuration_changed(function(event)
-    if event["mod_changes"] and event["mod_changes"]["TrainNetworkForPlayers"] then
-        if not event["mod_changes"]["TrainNetworkForPlayers"]["version"] then
-            event["mod_changes"]["TrainNetworkForPlayers"]["version"] = "0.4.2"
+    if not event["mod_changes"] or not event["mod_changes"]["TrainNetworkForPlayers"] then
+        return
+    end
 
-            global.dynamicstop_data = global.dynamicstop_data or {}
-            global.gui_data = global.gui_data or {}
-            global.ltnstop_data = global.ltnstop_data or {}
-            global.player_data = global.player_data or {}
-            global.train_data = global.train_data or {}
-        end
+    local old_version = event["mod_changes"]["TrainNetworkForPlayers"]["old_version"] or "0.0.0"
+    local oldv = util.split(old_version, "%.")
+    local newv = util.split(event["mod_changes"]["TrainNetworkForPlayers"]["new_version"], "%.")
 
-        if event["mod_changes"]["TrainNetworkForPlayers"]["version"] == "0.4.2" then
-            event["mod_changes"]["TrainNetworkForPlayers"]["version"] = "0.6.0"
-            global.stationpins_data = global.stationpins_data or {}
-        end
+    -- Old version is < 0.9.0
+    if tonumber(oldv[1]) <= 0 and tonumber(oldv[2]) < 9 then
+        devent_populate()
+
+        global.dynamicstop_data = global.dynamicstop_data or {}
+        global.gui_data = global.gui_data or {}
+        global.ltnstop_data = global.ltnstop_data or {}
+        global.player_data = global.player_data or {}
+        global.train_data = global.train_data or {}
+        global.stationpins_data = global.stationpins_data or {}
     end
 end)

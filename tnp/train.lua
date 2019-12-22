@@ -144,6 +144,24 @@ function tnp_train_getall(player)
     return tnp_trains
 end
 
+-- tnp_train_getsupply()
+--   Returns an indexed array of all supply trains available to the player
+function tnp_train_getsupply(player)
+    local tnp_trains = {}
+    local tnp_train_ids = {}
+
+    local tnp_stops = tnp_stop_getsupply(player)
+    for i, ent in pairs(tnp_stops) do
+        local train = ent.get_stopped_train()
+        if train and train.valid then
+            table.insert(tnp_trains, train)
+        end
+
+    end
+
+    return tnp_trains
+end
+
 -- tnp_train_info_save()
 --   Collates a trains information for save state, such as manual_mode and schedule
 --
@@ -221,4 +239,60 @@ function tnp_train_schedule_copy(train)
     end
 
     return schedule
+end
+
+-- tnp_train_schedule_copyamend()
+--   Returns a copy of the trains schedule, amended to add the given station
+function tnp_train_schedule_copyamend(player, train, station, status, temporary, supplymode)
+    local config = settings.get_player_settings(player)
+
+    local schedule = tnp_train_schedule_copy(train)
+    local schedule_found = tnp_train_schedule_check(schedule, station.backer_name)
+
+    if not schedule then
+        schedule = {}
+        schedule.records = {}
+    end
+
+    if schedule_found == false then
+        local record = {
+            station = station.backer_name,
+            temporary = temporary
+        }
+
+        if supplymode then
+            record['wait_conditions'] = {{
+                type = "circuit",
+                compare_type = "or"
+            }}
+        elseif status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
+            record['wait_conditions'] = {{
+                type = "time",
+                compare_type = "or",
+                ticks = config['tnp-train-boarding-timeout'].value*60
+            }}
+        elseif status == tnpdefines.train.status.redispatched then
+            record['wait_conditions'] = {{
+                type="passenger_not_present",
+                compare_type = "or"
+            }}
+        end
+
+        table.insert(schedule.records, record)
+        schedule.current = #schedule.records
+    else
+        schedule.current = schedule_found
+    end
+
+    return schedule
+end
+
+-- tnp_train_stationname()
+--   Returns the name of the station a train is currently stopped at, or ? if unknown
+function tnp_train_stationname(train)
+    if not train or not train.valid or not train.station or not train.station.valid then
+        return "?"
+    end
+
+    return train.station.backer_name
 end

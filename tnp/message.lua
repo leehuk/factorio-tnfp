@@ -53,3 +53,35 @@ function tnp_message(msglevel, player, message, entity)
         player.print(message)
     end
 end
+
+-- tnp_speechbubble()
+--   Displays a speechbubble above the player
+function tnp_speechbubble(player, message)
+    local bubble = tnp_state_player_get(player, 'speechbubble')
+    if bubble and bubble.valid then
+        bubble.destroy()
+    end
+
+    bubble = player.surface.create_entity({
+        name = "tnp-speechbubble",
+        type = "speech-bubble",
+        text = message,
+        position = player.position,
+        target = player.character
+    })
+    tnp_state_player_set(player, 'speechbubble', bubble)
+end
+
+-- tnp_speechbubble_destroy()
+--   Destroys a players speechbubble
+function tnp_speechbubble_destroy(player)
+    local bubble = tnp_state_player_get(player, 'speechbubble')
+
+    if bubble then
+        if bubble.valid then
+            bubble.destroy()
+        end
+
+        tnp_state_player_delete(player, 'speechbubble')
+    end
+end

@@ -1,21 +1,32 @@
 -- tnp_stop_check()
---   Validates if a stop is assigned for tnp, returning false/1/2 if not assigned, assigned, or home station.
+--   Validates if a stop is assigned for tnp, returning an array of bool statuses in the form
+--   result[tnp = bool, home = bool, supply = bool, supplyidx = int]
 function tnp_stop_check(stop)
+    local result = {
+        tnp       = false,
+        home      = false,
+        supply    = false,
+        supplyidx = 0
+    }
+
     -- tnp can only be assigned to vanilla stops
     if stop.name ~= "train-stop" then
-        return false
+        return result
     end
-
-    local result = false
 
     local signals = stop.get_merged_signals(defines.circuit_connector_id.combinator_input)
     if signals then
         for _, signal in pairs(signals) do
             if signal.signal.type == "virtual" then
                 if signal.signal.name == "tnp-station" then
-                    result = 1
-                elseif signal.signal.name == "tnp-station-home" then
-                    result = 2
+                    result.tnp = true
+                end
+                if signal.signal.name == "tnp-station-home" then
+                    result.home = true
+                end
+                if signal.signal.name == "tnp-station-supply" then
+                    result.supply = true
+                    result.supplyidx = signal.count
                 end
             end
         end
@@ -86,7 +97,8 @@ function tnp_stop_find(player)
                     table.insert(valid_stops_train, ent)
                 end
             else
-                if tnp_stop_check(ent) ~= false then
+                local is_tnp = tnp_stop_check(ent)
+                if is_tnp.tnp == true or is_tnp.home == true then
                     table.insert(valid_stops_tnp, ent)
                 elseif tnp_stop_danger(ent) == false then
                     table.insert(valid_stops_std, ent)
@@ -116,10 +128,31 @@ function tnp_stop_getall(player)
         name = "train-stop"
     })
     for _, ent in pairs(entities) do
-        if tnp_stop_check(ent) ~= false then
+        local is_tnp = tnp_stop_check(ent)
+        if is_tnp.tnp == true or is_tnp.home == true then
             table.insert(tnp_stops, ent)
         end
     end
 
     return tnp_stops
+end
+
+-- tnp_stop_getsupply()
+--   Returns a hash of tnp supply train stops, in the form [{stop = LuaEntity, supplyidx = int}]
+function tnp_stop_getsupply(player)
+    local tnp_stops = {}
+
+    -- tnp train stops must be vanilla train stops, so search by name instead of type
+    local entities = player.surface.find_entities_filtered({
+        name = "train-stop"
+    })
+    for _, ent in pairs(entities) do
+        local is_tnp = tnp_stop_check(ent)
+        if is_tnp.supply == true then
+            tnp_stops[is_tnp.supplyidx] = ent
+        end
+    end
+
+    return tnp_stops
+
 end
