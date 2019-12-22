@@ -2,30 +2,35 @@
 Version: 0.9.0
 Date: 2019-12-21
   Changes:
-    - Add supply train dispatching, so a train full of supplies (e.g. an outpost train, landfill,
-      concrete, etc) can be dispatched to the players location -- independently of tnfp trains
+    - Add supply train dispatching, so a train full of supplies (e.g. an outpost train,
+      landfill, concrete, etc) can be dispatched to the players location independently
+      of tnfp trains
 
-      - Note: Theres been a lot of code cleanup and refactoring in this release so *be cautious*,
-        ensure you have backup saves and maybe the ability to downgrade the mod.  It's been
-        tested to a given degree, but trains are reaaaaally complicated things to interact with
+      - Note: Theres been a lot of code cleanup and refactoring in this release so
+        *be cautious*, ensure you have backup saves and maybe the ability to downgrade
+        the mod.  It's been tested to a given degree, but trains are reaaaaally
+        complicated things to interact with
 
       - First Steps:
-        - Enable 'Provide TNfP Supply Train Rail Tool' in your shortcut bar, or go into the
-          keyboard control settings and define a hotkey for it
-        - In the keyboard control settings set 'Next Supply Train Station' to your preference.  It
-          defaults to CTRL+EQUALS but CTRL+MOUSE_WHEEL_UP is better
-        - Supply stations are added via the 'TNfP Supply Station' virtual signal, in the same way
-          as normal tnfp stations.  The signal value will determine the order they're listed
-          (lowest first)
+        - Enable 'Provide TNfP Supply Train Rail Tool' in your shortcut bar, or go into
+          the keyboard control settings and define a hotkey for it
+        - In the keyboard control settings set 'Next Supply Train Station' to your
+          preference.  It defaults to CTRL+EQUALS but CTRL+MOUSE_WHEEL_UP is better
+        - Supply stations are added via the 'TNfP Supply Station' virtual signal, in
+          the same way as normal tnfp stations.  The signal value will determine the
+          order they're listed (lowest first)
         - Ensure you dont have duplicate signal values, it will ignore them
-        - Trains must be in automatic mode waiting at a signalled supply station to be available
+        - Trains must be in automatic mode waiting at a signalled supply station to be
+          available
 
       - Usage:
-        - Use the 'Provide TNfP Supply Train Rail Tool hotkey or shortcut to get a special railtool
-        - Select which train you want to dispatch (using the 'Next Supply Train Station' keyboard
-          shortcut, default CTRL+EQUALS)
-        - Drag the railtool over a valid train stop and the train will be dispatched to that
-          location.  On arrival it will switch to manual mode and reset its schedule
+        - Use the 'Provide TNfP Supply Train Rail Tool hotkey or shortcut to get a
+          special railtool
+        - Select the train you want to dispatch (using the 'Next Supply Train Station'
+          keyboard shortcut, default CTRL+EQUALS)
+        - Drag the railtool over a valid train stop and the train will be dispatched to
+          that location.  On arrival it will switch to manual mode and reset its
+          schedule
 ---------------------------------------------------------------------------------------------------
 Version: 0.8.1
 Date: 2019-12-09
@@ -36,26 +41,28 @@ Date: 2019-12-09
 Version: 0.8.0
 Date: 2019-12-04
   Changes:
-    - Add support for using the railtool in alternate mode, triggered by holding shift.  Alt mode
-      will change the way dispatch works so on arrival the schedule will still be reset -- but the
-      train will instead switch to manual mode and then remain in place.  Works for both dispatch
-      to the player and a redispatch from onboard a train.
+    - Add support for using the railtool in alternate mode, triggered by holding shift
+      Alt mode will change the way dispatch works so on arrival the schedule will still
+      be reset -- but the train will instead switch to manual mode and then remain in
+      place.  Works for both dispatch to the player and a redispatch from onboard a
+      train
     - Add station name to arrival messages
-    - Fix that if a trains schedule before redispatch was originally blank, we restore a blank
-      schedule after rearrival.
+    - Fix that if a trains schedule before redispatch was originally blank, we restore
+      a blank schedule after rearrival.
     - Fix a potential error in train state pruning
 ---------------------------------------------------------------------------------------------------
 Version: 0.7.0
 Date: 2019-11-25
   Changes:
-    - Add 'TNfP Home Station' virtual signal.  Stations with this signal will be pinned at the
-      very top of the Station Select dialog, above normal pinned stations
-    - Pressing enter to submit the search field in the Station Select dialog will now dispatch
-      to the first station in the list [Github PR from coderanger]
-    - Fix the closest train detection logic when dispatching [Github PR from coderanger]
+    - Add 'TNfP Home Station' virtual signal.  Stations with this signal will be pinned
+      at the very top of the Station Select dialog, above normal pinned stations
+    - Pressing enter to submit the search field in the Station Select dialog will now
+      dispatch to the first station in the list [Github PR from coderanger]
+    - Fix closest train detection logic when dispatching [Github PR from coderanger]
     - Provide candidate rails to closest train detection logic for temporary stations
-    - Allow manual mode shortcut to apply to trains that have just arrived after dispatch
-    - Block TSM requester stations from dispatch to avoid breaking the TSM train counter
+    - Allow manual mode shortcut to apply to trains that have just arrived after
+      dispatch
+    - Block TSM requester stations from dispatch to avoid breaking TSMs train counter
 ---------------------------------------------------------------------------------------------------
 Version: 0.6.0
 Date: 2019-11-08
@@ -66,26 +73,26 @@ Date: 2019-11-08
     - Right clicking the station selects search bar will now clear the search field
     - Rework the station select gui so its more compact and cleaner
     - Rework the logic when a player boards/disembarks a train:
-      - Exiting a train after it arrives at an onward destination is now treated the same as
-        exiting whilst on the way
-      - Add a special handler so if a trains onward destination is already in its schedule and its
-        a tnfp managed train, it will just follow that wait condition and will not resume its
-        previous schedule
+      - Exiting a train after it arrives at an onward destination is now treated the
+        same as exiting whilst on the way
+      - Add a special handler so if a trains onward destination is already in its
+        schedule and its a tnfp managed train, it will just follow that wait condition
+        and will not resume its previous schedule
       - Split completion messages so its clearer what a train will do next
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.1
 Date: 2019-10-07
   Changes:
     - Add a mod setting to control the default view in the station select dialog
-    - Amend dispatch logic so the train arriving at a different station than the one it expects
-      but with the same name is handled gracefully
+    - Amend dispatch logic so the train arriving at a different station than the one it
+      expects but with the same name is handled gracefully
     - Fix localisation of mod setting dropdowns
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.0
 Date: 2019-09-29
   Changes:
-    - Add a search field to the Station Select dialog to filter the list of stations with a mod
-      setting to automatically focus it.
+    - Add a search field to the Station Select dialog to filter the list of stations
+      with a mod setting to automatically focus it.
     - Add a button to the Station Select dialog to open the map with a railtool in hand
     - The railtool will now automatically close the map and clear the cursor on success
     - Make the station select dialog use localised text strings
