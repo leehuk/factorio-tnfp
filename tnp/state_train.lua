@@ -42,8 +42,19 @@ function _tnp_state_train_prune()
 
             global.train_data[id] = nil
         elseif not data.player or not data.player.valid then
-            -- The player we were tracking is invalid -- but the trains ok.  Cancel any dispatching.
-            tnp_train_enact(data.train, true, nil, nil, false)
+            -- The player we were tracking is invalid -- but the trains ok.  We need to cancel
+            -- dispatching, but we need to enforce nothing attempts to touch state as otherwise
+            -- we'll infinite loop -- so reimplement a shorter tnp_train_enact()
+            if data.info then
+                if data.info.schedule then
+                    data.train.schedule = util.table.deepcopy(data.info.schedule)
+                elseif data.info.schedule_blank then
+                    data.train.schedule = nil
+                end
+            end
+
+            data.train.manual_mode = false
+
             global.train_data[id] = nil
         end
     end
