@@ -70,7 +70,7 @@ end
 
 -- tnp_dynamicstop_destroy()
 --   Destroys a dynamic stop
-function tnp_dynamicstop_destroy(player, dynamicstop)
+function tnp_dynamicstop_destroy(dynamicstop)
     local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
 
     if dynamicstop and dynamicstop.valid then
@@ -82,7 +82,6 @@ function tnp_dynamicstop_destroy(player, dynamicstop)
     end
 
     tnp_state_dynamicstop_delete(dynamicstop)
-    tnp_state_player_delete(player, 'dynamicstop')
 end
 
 -- tnp_dynamicstop_place()

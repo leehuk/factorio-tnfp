@@ -391,7 +391,8 @@ function tnp_action_train_arrival(player, train, alternate, supplymode)
     if not supplymode then
         local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
         if dynamicstop then
-            tnp_dynamicstop_destroy(player, dynamicstop)
+            tnp_dynamicstop_destroy(dynamicstop)
+            tnp_state_player_delete(player, 'dynamicstop')
         end
 
         tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
