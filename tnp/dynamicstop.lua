@@ -42,6 +42,7 @@ function tnp_dynamicstop_create(player, rail, train)
         local station_north = tnp_dynamicstop_place(player, rail, defines.direction.north)
         local station_south = tnp_dynamicstop_place(player, rail, defines.direction.south)
 
+        tnp_request_setup(player, station_north, train, tnpdefines.train.status.railtooltest, false)
         tnp_dynamicstop_setup(player, train, station_north, station_south)
         tnp_request_railtooltest(player, station_north, train)
 
@@ -58,6 +59,7 @@ function tnp_dynamicstop_create(player, rail, train)
         local station_east = tnp_dynamicstop_place(player, rail, defines.direction.east)
         local station_west = tnp_dynamicstop_place(player, rail, defines.direction.west)
 
+        tnp_request_setup(player, station_east, train, tnpdefines.train.status.railtooltest, false)
         tnp_dynamicstop_setup(player, train, station_east, station_west)
         tnp_request_railtooltest(player, station_east, train)
 
@@ -124,11 +126,8 @@ end
 -- tnp_dynamicstop_setup()
 --   Handles common logic for state information of dynamic stops
 function tnp_dynamicstop_setup(player, train, dynamicstop, altstop)
-    tnp_state_dynamicstop_delete(dynamicstop)
+    tnp_state_train_set(train, 'dynamicstop', dynamicstop)
 
-    tnp_state_player_set(player, 'dynamicstop', dynamicstop)
-
-    tnp_state_dynamicstop_set(dynamicstop, 'player', player)
     tnp_state_dynamicstop_set(dynamicstop, 'train', train)
 
     if altstop then

@@ -1,6 +1,5 @@
 --[[
 State Table:
-    dynamicstop             = LuaElement, dynamic stop we're tracking
     gui                     = LuaGuiElement, root gui element we're tracking
     gui_stationsearch       = LuaGuiElement, search element in a station select dialog
     gui_stationtableall     = LuaGuiElement, station table element we're tracking
@@ -23,7 +22,7 @@ function _tnp_state_player_prune()
         elseif not data.player or not data.player.valid then
             global.player_data[id] = nil
         else
-            local children = {'dynamicstop', 'train', 'gui', 'gui_stationsearch', 'gui_stationtableall', 'gui_stationtabletrain', 'gui_stationtabletnfp', 'speechbubble'}
+            local children = {'train', 'gui', 'gui_stationsearch', 'gui_stationtableall', 'gui_stationtabletrain', 'gui_stationtabletnfp', 'speechbubble'}
             for _, child in pairs(children) do
                 if data[child] and data[child].valid ~= true then
                     global.player_data[id][child] = nil
@@ -36,7 +35,7 @@ function _tnp_state_player_prune()
             end
 
             local xdata = global.player_data[id]
-            if not xdata['dynamicstop'] and not xdata['train'] and not xdata['gui'] and xdata['railtool'] == nil and not xdata['speechbubble'] and not xdata['supplyselected'] then
+            if not xdata['train'] and not xdata['gui'] and xdata['railtool'] == nil and not xdata['speechbubble'] and not xdata['supplyselected'] then
                 global.player_data[id] = nil
             end
         end

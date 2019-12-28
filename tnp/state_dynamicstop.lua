@@ -2,13 +2,12 @@
     State Table:
         altstop         - LuaEntity, alternate stop we're tracking
         dynamicstop     - LuaEntity, dynamic stop we're tracking
-        player          - LuaPlayer, player we're tracking the request for
         train           - LuaEntity, train we're tracking the request for
 ]]
 
 function _tnp_state_dynamicstop_prune()
     for id, ent in pairs(global.dynamicstop_data) do
-        if not ent.dynamicstop.valid or not ent.player or not ent.player.valid or not ent.train or not ent.train.valid then
+        if not ent.dynamicstop.valid or not ent.train or not ent.train.valid then
             if ent.dynamicstop and ent.dynamicstop.valid then
                 ent.dynamicstop.destroy()
             end

@@ -108,4 +108,30 @@ script.on_configuration_changed(function(event)
         global.train_data = global.train_data or {}
         global.stationpins_data = global.stationpins_data or {}
     end
+
+    -- Old version is < 0.9.1
+    if tonumber(oldv[1]) <= 0 and (tonumber(oldv[2]) < 9 or (tonumber(oldv[2]) == 9 and tonumber(oldv[3]) < 1)) then
+        -- Dynamic stops moved from being per-player tracked to per-train tracked.  Handle the
+        -- cleanup and cancel any in-flight requests.
+        for id, data in pairs(global.player_data) do
+            if data and data.dynamicstop then
+                if data.train and data.train.valid then
+                    tnp_train_enact(data.train, true, nil, nil, nil)
+                end
+                tnp_request_cancel(data.player, data.train, nil)
+            end
+        end
+
+        for id, data in pairs(global.dynamicstop_data) do
+            if data.dynamicstop and data.dynamicstop.valid then
+                data.dynamicstop.destroy()
+            end
+
+            if data.altstop and data.altstop.valid then
+                data.altstop.destroy()
+            end
+        end
+
+        global.dynamicstop_data = {}
+    end
 end)

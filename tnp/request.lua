@@ -21,16 +21,15 @@ function tnp_request_cancel(player, train, message)
             end
         end
 
-        local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
-        if dynamicstop then
-            tnp_dynamicstop_destroy(dynamicstop)
-            tnp_state_player_delete(player, 'dynamicstop')
-        end
-
         tnp_state_player_delete(player, 'train')
     end
 
     if train then
+        local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
+        if dynamicstop then
+            tnp_dynamicstop_destroy(dynamicstop)
+        end
+
         tnp_state_train_delete(train, false)
     end
 end
@@ -117,7 +116,6 @@ function tnp_request_railtooltest(player, target, train)
         dynamicstatus = tnpdefines.train.status.redispatched
     end
 
-    tnp_request_setup(player, target, train, tnpdefines.train.status.railtooltest, false)
     tnp_state_train_set(train, 'timeout_railtooltest', 2)
     tnp_state_train_set(train, 'dynamicstatus', dynamicstatus)
 

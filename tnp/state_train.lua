@@ -1,6 +1,7 @@
 --[[
     State Table:
         dynamicstatus              = int, actual dispatching status
+        dynamicstop                = LuaElement, dynamic stop we're tracking
         expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
         expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
@@ -40,6 +41,10 @@ function _tnp_state_train_prune()
                 tnp_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
             end
 
+            if data.dynamicstop then
+                tnp_dynamicstop_destroy(data.dynamicstop)
+            end
+
             global.train_data[id] = nil
         elseif not data.player or not data.player.valid then
             -- The player we were tracking is invalid -- but the trains ok.  We need to cancel
@@ -54,6 +59,10 @@ function _tnp_state_train_prune()
             end
 
             data.train.manual_mode = false
+
+            if data.dynamicstop then
+                tnp_dynamicstop_destroy(data.dynamicstop)
+            end
 
             global.train_data[id] = nil
         end

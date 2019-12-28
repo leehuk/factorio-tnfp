@@ -39,7 +39,7 @@ function tnp_action_trainstate(player, train)
 
         elseif status == tnpdefines.train.status.railtooltest then
             -- The temporary station the railtool is dispatching to works.
-            local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
+            local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
             local dynamicstatus = tnp_state_train_get(train, 'dynamicstatus')
 
             if not dynamicstop then
@@ -92,14 +92,14 @@ function tnp_action_trainstate(player, train)
             tnp_train_enact(train, true, nil, nil, nil)
             tnp_state_train_delete(train, 'timeout_arrival')
 
-            local dynamicstop = tnp_state_player_get(player, 'dynamicstop')
-            local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
-            local keep_position = tnp_state_train_get(train, 'keep_position')
+            local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
 
             if not dynamicstop then
                 tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
                 return
             end
+
+            local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
 
             tnp_state_dynamicstop_delete(dynamicstop)
             dynamicstop.destroy()
@@ -109,12 +109,9 @@ function tnp_action_trainstate(player, train)
                 return
             end
 
+            tnp_state_train_set(train, 'station', altstop)
             tnp_dynamicstop_setup(player, train, altstop, nil)
             tnp_request_railtooltest(player, altstop, train)
-
-            if keep_position then
-                tnp_state_train_set(train, 'keep_position', true)
-            end
         end
         -- elseif train.state == defines.train_state.arrive_signal
         -- Train has arrived at a signal.
