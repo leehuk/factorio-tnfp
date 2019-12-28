@@ -26,7 +26,7 @@ end
 
 -- tnp_dynamicstop_create()
 --   Create trainstops against either side of a rail, then dispatches to the first
-function tnp_dynamicstop_create(player, rail, train)
+function tnp_dynamicstop_create(player, rail, train, supplymode)
     if not rail or not rail.valid then
         return false
     end
@@ -42,7 +42,7 @@ function tnp_dynamicstop_create(player, rail, train)
         local station_north = tnp_dynamicstop_place(player, rail, defines.direction.north)
         local station_south = tnp_dynamicstop_place(player, rail, defines.direction.south)
 
-        tnp_request_setup(player, station_north, train, tnpdefines.train.status.railtooltest, false)
+        tnp_request_setup(player, station_north, train, tnpdefines.train.status.railtooltest, supplymode)
         tnp_dynamicstop_setup(player, train, station_north, station_south)
         tnp_request_railtooltest(player, station_north, train)
 
@@ -59,7 +59,7 @@ function tnp_dynamicstop_create(player, rail, train)
         local station_east = tnp_dynamicstop_place(player, rail, defines.direction.east)
         local station_west = tnp_dynamicstop_place(player, rail, defines.direction.west)
 
-        tnp_request_setup(player, station_east, train, tnpdefines.train.status.railtooltest, false)
+        tnp_request_setup(player, station_east, train, tnpdefines.train.status.railtooltest, supplymode)
         tnp_dynamicstop_setup(player, train, station_east, station_west)
         tnp_request_railtooltest(player, station_east, train)
 

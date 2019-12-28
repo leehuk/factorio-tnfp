@@ -122,9 +122,6 @@ function tnp_action_player_railtool(player, entities, altmode, supplymode)
     local target = nil
     if #valid_stops > 0 then
         target = valid_stops[1]
-    elseif supplymode then
-        tnp_message(tnpdefines.loglevel.standard, player, {"tnp_train_notrainstop"})
-        return
     end
 
     if not supplymode then
@@ -179,7 +176,7 @@ function tnp_action_player_railtool(player, entities, altmode, supplymode)
     if #valid_rails > 0 then
         local i = 1
         repeat
-            complete = tnp_dynamicstop_create(player, valid_rails[i], train)
+            complete = tnp_dynamicstop_create(player, valid_rails[i], train, supplymode)
             i = i + 1
         until i > #valid_rails or complete
     end
@@ -190,7 +187,7 @@ function tnp_action_player_railtool(player, entities, altmode, supplymode)
         end
         player.close_map()
 
-        if altmode then
+        if altmode or supplymode then
             tnp_state_train_set(train, 'keep_position', true)
         end
     else
@@ -388,13 +385,13 @@ function tnp_action_train_arrival(player, train, alternate, supplymode)
     -- Store destination before destroying temporary stops
     local destination = tnp_train_destinationstring(train)
 
-    if not supplymode then
-        local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
-        if dynamicstop then
-            tnp_dynamicstop_destroy(dynamicstop)
-            tnp_state_train_delete(train, 'dynamicstop')
-        end
+    local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
+    if dynamicstop then
+        tnp_dynamicstop_destroy(dynamicstop)
+        tnp_state_train_delete(train, 'dynamicstop')
+    end
 
+    if not supplymode then
         tnp_state_train_set(train, 'status', tnpdefines.train.status.arrived)
     end
 
