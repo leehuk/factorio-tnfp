@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.1
+Date: 2019-12-29
+  Changes:
+    - Extend supply train dispatching to support temporary stations, so supply trains
+      can now be dispatched to rail segments as well as stations
+    - Add a migration to cancel existing requests to temporary stops, to support the
+      cleanup and refactoring around temporary stations
+---------------------------------------------------------------------------------------------------
 Version: 0.9.0
 Date: 2019-12-21
   Changes:
