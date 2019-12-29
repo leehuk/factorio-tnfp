@@ -1,6 +1,7 @@
 --[[
     State Table:
         dynamicstatus              = int, actual dispatching status
+        dynamicstop                = LuaElement, dynamic stop we're tracking
         expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
         expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
@@ -40,10 +41,29 @@ function _tnp_state_train_prune()
                 tnp_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
             end
 
+            if data.dynamicstop then
+                tnp_dynamicstop_destroy(data.dynamicstop)
+            end
+
             global.train_data[id] = nil
         elseif not data.player or not data.player.valid then
-            -- The player we were tracking is invalid -- but the trains ok.  Cancel any dispatching.
-            tnp_train_enact(data.train, true, nil, nil, false)
+            -- The player we were tracking is invalid -- but the trains ok.  We need to cancel
+            -- dispatching, but we need to enforce nothing attempts to touch state as otherwise
+            -- we'll infinite loop -- so reimplement a shorter tnp_train_enact()
+            if data.info then
+                if data.info.schedule then
+                    data.train.schedule = util.table.deepcopy(data.info.schedule)
+                elseif data.info.schedule_blank then
+                    data.train.schedule = nil
+                end
+            end
+
+            data.train.manual_mode = false
+
+            if data.dynamicstop then
+                tnp_dynamicstop_destroy(data.dynamicstop)
+            end
+
             global.train_data[id] = nil
         end
     end
