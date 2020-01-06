@@ -336,10 +336,14 @@ end
 function tnp_action_stationselect_pin(player, gui)
     local station = tnp_state_gui_get(gui, player, 'pinstation')
 
-    if tnp_state_stationpins_check(player, station) then
-        tnp_state_stationpins_delete(player, station)
+    if not station.valid then
+        return
+    end
+
+    if tnp_state_playerprefs_check(player, 'stationpins', station.unit_number) then
+        tnp_state_playerprefs_delete(player, 'stationpins', station.unit_number)
     else
-        tnp_state_stationpins_set(player, station)
+        tnp_state_playerprefs_set(player, 'stationpins', station, station.unit_number)
     end
 
     if player.vehicle and player.vehicle.valid and player.vehicle.train then

@@ -210,13 +210,15 @@ function tnp_gui_stationlist_build(player, train)
     local stations_map_count = {}
 
     for _, station in pairs(stations_unsorted) do
-        if tnp_stop_danger(station) == false then
-            if not stations_map[station.backer_name] then
-                table.insert(stations_key, station.backer_name)
-                stations_map[station.backer_name] = station
-                stations_map_count[station.backer_name] = 1
-            else
-                stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+        if station.valid then
+            if tnp_stop_danger(station) == false then
+                if not stations_map[station.backer_name] then
+                    table.insert(stations_key, station.backer_name)
+                    stations_map[station.backer_name] = station
+                    stations_map_count[station.backer_name] = 1
+                else
+                    stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+                end
             end
         end
     end
@@ -243,7 +245,7 @@ function tnp_gui_stationlist_build(player, train)
                 stations_tnfp[i] = true
             end
 
-            if tnp_state_stationpins_check(player, stations_map[stationname]) == true then
+            if tnp_state_playerprefs_check(player, 'stationpins', stations_map[stationname].unit_number) == true then
                 stations_pinned[i] = true
             end
         end
