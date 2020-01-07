@@ -1,7 +1,7 @@
 data.raw["gui-style"].default["tnp_stationlist"] = {
     type = "frame_style",
     parent = "frame",
-    height = 528,
+    height = 560,
     width = 356
 }
 
@@ -61,6 +61,32 @@ data.raw["gui-style"].default["tnp_stationlist_headingbutton_close"] = {
     scalable = false,
     height = 28,
     width = 28,
+    cell_padding = 0
+}
+
+data.raw["gui-style"].default["tnp_stationlist_arrivalbehaviourarea"] = {
+    type = "horizontal_flow_style",
+    parent = "horizontal_flow",
+    visible = true,
+    height = 20,
+    width = 332
+}
+
+data.raw["gui-style"].default["tnp_stationlist_arrivalbehaviourtext"] = {
+    type = "label_style",
+    font = "default-bold",
+    single_line = true,
+    horizontal_align = "left",
+    vertical_align = "center",
+    cell_padding = 0,
+    left_padding = 4,
+    right_padding = 8
+}
+
+data.raw["gui-style"].default["tnp_stationlist_arrivalbehaviouropt"] = {
+    type = "switch_style",
+    parent = "switch",
+    vertical_align = "center",
     cell_padding = 0
 }
 

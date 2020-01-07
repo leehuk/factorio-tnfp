@@ -65,6 +65,38 @@ function tnp_gui_stationlist(player, train)
         direction = "horizontal"
     })
 
+    -- Arrival Behaviour Frame
+    local gui_arrivalbeh_area = gui_top.add({
+        name = "tnp-stationlist-arrivalbehaviour",
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_arrivalbehaviourarea"
+    })
+    gui_arrivalbeh_area.add({
+        name = "tnp-stationlist-arrivalbehaviourtext",
+        type = "label",
+        caption = {"tnp_gui_stationlist_arrival"},
+        style = "tnp_stationlist_arrivalbehaviourtext"
+    })
+
+    local switch_state = 'left'
+    gui_arrivalbeh_area.add({
+        name = "tnp-stationlist-arrivalbehaviouropt",
+        type = "switch",
+        allow_none_state = false,
+        switch_state = switch_state,
+        left_label_caption={"tnp_gui_stationlist_arrival_default"},
+        --left_label_tooltip={"tnp_gui_stationlist_arrival_default_tip"},
+        right_label_caption={"tnp_gui_stationlist_arrival_manual"},
+        style = "tnp_stationlist_arrivalbehaviouropt"
+    })
+
+    gui_top.add({
+        name = "tnp-stationlist-heading-line2",
+        type = "line",
+        direction = "horizontal"
+    })
+
     -- Station Type Frame
     local gui_stationtype_area = gui_top.add({
         name = "tnp-stationlist-stationtypearea",
