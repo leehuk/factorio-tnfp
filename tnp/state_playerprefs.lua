@@ -1,5 +1,6 @@
 --[[
     State Table:
+        keep_position   - bool, marker to keep position on arrival after redispatch
         player          - LuaPlayer, player we're tracking preferences for
         stationpins     - LuaElement array, array of stations that are pinned
 ]]

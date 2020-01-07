@@ -381,6 +381,10 @@ function tnp_action_stationselect_redispatch(player, gui)
     end
 
     tnp_request_redispatch(player, station, player.vehicle.train)
+
+    if tnp_state_playerprefs_get(player, 'keep_position') == true then
+        tnp_state_train_set(player.vehicle.train, 'keep_position', true)
+    end
 end
 
 -- tnp_action_train_arrival()

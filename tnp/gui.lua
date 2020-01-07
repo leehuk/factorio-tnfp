@@ -80,6 +80,9 @@ function tnp_gui_stationlist(player, train)
     })
 
     local switch_state = 'left'
+    if tnp_state_playerprefs_get(player, 'keep_position') == true then
+        switch_state = 'right'
+    end
     gui_arrivalbeh_area.add({
         name = "tnp-stationlist-arrivalbehaviouropt",
         type = "switch",
@@ -206,6 +209,8 @@ function tnp_gui_stationlist(player, train)
         column_count = 1,
         style = "tnp_stationlist_stationlisttable"
     })
+
+    devent_enable('gui_switch_state_changed')
 
     tnp_state_player_set(player, 'gui_stationtableall', gui_stationtable_all)
     tnp_state_player_set(player, 'gui_stationtabletnfp', gui_stationtable_tnfp)
@@ -398,6 +403,10 @@ function tnp_gui_stationlist_close(player)
 
     tnp_state_player_delete(player, 'gui')
     _tnp_state_gui_prune()
+
+    if tnp_state_player_any('gui') == false then
+        devent_disable('gui_switch_state_changed')
+    end
 end
 
 -- tnp_gui_stationlist_search()

@@ -136,6 +136,9 @@ script.on_configuration_changed(function(event)
 
     -- Old version is < 0.9.2
     if tonumber(oldv[1]) <= 0 and (tonumber(oldv[2]) < 9 or (tonumber(oldv[2]) == 9 and tonumber(oldv[3]) < 2)) then
+        -- Populate dynamic event for on_gui_switch_state_changed
+        devent_populate()
+
         -- Station pins moved from global.stationpins_data to global.playerprefs_data.  Migrate all data as-is
         global.playerprefs_data = {}
 
