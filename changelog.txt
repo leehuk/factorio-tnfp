@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.2
+Date: 2020-01-08
+  Changes:
+    - Extend station selection gui so trains can be set to manual mode on arrival
+    - Add a migration from station pins to more generic player preferences
+---------------------------------------------------------------------------------------------------
 Version: 0.9.1
 Date: 2019-12-29
   Changes:
