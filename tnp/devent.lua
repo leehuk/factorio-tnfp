@@ -37,6 +37,14 @@ function devent_populate()
         global.dynamic_events = {}
     end
 
+    if not global.dynamic_events["gui_switch_state_changed"] then
+        global.dynamic_events["gui_switch_state_changed"] = {
+            def = defines.events.on_gui_switch_state_changed,
+            f = tnp_handle_gui_switch,
+            enabled = false
+        }
+    end
+
     if not global.dynamic_events["player_cursor_stack_changed"] then
         global.dynamic_events["player_cursor_stack_changed"] = {
             def = defines.events.on_player_cursor_stack_changed,

@@ -65,6 +65,41 @@ function tnp_gui_stationlist(player, train)
         direction = "horizontal"
     })
 
+    -- Arrival Behaviour Frame
+    local gui_arrivalbeh_area = gui_top.add({
+        name = "tnp-stationlist-arrivalbehaviour",
+        type = "flow",
+        direction = "horizontal",
+        style = "tnp_stationlist_arrivalbehaviourarea"
+    })
+    gui_arrivalbeh_area.add({
+        name = "tnp-stationlist-arrivalbehaviourtext",
+        type = "label",
+        caption = {"tnp_gui_stationlist_arrival"},
+        style = "tnp_stationlist_arrivalbehaviourtext"
+    })
+
+    local switch_state = 'left'
+    if tnp_state_playerprefs_get(player, 'keep_position') == true then
+        switch_state = 'right'
+    end
+    gui_arrivalbeh_area.add({
+        name = "tnp-stationlist-arrivalbehaviouropt",
+        type = "switch",
+        allow_none_state = false,
+        switch_state = switch_state,
+        left_label_caption={"tnp_gui_stationlist_arrival_default"},
+        --left_label_tooltip={"tnp_gui_stationlist_arrival_default_tip"},
+        right_label_caption={"tnp_gui_stationlist_arrival_manual"},
+        style = "tnp_stationlist_arrivalbehaviouropt"
+    })
+
+    gui_top.add({
+        name = "tnp-stationlist-heading-line2",
+        type = "line",
+        direction = "horizontal"
+    })
+
     -- Station Type Frame
     local gui_stationtype_area = gui_top.add({
         name = "tnp-stationlist-stationtypearea",
@@ -175,6 +210,8 @@ function tnp_gui_stationlist(player, train)
         style = "tnp_stationlist_stationlisttable"
     })
 
+    devent_enable('gui_switch_state_changed')
+
     tnp_state_player_set(player, 'gui_stationtableall', gui_stationtable_all)
     tnp_state_player_set(player, 'gui_stationtabletnfp', gui_stationtable_tnfp)
     tnp_state_player_set(player, 'gui_stationtabletrain', gui_stationtable_train)
@@ -210,13 +247,15 @@ function tnp_gui_stationlist_build(player, train)
     local stations_map_count = {}
 
     for _, station in pairs(stations_unsorted) do
-        if tnp_stop_danger(station) == false then
-            if not stations_map[station.backer_name] then
-                table.insert(stations_key, station.backer_name)
-                stations_map[station.backer_name] = station
-                stations_map_count[station.backer_name] = 1
-            else
-                stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+        if station.valid then
+            if tnp_stop_danger(station) == false then
+                if not stations_map[station.backer_name] then
+                    table.insert(stations_key, station.backer_name)
+                    stations_map[station.backer_name] = station
+                    stations_map_count[station.backer_name] = 1
+                else
+                    stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
+                end
             end
         end
     end
@@ -243,7 +282,7 @@ function tnp_gui_stationlist_build(player, train)
                 stations_tnfp[i] = true
             end
 
-            if tnp_state_stationpins_check(player, stations_map[stationname]) == true then
+            if tnp_state_playerprefs_check(player, 'stationpins', stations_map[stationname].unit_number) == true then
                 stations_pinned[i] = true
             end
         end
@@ -364,6 +403,10 @@ function tnp_gui_stationlist_close(player)
 
     tnp_state_player_delete(player, 'gui')
     _tnp_state_gui_prune()
+
+    if tnp_state_player_any('gui') == false then
+        devent_disable('gui_switch_state_changed')
+    end
 end
 
 -- tnp_gui_stationlist_search()

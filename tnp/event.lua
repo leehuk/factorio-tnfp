@@ -32,6 +32,24 @@ function tnp_handle_gui_click(event)
     end
 end
 
+-- tnp_handle_gui_switch()
+--   Handles a gui switch change
+function tnp_handle_gui_switch(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid then
+        return
+    end
+
+    if event.element.name == "tnp-stationlist-arrivalbehaviouropt" then
+        if event.element.switch_state == 'left' then
+            tnp_state_playerprefs_set(player, 'keep_position', false)
+        else
+            tnp_state_playerprefs_set(player, 'keep_position', true)
+        end
+    end
+end
+
 -- tnp_handle_gui_text()
 --   Handles text input via gui elements
 function tnp_handle_gui_text(event)

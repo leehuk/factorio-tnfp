@@ -17,7 +17,7 @@ require('tnp/state_dynamicstop')
 require('tnp/state_gui')
 require('tnp/state_ltnstop')
 require('tnp/state_player')
-require('tnp/state_stationpins')
+require('tnp/state_playerprefs')
 require('tnp/state_train')
 require('tnp/stop')
 require('tnp/supplytrain')
@@ -75,7 +75,7 @@ script.on_init(function()
     global.gui_data = global.gui_data or {}
     global.ltnstop_data = global.ltnstop_data or {}
     global.player_data = global.player_data or {}
-    global.stationpins_data = global.stationpins_data or {}
+    global.playerprefs_data = global.playerprefs_data or {}
     global.train_data = global.train_data or {}
 end)
 
@@ -106,7 +106,6 @@ script.on_configuration_changed(function(event)
         global.ltnstop_data = global.ltnstop_data or {}
         global.player_data = global.player_data or {}
         global.train_data = global.train_data or {}
-        global.stationpins_data = global.stationpins_data or {}
     end
 
     -- Old version is < 0.9.1
@@ -133,5 +132,33 @@ script.on_configuration_changed(function(event)
         end
 
         global.dynamicstop_data = {}
+    end
+
+    -- Old version is < 0.9.2
+    if tonumber(oldv[1]) <= 0 and (tonumber(oldv[2]) < 9 or (tonumber(oldv[2]) == 9 and tonumber(oldv[3]) < 2)) then
+        -- Populate dynamic event for on_gui_switch_state_changed
+        devent_populate()
+
+        -- Station pins moved from global.stationpins_data to global.playerprefs_data.  Migrate all data as-is
+        global.playerprefs_data = {}
+
+        if global.stationpins_data then
+            for id, ent in pairs(global.stationpins_data) do
+                global.playerprefs_data[id] = {}
+                global.playerprefs_data[id]['player'] = ent.player
+                global.playerprefs_data[id]['stationpins'] = {}
+
+                if ent.stations then
+                    for sid, station in pairs(ent.stations) do
+                        global.playerprefs_data[id]['stationpins'][sid] = station
+                    end
+                end
+            end
+
+            -- Force a prune to clear out any invalid data
+            _tnp_state_playerprefs_prune()
+
+            global.stationpins_data = nil
+        end
     end
 end)
