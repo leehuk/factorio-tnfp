@@ -12,7 +12,7 @@ function _tnp_state_playerprefs_prune()
         if not ent.player.valid then
             global.playerprefs_data[id] = nil
         else
-            if not ent.stationpins then
+            if not ent.stationpins and ent.keep_position == nil then
                 global.playerprefs_data[id] = nil
             else
                 if ent.stationpins then
