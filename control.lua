@@ -3,6 +3,8 @@ tnpdefines = {}
 require('util')
 require('tnp/action')
 require('tnp/action_trainstate')
+require('tnp/commands')
+require('tnp/debug')
 require('tnp/devent')
 require('tnp/draw')
 require('tnp/dynamicstop')
@@ -69,6 +71,7 @@ script.on_init(function()
         script.on_event(ltn_stops_updated_event, tnp_handle_ltn_stops)
     end
 
+    tnp_cmd_init()
     devent_populate()
 
     global.dynamicstop_data = global.dynamicstop_data or {}
@@ -80,6 +83,7 @@ script.on_init(function()
 end)
 
 script.on_load(function()
+    tnp_cmd_init()
     devent_activate()
 
     if remote.interfaces["logistic-train-network"] then

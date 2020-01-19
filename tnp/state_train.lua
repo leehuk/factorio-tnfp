@@ -164,7 +164,12 @@ function tnp_state_train_timeout()
     for id, data in pairs(global.train_data) do
         -- Exclude any trains pending a prune, or without a timeout
         if data.train.valid then
+            tnpdebug("tnp_state_train_timeout(): Checking timeouts")
+            tnpdebug("tnp_state_train_timeout(): train: " .. tostring(data.train.id))
+
             if data.timeout_arrival and data.timeout_arrival >= 0 then
+                tnpdebug("tnp_state_train_timeout(): data.timeout_arrival: " .. tostring(data.timeout_arrival))
+
                 data.timeout_arrival = data.timeout_arrival - 1
                 if data.timeout_arrival <= 0 then
                     table.insert(trains.arrival, data.train)
@@ -172,6 +177,8 @@ function tnp_state_train_timeout()
             end
 
             if data.timeout_railtooltest and data.timeout_railtooltest >= 0 then
+                tnpdebug("tnp_state_train_timeout(): data.timeout_railtooltest: " .. tostring(data.timeout_railtooltest))
+
                 data.timeout_railtooltest = data.timeout_railtooltest - 1
                 if data.timeout_railtooltest <= 0 then
                     table.insert(trains.railtooltest, data.train)

@@ -43,6 +43,12 @@ function tnp_train_enact(train, schedule_lookup, schedule, manual_mode_pre, manu
         return
     end
 
+    tnpdebug("tnp_train_enact(): Enacting train change")
+    tnpdebug("tnp_train_enact(): train: " .. tostring(train.id))
+    tnpdebug("tnp_train_enact(): schedule_lookup: " .. tostring(schedule_lookup))
+    tnpdebug("tnp_train_enact(): schedule: " .. serpent.block(schedule))
+    tnpdebug("tnp_train_enact(): manual_mode: " .. tostring(manual_mode_pre) .. "/" .. tostring(manual_mode_post))
+
     if manual_mode_pre == false or manual_mode_pre == true then
         if train.manual_mode ~= manual_mode_pre then
             if manual_mode_pre == true then

@@ -27,7 +27,10 @@ end
 -- tnp_dynamicstop_create()
 --   Create trainstops against either side of a rail, then dispatches to the first
 function tnp_dynamicstop_create(player, rail, train, supplymode)
+    tnpdebug("tnp_dynamicstop_create(): Creating dynamic stop")
+
     if not rail or not rail.valid then
+        tnpdebug("tnp_dynamicstop_create(): Invalid rail")
         return false
     end
 
@@ -36,11 +39,19 @@ function tnp_dynamicstop_create(player, rail, train, supplymode)
         local place_south = tnp_dynamicstop_place_check(player, rail, defines.direction.south)
 
         if not place_north or not place_south then
+            tnpdebug("tnp_dynamicstop_create(): Unable to place north/south: " .. tostring(place_north) .. "/" .. tostring(place_south))
             return false
         end
 
         local station_north = tnp_dynamicstop_place(player, rail, defines.direction.north)
         local station_south = tnp_dynamicstop_place(player, rail, defines.direction.south)
+
+        if station_north.valid then
+            tnpdebug("tnp_dynamicstop_create(): Placed north: " .. station_north.unit_number)
+        end
+        if station_south.valid then
+            tnpdebug("tnp_dynamicstop_create(): Placed south: " .. station_south.unit_number)
+        end
 
         tnp_request_setup(player, station_north, train, tnpdefines.train.status.railtooltest, supplymode)
         tnp_dynamicstop_setup(player, train, station_north, station_south)
@@ -53,11 +64,19 @@ function tnp_dynamicstop_create(player, rail, train, supplymode)
         local place_west = tnp_dynamicstop_place_check(player, rail, defines.direction.west)
 
         if not place_east or not place_west then
+            tnpdebug("tnp_dynamicstop_create(): Unable to place east/west: " .. tostring(place_east) .. "/" .. tostring(place_west))
             return false
         end
 
         local station_east = tnp_dynamicstop_place(player, rail, defines.direction.east)
         local station_west = tnp_dynamicstop_place(player, rail, defines.direction.west)
+
+        if station_east.valid then
+            tnpdebug("tnp_dynamicstop_create(): Placed east: " .. tostring(station_east.unit_number))
+        end
+        if station_west.valid then
+            tnpdebug("tnp_dynamicstop_create(): Placed west: " .. tostring(station_west.unit_number))
+        end
 
         tnp_request_setup(player, station_east, train, tnpdefines.train.status.railtooltest, supplymode)
         tnp_dynamicstop_setup(player, train, station_east, station_west)

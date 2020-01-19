@@ -6,8 +6,22 @@ function tnp_action_trainstate(player, train)
     local status = tnp_state_train_get(train, 'status')
     local supplymode = tnp_state_train_get(train, 'supplymode')
 
+    tnpdebug("tnp_action_trainstate(): Handling train state change")
+    if player and player.valid then
+        tnpdebug("tnp_action_trainstate(): player: " .. tostring(player.index))
+    end
+    if train and train.valid then
+        tnpdebug("tnp_action_trainstate(): train: " .. tostring(train.id))
+        tnpdebug("tnp_action_trainstate(): train.manual_mode: " .. tostring(train.manual_mode))
+        tnpdebug("tnp_action_trainstate(): train.state: " .. tostring(train.state))
+    end
+    if status then
+        tnpdebug("tnp_action_trainstate(): status: " .. tostring(status))
+    end
+
     -- We have now seen a state change request for one of our railtool tests
     if status == tnpdefines.train.status.railtooltest then
+        tnpdebug("tnp_action_trainstate(): Clearing timeout_railtooltest")
         tnp_state_train_delete(train, 'timeout_railtooltest')
     end
 

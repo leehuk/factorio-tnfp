@@ -149,6 +149,17 @@ end
 function tnp_request_setup(player, target, train, status, supplymode)
     tnp_state_train_reset(train)
 
+    tnpdebug("tnp_request_setup(): Setting up request")
+    if player and player.valid then
+        tnpdebug("tnp_request_setup(): player: " .. tostring(player.index))
+    end
+    if target and target.valid then
+        tnpdebug("tnp_request_setup(): target: " .. tostring(target.unit_number))
+    end
+    if train and train.valid then
+        tnpdebug("tnp_request_setup(): train: " .. tostring(train.id))
+    end
+
     tnp_state_train_set(train, 'player', player)
 
     if supplymode then
