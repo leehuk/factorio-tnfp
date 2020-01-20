@@ -501,7 +501,6 @@ function tnp_action_timeout()
     end
 
     for _, train in pairs(trains.railtooltest) do
-        tnp_state_train_delete(train, 'timeout_railtooltest')
         tnp_action_train_statechange(train)
     end
 end
