@@ -89,6 +89,10 @@ script.on_load(function()
 end)
 
 script.on_configuration_changed(function(event)
+    -- The dynamic event framework shadows entries from defines.events and these need to be
+    -- recalculated whenever factorio upgrades
+    devent_populate()
+
     if not event["mod_changes"] or not event["mod_changes"]["TrainNetworkForPlayers"] then
         return
     end

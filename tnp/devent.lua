@@ -43,6 +43,8 @@ function devent_populate()
             f = tnp_handle_gui_switch,
             enabled = false
         }
+    else
+        global.dynamic_events["gui_switch_state_changed"]["def"] = defines.events.on_gui_switch_state_changed
     end
 
     if not global.dynamic_events["player_cursor_stack_changed"] then
@@ -51,5 +53,7 @@ function devent_populate()
             f = tnp_handle_player_cursor_stack_changed,
             enabled = false
         }
+    else
+        global.dynamic_events["player_cursor_stack_changed"]["def"] = defines.events.on_player_cursor_stack_changed
     end
 end
