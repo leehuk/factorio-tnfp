@@ -10,6 +10,68 @@
 -- then have our train attempt to path to them in turn.  At least one of them should hopefully work.
 
 
+-- tnp_dynamicstop_action_success()
+--   Actions a train state change that marks a successful dispatch
+function tnp_dynamicstop_action_success(player, train)
+    local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
+    local dynamicstatus = tnp_state_train_get(train, 'dynamicstatus')
+
+    if not dynamicstop then
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+        return
+    end
+
+    tnp_state_train_delete(train, 'timeout_railtooltest')
+
+    -- We have an alternate stop -- remove that
+    local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
+    if altstop then
+        if altstop.valid then
+            altstop.destroy()
+        end
+
+        tnp_state_dynamicstop_delete(dynamicstop, 'altstop')
+    end
+
+    tnp_state_train_set(train, 'status', dynamicstatus)
+    tnp_state_train_delete(train, 'dynamicstatus')
+    tnp_state_train_delete(train, 'expect_manualmode')
+
+    if dynamicstatus == tnpdefines.train.status.dispatched then
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", dynamicstop.backer_name})
+    end
+end
+
+-- tnp_dynamicstop_action_failure()
+--   Actions a train state change that marks a path failure
+function tnp_dynamicstop_action_failure(player, train)
+    tnp_train_enact(train, true, nil, nil, nil)
+    tnp_state_train_delete(train, 'timeout_arrival')
+
+    local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
+
+    if not dynamicstop then
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+        return
+    end
+
+    tnp_state_train_delete(train, 'timeout_railtooltest')
+
+    local altstop = tnp_state_dynamicstop_get(dynamicstop, 'altstop')
+
+    tnp_state_dynamicstop_delete(dynamicstop)
+    dynamicstop.destroy()
+
+    if not altstop then
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_nolocation"})
+        return
+    end
+
+    tnp_state_train_set(train, 'station', altstop)
+    tnp_dynamicstop_setup(player, train, altstop, nil)
+    tnp_request_railtooltest(player, altstop, train)
+end
+
 -- tnp_dynamicstop_calculate()
 --   Calculates the position of a train stop, given the direction
 function tnp_dynamicstop_calculate(position, direction)

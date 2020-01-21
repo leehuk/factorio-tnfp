@@ -58,6 +58,8 @@ function tnp_stop_danger(stop)
     if stop.name == "logistic-train-stop" then
         if tnp_state_ltnstop_get(stop, 'depot') then
             return true
+        else
+            return false
         end
     end
 

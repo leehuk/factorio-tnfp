@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.4
+Date: 2020-01-21
+  Changes:
+    - Fix non-depot ltn stops being ignored
+    - Improve logic for detecting train pathing events to railtool created dynamic
+      stops when working out the direction of the stop
+---------------------------------------------------------------------------------------------------
 Version: 0.9.2
 Date: 2020-01-08
   Changes:
