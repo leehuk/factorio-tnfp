@@ -1,8 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.10.5
+Date: 2020-02-06
+  Changes:
+    - Fix errors when we've detected an invalid state during redispatch
+    - Add extra validation during redispatch the train is the one expected
+---------------------------------------------------------------------------------------------------
 Version: 0.10.4
 Date: 2020-01-21
   Changes:
     - Add factorio 0.18 support
+---------------------------------------------------------------------------------------------------
+Version: 0.9.5
+Date: 2020-02-06
+  Changes:
+    - Fix errors when we've detected an invalid state during redispatch
+    - Add extra validation during redispatch the train is the one expected
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.4
 Date: 2020-01-21
