@@ -373,11 +373,19 @@ function tnp_action_stationselect_redispatch(player, gui)
 
     if not train or not train.valid then
         tnp_request_cancel(player, train, {"tnp_train_cancelled_invalid"})
+        return
     end
 
     -- Lets just revalidate the player is on a valid train
     if not player.vehicle or not player.vehicle.train or not player.vehicle.train.valid then
         tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+        return
+    end
+
+    -- This is not the train we're expecting the player to be on
+    if train.id ~= player.vehicle.train.id then
+        tnp_request_cancel(player, train, {"tnp_train_cancelled_invalidstate"})
+        return
     end
 
     tnp_request_redispatch(player, station, player.vehicle.train)
