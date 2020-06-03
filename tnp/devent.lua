@@ -7,7 +7,11 @@ function devent_activate()
 
     for k, v in pairs(global.dynamic_events) do
         if v.enabled == true then
-            script.on_event(v.def, v.f)
+            if k == "gui_switch_state_changed" then
+                script.on_event(v.def, tnp_handle_gui_switch)
+            elseif k == "player_cursor_stack_changed" then
+                script.on_event(v.def, tnp_handle_player_cursor_stack_changed)
+            end
         end
     end
 end
@@ -26,7 +30,11 @@ end
 function devent_enable(name)
     if global.dynamic_events[name] and global.dynamic_events[name].enabled == false then
         global.dynamic_events[name].enabled = true
-        script.on_event(global.dynamic_events[name].def, global.dynamic_events[name].f)
+        if name == "gui_switch_state_changed" then
+            script.on_event(global.dynamic_events[name].def, tnp_handle_gui_switch)
+        elseif name == "player_cursor_stack_changed" then
+            script.on_event(global.dynamic_events[name].def, tnp_handle_player_cursor_stack_changed)
+        end
     end
 end
 
@@ -40,7 +48,6 @@ function devent_populate()
     if not global.dynamic_events["gui_switch_state_changed"] then
         global.dynamic_events["gui_switch_state_changed"] = {
             def = defines.events.on_gui_switch_state_changed,
-            f = tnp_handle_gui_switch,
             enabled = false
         }
     else
@@ -50,7 +57,6 @@ function devent_populate()
     if not global.dynamic_events["player_cursor_stack_changed"] then
         global.dynamic_events["player_cursor_stack_changed"] = {
             def = defines.events.on_player_cursor_stack_changed,
-            f = tnp_handle_player_cursor_stack_changed,
             enabled = false
         }
     else
