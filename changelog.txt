@@ -1,3 +1,18 @@
+Version: 0.10.6
+Date: 2020-06-03
+  Changes:
+    - Fix arrival behaviour switch not working in newer 0.18 releases
+---------------------------------------------------------------------------------------------------
+Version: 0.10.5
+Date: 2020-02-06
+  Changes:
+    - Fix errors when we've detected an invalid state during redispatch
+    - Add extra validation during redispatch the train is the one expected
+---------------------------------------------------------------------------------------------------
+Version: 0.10.4
+Date: 2020-01-21
+  Changes:
+    - Add factorio 0.18 support
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.5
 Date: 2020-02-06
