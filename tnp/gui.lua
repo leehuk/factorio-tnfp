@@ -15,7 +15,7 @@ function tnp_gui_stationlist(player, train)
         name = "tnp-stationlist",
         type = "frame",
         direction = "vertical",
-        style = "tnp_stationlist"
+        style = "inner_frame_in_outer_frame"
     })
     tnp_state_player_set(player, 'gui', gui_top)
 
@@ -30,53 +30,52 @@ function tnp_gui_stationlist(player, train)
         name = "tnp-stationlist-headingtext",
         type = "label",
         caption = {"tnp_gui_stationlist_heading"},
-        style = "tnp_stationlist_headingtext"
+        style = "frame_title"
     })
-
-    local gui_heading_buttonarea = gui_heading_area.add({
-        name = "tnp-stationlist-headingbuttonarea",
-        type = "flow",
-        direction = "horizontal",
-        style = "tnp_stationlist_headingbuttonarea"
+    gui_heading_area.add({
+        name = "tnp-stationlist-headingfiller",
+        type = "empty-widget",
+        style = "tnp_stationlist_headingfiller"
     })
-    local gui_railtool = gui_heading_buttonarea.add({
+    gui_heading_area.add({
         name = "tnp-stationlist-headingbutton-railtool",
         type = "sprite-button",
-        sprite = "tnp_button_railtool",
-        style = "tnp_stationlist_headingbutton_railtool"
+        sprite = "tnp_button_rail",
+        style = "frame_action_button"
     })
-    gui_heading_buttonarea.add({
-        name = "tnp-stationlist-headingbutton-spacer1",
-        type = "flow",
-        direction = "horizontal",
-        style = "tnp_stationlist_headingbutton_spacer"
-    })
-    local gui_close = gui_heading_buttonarea.add({
+    -- TODO: Why is this stored in state?
+    local gui_close = gui_heading_area.add({
         name = "tnp-stationlist-headingbutton-close",
         type = "sprite-button",
         sprite = "tnp_button_close",
-        style = "tnp_stationlist_headingbutton_close"
+        style = "frame_action_button"
     })
     tnp_state_gui_set(gui_close, player, 'close', true)
 
-    gui_top.add({
-        name = "tnp-stationlist-heading-line",
-        type = "line",
-        direction = "horizontal"
+    local gui_main = gui_top.add({
+        name = "tnp-stationlist-main",
+        type = "frame",
+        direction = "vertical",
+        style = "inside_shallow_frame_with_padding"
     })
 
     -- Arrival Behaviour Frame
-    local gui_arrivalbeh_area = gui_top.add({
+    local gui_arrivalbeh_area = gui_main.add({
         name = "tnp-stationlist-arrivalbehaviour",
         type = "flow",
         direction = "horizontal",
-        style = "tnp_stationlist_arrivalbehaviourarea"
+        style = "tnp_stationlist_headingarea"
     })
     gui_arrivalbeh_area.add({
         name = "tnp-stationlist-arrivalbehaviourtext",
         type = "label",
         caption = {"tnp_gui_stationlist_arrival"},
-        style = "tnp_stationlist_arrivalbehaviourtext"
+        style = "tnp_stationlist_subheading"
+    })
+    gui_arrivalbeh_area.add({
+        name = "tnp-stationlist-headingfiller",
+        type = "empty-widget",
+        style = "tnp_stationlist_arrivalbehfiller"
     })
 
     local switch_state = 'left'
@@ -89,19 +88,18 @@ function tnp_gui_stationlist(player, train)
         allow_none_state = false,
         switch_state = switch_state,
         left_label_caption={"tnp_gui_stationlist_arrival_default"},
-        --left_label_tooltip={"tnp_gui_stationlist_arrival_default_tip"},
         right_label_caption={"tnp_gui_stationlist_arrival_manual"},
-        style = "tnp_stationlist_arrivalbehaviouropt"
+        style = "switch"
     })
 
-    gui_top.add({
+    gui_main.add({
         name = "tnp-stationlist-heading-line2",
         type = "line",
         direction = "horizontal"
     })
 
     -- Station Type Frame
-    local gui_stationtype_area = gui_top.add({
+    local gui_stationtype_area = gui_main.add({
         name = "tnp-stationlist-stationtypearea",
         type = "flow",
         direction = "horizontal",
@@ -149,7 +147,7 @@ function tnp_gui_stationlist(player, train)
         gui_stationtype_all.state = true
     end
 
-    local gui_stationsearch_area = gui_top.add({
+    local gui_stationsearch_area = gui_main.add({
         name = "tnp-stationlist-searcharea",
         type = "flow",
         direction = "vertical",
@@ -419,7 +417,7 @@ function tnp_gui_stationlist_search(player, element)
     end
 
     local gui_stationsearch_area = element.parent
-    local gui_top = gui_stationsearch_area.parent
+    local gui_top = gui_stationsearch_area.parent.parent
     local search = element.text:lower()
 
     for _, stationlist in pairs(gui_top.children) do
@@ -474,7 +472,7 @@ function tnp_gui_stationlist_switch(player, element)
     end
 
     -- Now we need to sort the scroll areas out
-    local gui_top = gui_stationtype_table.parent.parent
+    local gui_top = gui_stationtype_table.parent.parent.parent
     for _, child in pairs(gui_top.children) do
         if child.name == "tnp-stationlist-stationlisttnfp" then
             if element.name == "tnp-stationlist-stationtypetnfp" then
