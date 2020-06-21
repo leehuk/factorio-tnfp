@@ -1,17 +1,3 @@
--- tnp_handle_gui_check()
---   Handles a gui checkbox/radiobutton being selected
-function tnp_handle_gui_check(event)
-    local player = game.players[event.player_index]
-
-    if not player.valid then
-        return
-    end
-
-    if event.element.name == "tnp-stationlist-stationtypetnfp" or event.element.name == "tnp-stationlist-stationtypetrain" or event.element.name == "tnp-stationlist-stationtypeall" then
-        tnp_gui_stationlist_switch(player, event.element)
-    end
-end
-
 -- tnp_handle_gui_click()
 --   Handles a gui click
 function tnp_handle_gui_click(event)
@@ -21,9 +7,9 @@ function tnp_handle_gui_click(event)
         return
     end
 
-    if event.element.name == "tnp-stationlist-headingbutton-close" then
+    if event.element.name == "tnp-sl-closebutton" then
         tnp_action_stationselect_cancel(player)
-    elseif event.element.name == "tnp-stationlist-headingbutton-railtool" then
+    elseif event.element.name == "tnp-sl-railtoolbutton" then
         tnp_action_stationselect_railtoolmap(player)
     elseif string.find(event.element.name, "tnp-stationlist-dest", 1, true) ~= nil then
         tnp_action_stationselect_redispatch(player, event.element)
@@ -41,7 +27,7 @@ function tnp_handle_gui_switch(event)
         return
     end
 
-    if event.element.name == "tnp-stationlist-arrivalbehaviouropt" then
+    if event.element.name == "tnp-sl-arrival-switch" then
         if event.element.switch_state == 'left' then
             tnp_state_playerprefs_set(player, 'keep_position', false)
         else
@@ -59,7 +45,7 @@ function tnp_handle_gui_text(event)
         return
     end
 
-    if event.element.name == "tnp-stationlist-search" then
+    if event.element.name == "tnp-sl-search-field" then
         tnp_gui_stationlist_search(player, event.element)
     end
 end
@@ -73,7 +59,7 @@ function tnp_handle_gui_confirmed(event)
         return
     end
 
-    if event.element.name == "tnp-stationlist-search" then
+    if event.element.name == "tnp-sl-search-field" then
         tnp_gui_stationlist_search_confirm(player, event.element)
     end
 end

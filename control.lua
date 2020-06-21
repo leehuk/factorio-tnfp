@@ -38,7 +38,6 @@ script.on_event(defines.events.on_player_dropped_item, tnp_handle_player_dropped
 --script.on_event(defines.events.on_player_left_game, tnp_handle_player_exit)
 
 -- GUI Events
-script.on_event(defines.events.on_gui_checked_state_changed, tnp_handle_gui_check)
 script.on_event(defines.events.on_gui_click, tnp_handle_gui_click)
 script.on_event(defines.events.on_gui_text_changed, tnp_handle_gui_text)
 script.on_event(defines.events.on_gui_confirmed, tnp_handle_gui_confirmed)

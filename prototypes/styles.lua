@@ -1,11 +1,11 @@
-data.raw["gui-style"].default["tnp_stationlist_headingarea"] = {
+data.raw["gui-style"].default["tnp_sl_heading_flow"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",
     bottom_padding = 4,
     horizontally_stretchable = "on"
 }
 
-data.raw["gui-style"].default["tnp_stationlist_headingfiller"] = {
+data.raw["gui-style"].default["tnp_sl_heading_filler"] = {
     type = "empty_widget_style",
     parent = "draggable_space_header",
     height = 24,
@@ -14,7 +14,7 @@ data.raw["gui-style"].default["tnp_stationlist_headingfiller"] = {
     vertically_stretchable = "on"
 }
 
-data.raw["gui-style"].default["tnp_stationlist_subheading"] = {
+data.raw["gui-style"].default["tnp_sl_subheading_label"] = {
     type = "label_style",
     font = "default-bold",
     single_line = true,
@@ -23,7 +23,7 @@ data.raw["gui-style"].default["tnp_stationlist_subheading"] = {
     vertical_align = "center"
 }
 
-data.raw["gui-style"].default["tnp_stationlist_arrivalbehfiller"] = {
+data.raw["gui-style"].default["tnp_sl_empty_filler"] = {
     type = "empty_widget_style",
     height = 16,
     natural_height = 16,
@@ -31,48 +31,17 @@ data.raw["gui-style"].default["tnp_stationlist_arrivalbehfiller"] = {
     vertically_stretchable = "on"
 }
 
-data.raw["gui-style"].default["tnp_stationlist_stationtypearea"] = {
+data.raw["gui-style"].default["tnp_sl_subheading_flow"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",
-    visible = true,
-    height = 20,
-    width = 332
+    left_padding = 12,
+    right_padding = 12,
+    top_padding = 0,
+    bottom_padding = 12,
+    horizontal_spacing = 0
 }
 
-data.raw["gui-style"].default["tnp_stationlist_stationtypetext"] = {
-    type = "label_style",
-    font = "default-bold",
-    single_line = true,
-    horizontal_align = "left",
-    vertical_align = "center",
-    cell_padding = 0,
-    left_padding = 4
-}
-
-data.raw["gui-style"].default["tnp_stationlist_stationtypetable"] = {
-    type = "table_style",
-    vertical_spacing = 0,
-    draw_vertical_lines = true,
-    natural_width = 332,
-    horizontally_squashable = "on"
-}
-
-data.raw["gui-style"].default["tnp_stationlist_stationtyperadio"] = {
-    type = "radiobutton_style",
-    parent = "radiobutton",
-    horizontally_stretchable = "on"
-}
-
-data.raw["gui-style"].default["tnp_stationlist_searcharea"] = {
-    type = "vertical_flow_style",
-    parent = "vertical_flow",
-    visible = true,
-    height = 34,
-    width = 332,
-    bottom_padding = 4
-}
-
-data.raw["gui-style"].default["tnp_stationlist_search"] = {
+data.raw["gui-style"].default["tnp_sl_search_field"] = {
     type = "textbox_style",
     parent = "textbox",
     visible = true,
@@ -80,15 +49,13 @@ data.raw["gui-style"].default["tnp_stationlist_search"] = {
     width = 332
 }
 
-data.raw["gui-style"].default["tnp_stationlist_stationlistscroll"] = {
+data.raw["gui-style"].default["tnp_sl_list_scroll"] = {
     type = "scroll_pane_style",
-    height = 404,
-    width = 356,
-    vertical_scroll_policy = "auto-and-reserve-space",
-    horizontal_scroll_policy = "never"
-}
+    height = 350,
+    width = 344
+}   
 
-data.raw["gui-style"].default["tnp_stationlist_stationlisttable"] = {
+data.raw["gui-style"].default["tnp_sl_list_table"] = {
     type = "table_style",
     vertical_spacing = 0
 }
@@ -98,7 +65,7 @@ data.raw["gui-style"].default["tnp_stationlist_stationlistrow"] = {
     parent = "horizontal_flow",
     visible = true,
     height = 28,
-    natural_width = 324,
+    maximal_width = 324,
     horizontal_spacing = 1,
     horizontally_squashable = "on"
 }

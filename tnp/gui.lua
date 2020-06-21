@@ -12,78 +12,79 @@ function tnp_gui_stationlist(player, train)
 
     -- Top Frame
     local gui_top = player.gui.center.add({
-        name = "tnp-stationlist",
+        name = "tnp-sl-top",
         type = "frame",
         direction = "vertical",
         style = "inner_frame_in_outer_frame"
     })
     tnp_state_player_set(player, 'gui', gui_top)
 
-    -- Heading Flow (Borderless)
+    -- Heading Title Bar
     local gui_heading_area = gui_top.add({
-        name = "tnp-stationlist-headingarea",
+        name = "tnp-sl-heading-flow",
         type = "flow",
         direction = "horizontal",
-        style = "tnp_stationlist_headingarea"
+        style = "tnp_sl_heading_flow"
     })
     gui_heading_area.add({
-        name = "tnp-stationlist-headingtext",
+        name = "tnp-sl-heading-label",
         type = "label",
         caption = {"tnp_gui_stationlist_heading"},
         style = "frame_title"
     })
     gui_heading_area.add({
-        name = "tnp-stationlist-headingfiller",
+        name = "tnp-sl-heading-filler",
         type = "empty-widget",
-        style = "tnp_stationlist_headingfiller"
+        style = "tnp_sl_heading_filler"
     })
     gui_heading_area.add({
-        name = "tnp-stationlist-headingbutton-railtool",
+        name = "tnp-sl-railtoolbutton",
         type = "sprite-button",
         sprite = "tnp_button_rail",
         style = "frame_action_button"
     })
     -- TODO: Why is this stored in state?
     local gui_close = gui_heading_area.add({
-        name = "tnp-stationlist-headingbutton-close",
+        name = "tnp-sl-closebutton",
         type = "sprite-button",
         sprite = "tnp_button_close",
         style = "frame_action_button"
     })
     tnp_state_gui_set(gui_close, player, 'close', true)
 
+    -- Main Frame
     local gui_main = gui_top.add({
-        name = "tnp-stationlist-main",
+        name = "tnp-sl-main",
         type = "frame",
         direction = "vertical",
-        style = "inside_shallow_frame_with_padding"
+        style = "inside_deep_frame_for_tabs"
     })
 
-    -- Arrival Behaviour Frame
-    local gui_arrivalbeh_area = gui_main.add({
-        name = "tnp-stationlist-arrivalbehaviour",
+    -- Arrival Behaviour
+    local gui_arrival_flow = gui_main.add({
+        name = "tnp-sl-arrival-flow",
         type = "flow",
         direction = "horizontal",
-        style = "tnp_stationlist_headingarea"
+        style = "tnp_sl_subheading_flow"
     })
-    gui_arrivalbeh_area.add({
-        name = "tnp-stationlist-arrivalbehaviourtext",
+    gui_arrival_flow.add({
+        name = "tnp-sl-arrival-label",
         type = "label",
         caption = {"tnp_gui_stationlist_arrival"},
-        style = "tnp_stationlist_subheading"
+        style = "tnp_sl_subheading_label"
     })
-    gui_arrivalbeh_area.add({
-        name = "tnp-stationlist-headingfiller",
+    gui_arrival_flow.add({
+        name = "tnp-sl-arrival-filler",
         type = "empty-widget",
-        style = "tnp_stationlist_arrivalbehfiller"
+        style = "tnp_sl_empty_filler"
     })
 
     local switch_state = 'left'
     if tnp_state_playerprefs_get(player, 'keep_position') == true then
         switch_state = 'right'
     end
-    gui_arrivalbeh_area.add({
-        name = "tnp-stationlist-arrivalbehaviouropt",
+    gui_arrival_flow.add({
+        name = "tnp-sl-arrival-switch",
         type = "switch",
         allow_none_state = false,
         switch_state = switch_state,
@@ -92,72 +93,17 @@ function tnp_gui_stationlist(player, train)
         style = "switch"
     })
 
-    gui_main.add({
-        name = "tnp-stationlist-heading-line2",
-        type = "line",
-        direction = "horizontal"
-    })
-
-    -- Station Type Frame
-    local gui_stationtype_area = gui_main.add({
-        name = "tnp-stationlist-stationtypearea",
+    local gui_stationsearch_area = gui_main.add({
+        name = "tnp-sl-search-flow",
         type = "flow",
         direction = "horizontal",
-        style = "tnp_stationlist_stationtypearea"
-    })
-    gui_stationtype_area.add({
-        name = "tnp-stationlist-stationtypetext",
-        type = "label",
-        caption = {"tnp_gui_stationlist_stationtype"},
-        style = "tnp_stationlist_stationtypetext"
-    })
-    local gui_stationtype_table = gui_stationtype_area.add({
-        name = "tnp-stationlist-stationtypetable",
-        type = "table",
-        column_count = 3,
-        style = "tnp_stationlist_stationtypetable"
-    })
-    local gui_stationtype_train = gui_stationtype_table.add({
-        name = "tnp-stationlist-stationtypetrain",
-        type = "radiobutton",
-        caption = {"tnp_gui_stationlist_stationtype_schedule"},
-        state = false,
-        style = "tnp_stationlist_stationtyperadio"
-    })
-    local gui_stationtype_tnfp = gui_stationtype_table.add({
-        name = "tnp-stationlist-stationtypetnfp",
-        type = "radiobutton",
-        caption = {"tnp_gui_stationlist_stationtype_tnfp"},
-        state = false,
-        style = "tnp_stationlist_stationtyperadio"
-    })
-    local gui_stationtype_all = gui_stationtype_table.add({
-        name = "tnp-stationlist-stationtypeall",
-        type = "radiobutton",
-        caption = {"tnp_gui_stationlist_stationtype_all"},
-        state = false,
-        style = "tnp_stationlist_stationtyperadio"
-    })
-
-    if config['tnp-stationlist-view'].value == 'tnfp' then
-        gui_stationtype_tnfp.state = true
-    elseif config['tnp-stationlist-view'].value == 'train' then
-        gui_stationtype_train.state = true
-    else
-        gui_stationtype_all.state = true
-    end
-
-    local gui_stationsearch_area = gui_main.add({
-        name = "tnp-stationlist-searcharea",
-        type = "flow",
-        direction = "vertical",
-        style = "tnp_stationlist_searcharea"
+        style = "tnp_sl_subheading_flow"
     })
 
     local gui_stationsearch = gui_stationsearch_area.add({
-        name = "tnp-stationlist-search",
+        name = "tnp-sl-search-field",
         type = "textfield",
-        style = "tnp_stationlist_search",
+        style = "tnp_sl_search_field",
         selectable = true,
         clear_and_focus_on_right_click = true
     })
@@ -167,60 +113,88 @@ function tnp_gui_stationlist(player, train)
         gui_stationsearch.focus()
     end
 
-    -- Station Lists, scroll panes
-    local gui_stationlist_tnfp = gui_top.add({
-        name = "tnp-stationlist-stationlisttnfp",
-        type = "scroll-pane",
-        style = "tnp_stationlist_stationlistscroll",
-        horizontal_scroll_policy = "auto-and-reserve-space",
-        visible = false
+    -- Station List Tabs
+    local gui_tabs = gui_main.add({
+        name = "tnp-sl-tabs",
+        type = "tabbed-pane"
+    })  
+
+    -- Scheduled Stations
+    local gui_tab_schedule = gui_tabs.add({
+        name = "tnp-sl-tabschedule",
+        type = "tab",
+        caption = {"tnp_gui_stationlist_stationtype_schedule"}
     })
-    local gui_stationtable_tnfp = gui_stationlist_tnfp.add({
-        name = "tnp-stationlist-stationtabletnfp",
+    local gui_scroll_schedule = gui_tabs.add({
+        name = "tnp-sl-scrollschedule",
+        type = "scroll-pane",
+        style = "tnp_sl_list_scroll",
+        horizontal_scroll_policy = "never",
+        vertical_scroll_policy = "always"
+    })
+    local gui_table_schedule = gui_scroll_schedule.add({
+        name = "tnp-sl-tableschedule",
         type = "table",
         column_count = 1,
-        style = "tnp_stationlist_stationlisttable"
+        style = "tnp_sl_list_table"
     })
-    local gui_stationlist_train = gui_top.add({
-        name = "tnp-stationlist-stationlisttrain",
+    gui_tabs.add_tab(gui_tab_schedule, gui_scroll_schedule)
+
+    -- TNfP Stations
+    local gui_tab_tnfp = gui_tabs.add({
+        name = "tnp-sl-tabtnfp",
+        type = "tab",
+        caption = {"tnp_gui_stationlist_stationtype_tnfp"}
+    })
+    local gui_scroll_tnfp = gui_tabs.add({
+        name = "tnp-sl-scrolltnfp",
         type = "scroll-pane",
-        style = "tnp_stationlist_stationlistscroll",
-        horizontal_scroll_policy = "auto-and-reserve-space",
-        visible = false
+        style = "tnp_sl_list_scroll",
+        horizontal_scroll_policy = "never",
+        vertical_scroll_policy = "always"
     })
-    local gui_stationtable_train = gui_stationlist_train.add({
-        name = "tnp-stationlist-stationtabletrain",
+    local gui_table_tnfp = gui_scroll_tnfp.add({
+        name = "tnp-sl-tabletnfp",
         type = "table",
         column_count = 1,
-        style = "tnp_stationlist_stationlisttable"
+        style = "tnp_sl_list_table"
     })
-    local gui_stationlist_all = gui_top.add({
-        name = "tnp-stationlist-stationlistall",
+    gui_tabs.add_tab(gui_tab_tnfp, gui_scroll_tnfp)
+
+    -- All Stations
+    local gui_tab_all = gui_tabs.add({
+        name = "tnp-sl-taball",
+        type = "tab",
+        caption = {"tnp_gui_stationlist_stationtype_all"}
+    })
+    local gui_scroll_all = gui_tabs.add({
+        name = "tnp-sl-scrollall",
         type = "scroll-pane",
-        style = "tnp_stationlist_stationlistscroll",
-        horizontal_scroll_policy = "auto-and-reserve-space",
-        visible = false
+        style = "tnp_sl_list_scroll",
+        horizontal_scroll_policy = "never",
+        vertical_scroll_policy = "always"
     })
-    local gui_stationtable_all = gui_stationlist_all.add({
-        name = "tnp-stationlist-stationtableall",
+    local gui_table_all = gui_scroll_all.add({
+        name = "tnp-sl-tableall",
         type = "table",
         column_count = 1,
-        style = "tnp_stationlist_stationlisttable"
+        style = "tnp_sl_list_table"
     })
+    gui_tabs.add_tab(gui_tab_all, gui_scroll_all)
+
+    if config['tnp-stationlist-view'].value == 'train' then
+        gui_tabs.selected_tab_index = 1
+    elseif config['tnp-stationlist-view'].value == 'tnfp' then
+        gui_tabs.selected_tab_index = 2
+    else
+        gui_tabs.selected_tab_index = 3
+    end
 
     devent_enable('gui_switch_state_changed')
 
-    tnp_state_player_set(player, 'gui_stationtableall', gui_stationtable_all)
-    tnp_state_player_set(player, 'gui_stationtabletnfp', gui_stationtable_tnfp)
-    tnp_state_player_set(player, 'gui_stationtabletrain', gui_stationtable_train)
-
-    if gui_stationtype_tnfp.state == true then
-        gui_stationlist_tnfp.visible = true
-    elseif gui_stationtype_train.state == true then
-        gui_stationlist_train.visible = true
-    elseif gui_stationtype_all.state == true then
-        gui_stationlist_all.visible = true
-    end
+    tnp_state_player_set(player, 'gui_stationtableall', gui_table_all)
+    tnp_state_player_set(player, 'gui_stationtabletnfp', gui_table_tnfp)
+    tnp_state_player_set(player, 'gui_stationtabletrain', gui_table_schedule)
 
     tnp_gui_stationlist_build(player, train)
 end
@@ -416,19 +390,22 @@ function tnp_gui_stationlist_search(player, element)
         return
     end
 
-    local gui_stationsearch_area = element.parent
-    local gui_top = gui_stationsearch_area.parent.parent
+    local gui_main = element.parent.parent
     local search = element.text:lower()
 
-    for _, stationlist in pairs(gui_top.children) do
-        if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" then
-            local stationtable = stationlist.children[1]
-            for _, row in pairs(stationtable.children) do
-                local station = row.children[1]
-                if search == "" or station.caption:lower():find(search, 1, true) ~= nil then
-                    row.visible = true
-                else
-                    row.visible = false
+    for _, gui_tabs in pairs(gui_main.children) do
+        if gui_tabs.name == "tnp-sl-tabs" then
+            for _, gui_scroll in pairs(gui_tabs.children) do
+                if gui_scroll.name:sub(1, 13) == "tnp-sl-scroll" then
+                    local stationtable = gui_scroll.children[1]
+                    for _, row in pairs(stationtable.children) do
+                        local station = row.children[1]
+                        if search == "" or station.caption:lower():find(search, 1, true) ~= nil then
+                            row.visible = true
+                        else
+                            row.visible = false
+                        end
+                    end
                 end
             end
         end
@@ -442,55 +419,18 @@ function tnp_gui_stationlist_search_confirm(player, element)
         return
     end
 
-    local gui_stationsearch_area = element.parent
-    local gui_top = gui_stationsearch_area.parent
+    for _, gui_tabs in pairs(element.parent.parent.children) do
+        if gui_tabs.name == "tnp-sl-tabs" then
+            for _, gui_scroll in pairs(gui_tabs.children) do
 
-    for _, stationlist in pairs(gui_top.children) do
-        if stationlist.name:sub(1, 27) == "tnp-stationlist-stationlist" and stationlist.visible == true then
-            local stationtable = stationlist.children[1]
-            for _, row in pairs(stationtable.children) do
-                if row and row.valid and row.visible then
-                    local station = row.children[1]
-                    return tnp_action_stationselect_redispatch(player, station)
+                if (gui_scroll.name == "tnp-sl-scrollschedule" and gui_tabs.selected_tab_index == 1) or (gui_scroll.name == "tnp-sl-scrolltnfp" and gui_tabs.selected_tab_index == 2) or (gui_scroll.name == "tnp-sl-scrollall" and gui_tabs.selected_tab_index == 3) then
+                    local stationtable = gui_scroll.children[1]
+                    for _, row in pairs(stationtable.children) do
+                        if row and row.valid and row.visible then
+                            return tnp_action_stationselect_redispatch(player, row.children[1])
+                        end
+                    end
                 end
-            end
-        end
-    end
-end
-
--- tnp_gui_stationlist_switch()
---   Switches the type of stationlist shown
-function tnp_gui_stationlist_switch(player, element)
-    -- First, we need to switch off the other radio buttons
-    local gui_stationtype_table = element.parent
-    if gui_stationtype_table.name == "tnp-stationlist-stationtypetable" then
-        for _, child in pairs(gui_stationtype_table.children) do
-            if child.index ~= element.index then
-                child.state = false
-            end
-        end
-    end
-
-    -- Now we need to sort the scroll areas out
-    local gui_top = gui_stationtype_table.parent.parent.parent
-    for _, child in pairs(gui_top.children) do
-        if child.name == "tnp-stationlist-stationlisttnfp" then
-            if element.name == "tnp-stationlist-stationtypetnfp" then
-                child.visible = true
-            else
-                child.visible = false
-            end
-        elseif child.name == "tnp-stationlist-stationlisttrain" then
-            if element.name == "tnp-stationlist-stationtypetrain" then
-                child.visible = true
-            else
-                child.visible = false
-            end
-        elseif child.name == "tnp-stationlist-stationlistall" then
-            if element.name == "tnp-stationlist-stationtypeall" then
-                child.visible = true
-            else
-                child.visible = false
             end
         end
     end
