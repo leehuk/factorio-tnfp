@@ -4,19 +4,20 @@ function tnp_gui_stationlist(player, train)
     local config = settings.get_player_settings(player)
 
     -- If a GUI already exists destroy it
-    for _, child in pairs(player.gui.center.children) do
-        if child.name == "tnp-stationlist" then
+    for _, child in pairs(player.gui.screen.children) do
+        if child.name == "tnp-stationlist" or child.name == "tnp-sl-top" then
             child.destroy()
         end
     end
 
     -- Top Frame
-    local gui_top = player.gui.center.add({
+    local gui_top = player.gui.screen.add({
         name = "tnp-sl-top",
         type = "frame",
         direction = "vertical",
-        style = "inner_frame_in_outer_frame"
+        style = "frame_without_footer"
     })
+    gui_top.force_auto_center()
     tnp_state_player_set(player, 'gui', gui_top)
 
     -- Heading Title Bar
@@ -26,17 +27,21 @@ function tnp_gui_stationlist(player, train)
         direction = "horizontal",
         style = "tnp_sl_heading_flow"
     })
-    gui_heading_area.add({
+    local gui_heading_label = gui_heading_area.add({
         name = "tnp-sl-heading-label",
         type = "label",
         caption = {"tnp_gui_stationlist_heading"},
         style = "frame_title"
     })
-    gui_heading_area.add({
+    local gui_heading_filler = gui_heading_area.add({
         name = "tnp-sl-heading-filler",
         type = "empty-widget",
         style = "tnp_sl_heading_filler"
     })
+
+    gui_heading_label.drag_target = gui_top
+    gui_heading_filler.drag_target = gui_top
+
     gui_heading_area.add({
         name = "tnp-sl-railtoolbutton",
         type = "sprite-button",
