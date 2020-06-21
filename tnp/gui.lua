@@ -131,7 +131,7 @@ function tnp_gui_stationlist(player, train)
         caption = {"tnp_gui_stationlist_stationtype_schedule"}
     })
     local gui_scroll_schedule = gui_tabs.add({
-        name = "tnp-sl-scrollschedule",
+        name = "tnp-sl-scroll-1",
         type = "scroll-pane",
         style = "tnp_sl_list_scroll",
         horizontal_scroll_policy = "never",
@@ -152,7 +152,7 @@ function tnp_gui_stationlist(player, train)
         caption = {"tnp_gui_stationlist_stationtype_tnfp"}
     })
     local gui_scroll_tnfp = gui_tabs.add({
-        name = "tnp-sl-scrolltnfp",
+        name = "tnp-sl-scroll-2",
         type = "scroll-pane",
         style = "tnp_sl_list_scroll",
         horizontal_scroll_policy = "never",
@@ -173,7 +173,7 @@ function tnp_gui_stationlist(player, train)
         caption = {"tnp_gui_stationlist_stationtype_all"}
     })
     local gui_scroll_all = gui_tabs.add({
-        name = "tnp-sl-scrollall",
+        name = "tnp-sl-scroll-3",
         type = "scroll-pane",
         style = "tnp_sl_list_scroll",
         horizontal_scroll_policy = "never",
@@ -195,6 +195,7 @@ function tnp_gui_stationlist(player, train)
         gui_tabs.selected_tab_index = 3
     end
 
+    devent_enable('gui_selected_tab_changed')
     devent_enable('gui_switch_state_changed')
 
     tnp_state_player_set(player, 'gui_stationtableall', gui_table_all)
@@ -202,6 +203,44 @@ function tnp_gui_stationlist(player, train)
     tnp_state_player_set(player, 'gui_stationtabletrain', gui_table_schedule)
 
     tnp_gui_stationlist_build(player, train)
+end
+
+-- tnp_gui_stationlist_collate()
+--   Collates a list of train stations and special flags they may have
+function tnp_gui_stationlist_collate(player, stations_key, stations_map, stations_flags)
+    -- Collate a full list of all stops, so we can sort them alphabetically
+    local stations_unsorted = player.surface.find_entities_filtered({
+        type = "train-stop"
+    })
+
+    for _, station in pairs(stations_unsorted) do
+        if station.valid then
+            if tnp_stop_danger(station) == false then
+                if not stations_map[station.backer_name] then
+                    table.insert(stations_key, station.backer_name)
+                    stations_map[station.backer_name] = station
+
+                    stations_flags[station.backer_name] = {}
+                    stations_flags[station.backer_name]['count'] = 1
+
+                    local is_tnp = tnp_stop_check(station)
+                    if is_tnp.home == true then
+                        stations_flags[station.backer_name]['home'] = true
+                    end
+                    if is_tnp.tnp == true then
+                        stations_flags[station.backer_name]['tnfp'] = true
+                    end
+                    if tnp_state_playerprefs_check(player, 'stationpins', station.unit_number) == true then
+                        stations_flags[station.backer_name]['pinned'] = true
+                    end
+                else
+                    stations_flags[station.backer_name]['count'] = stations_flags[station.backer_name]['count'] + 1
+                end
+            end
+        end
+    end
+
+    table.sort(stations_key)
 end
 
 -- tnp_gui_stationlist_build()
@@ -215,61 +254,23 @@ function tnp_gui_stationlist_build(player, train)
         return
     end
 
-    -- Collate a full list of all stops, so we can sort them alphabetically
-    local stations_unsorted = player.surface.find_entities_filtered({
-        type = "train-stop"
-    })
     local stations_key = {}
     local stations_map = {}
-    local stations_map_count = {}
+    local stations_flags = {}
 
-    for _, station in pairs(stations_unsorted) do
-        if station.valid then
-            if tnp_stop_danger(station) == false then
-                if not stations_map[station.backer_name] then
-                    table.insert(stations_key, station.backer_name)
-                    stations_map[station.backer_name] = station
-                    stations_map_count[station.backer_name] = 1
-                else
-                    stations_map_count[station.backer_name] = stations_map_count[station.backer_name] + 1
-                end
-            end
-        end
-    end
-    table.sort(stations_key)
+    tnp_gui_stationlist_collate(player, stations_key, stations_map, stations_flags)
 
     gui_stationtable_all.clear()
     gui_stationtable_tnfp.clear()
     gui_stationtable_train.clear()
 
-    -- For optimisation we want to make as few passes over the circuit network as possible, so we loop once
-    -- over our list to collate all the special statuses a stop may have affecting the gui.
     local stations_added = {}
-    local stations_pinned = {}
-    local stations_tnfp = {}
-    local stations_tnfphome = {}
-
-    for i, stationname in ipairs(stations_key) do
-        local is_tnp = tnp_stop_check(stations_map[stationname])
-        if is_tnp.home == true then
-            -- Home stations are not marked as pinned, or normal tnfp stations.
-            stations_tnfphome[i] = true
-        else
-            if is_tnp.tnp == true then
-                stations_tnfp[i] = true
-            end
-
-            if tnp_state_playerprefs_check(player, 'stationpins', stations_map[stationname].unit_number) == true then
-                stations_pinned[i] = true
-            end
-        end
-    end
 
     -- Add home stations first to the top of the tnp and all lists
     for i, stationname in ipairs(stations_key) do
-        if stations_tnfphome[i] == true then
-            tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false, true)
-            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], false, true)
+        if stations_flags[stationname]['home'] then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_flags[stationname]['count'], false, true)
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_flags[stationname]['count'], false, true)
 
             stations_added[i] = true
         end
@@ -278,11 +279,11 @@ function tnp_gui_stationlist_build(player, train)
     -- Then add pinned stations to the top of the all and tnfp lists.  The pinning interface isnt available
     -- inside the tnfp list, but they'll still be promoted.
     for i, stationname in ipairs(stations_key) do
-        if stations_pinned[i] == true then
-            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], true, false)
+        if stations_added[i] == nil and stations_flags[stationname]['pinned'] then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_flags[stationname]['count'], true, false)
 
-            if stations_tnfp[i] == true then
-                tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], true, false)
+            if stations_flags[stationname]['tnfp'] then
+                tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_flags[stationname]['count'], true, false)
             end
 
             stations_added[i] = true
@@ -299,17 +300,58 @@ function tnp_gui_stationlist_build(player, train)
         if trains then
             for _, stationtrain in pairs(trains) do
                 if train.id == stationtrain.id then
-                    tnp_gui_stationlist_addentry(player, gui_stationtable_train, "train", i, stations_map[stationname], stations_map_count[stationname], false, false)
+                    tnp_gui_stationlist_addentry(player, gui_stationtable_train, "train", i, stations_map[stationname], stations_flags[stationname]['count'], false, false)
                 end
             end
         end
 
         if stations_added[i] == nil then
-            if stations_tnfp[i] == true then
-                tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_map_count[stationname], false, false)
+            if stations_flags[stationname]['tnfp'] then
+                tnp_gui_stationlist_addentry(player, gui_stationtable_tnfp, "tnfp", i, stations_map[stationname], stations_flags[stationname]['count'], false, false)
             end
 
-            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_map_count[stationname], false, false)
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_flags[stationname]['count'], false, false)
+        end
+    end
+end
+
+-- tnp_gui_stationlist_rebuild_all()
+--   Rebuilds the 'All' train station view, in response to pinning
+function tnp_gui_stationlist_rebuild_all(player)
+    local gui_stationtable_all = tnp_state_player_get(player, 'gui_stationtableall')
+
+    if not gui_stationtable_all or not gui_stationtable_all.valid then
+        return
+    end
+
+    local stations_key = {}
+    local stations_map = {}
+    local stations_flags = {}
+
+    tnp_gui_stationlist_collate(player, stations_key, stations_map, stations_flags)
+
+    gui_stationtable_all.clear()
+
+    local stations_added = {}
+
+    -- Add home stations first, then pinned, then the rest
+    for i, stationname in ipairs(stations_key) do
+        if stations_flags[stationname]['home'] then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_flags[stationname]['count'], false, true)
+            stations_added[i] = true
+        end
+    end
+
+    for i, stationname in ipairs(stations_key) do
+        if stations_added[i] == nil and stations_flags[stationname]['pinned'] then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_flags[stationname]['count'], true, false)
+            stations_added[i] = true
+        end
+    end
+
+    for i, stationname in ipairs(stations_key) do
+        if stations_added[i] == nil then
+            tnp_gui_stationlist_addentry(player, gui_stationtable_all, "all", i, stations_map[stationname], stations_flags[stationname]['count'], false, false)
         end
     end
 end
@@ -382,14 +424,15 @@ function tnp_gui_stationlist_close(player)
     _tnp_state_gui_prune()
 
     if tnp_state_player_any('gui') == false then
+        devent_disable('gui_selected_tab_changed')
         devent_disable('gui_switch_state_changed')
     end
 end
 
--- tnp_gui_stationlist_search()
---   Handles filtering the list of stations in the stationselect
-function tnp_gui_stationlist_search(player, element)
-    element = element or tnp_state_player_get(player, 'gui_stationsearch')
+-- tnp_gui_stationlist_update()
+--   Updates a stationlist gui, generally as a result of a search or tab change
+function tnp_gui_stationlist_update(player)
+    local element = tnp_state_player_get(player, 'gui_stationsearch')
 
     if not element or not element.valid then
         return
@@ -400,8 +443,10 @@ function tnp_gui_stationlist_search(player, element)
 
     for _, gui_tabs in pairs(gui_main.children) do
         if gui_tabs.name == "tnp-sl-tabs" then
+            local gui_scroll_target = "tnp-sl-scroll-" .. gui_tabs.selected_tab_index
+
             for _, gui_scroll in pairs(gui_tabs.children) do
-                if gui_scroll.name:sub(1, 13) == "tnp-sl-scroll" then
+                if gui_scroll.name == gui_scroll_target then
                     local stationtable = gui_scroll.children[1]
                     for _, row in pairs(stationtable.children) do
                         local station = row.children[1]
@@ -426,9 +471,10 @@ function tnp_gui_stationlist_search_confirm(player, element)
 
     for _, gui_tabs in pairs(element.parent.parent.children) do
         if gui_tabs.name == "tnp-sl-tabs" then
-            for _, gui_scroll in pairs(gui_tabs.children) do
+            local gui_scroll_target = "tnp-sl-scroll-" .. gui_tabs.selected_tab_index
 
-                if (gui_scroll.name == "tnp-sl-scrollschedule" and gui_tabs.selected_tab_index == 1) or (gui_scroll.name == "tnp-sl-scrolltnfp" and gui_tabs.selected_tab_index == 2) or (gui_scroll.name == "tnp-sl-scrollall" and gui_tabs.selected_tab_index == 3) then
+            for _, gui_scroll in pairs(gui_tabs.children) do
+                if gui_scroll.name == gui_scroll_target then
                     local stationtable = gui_scroll.children[1]
                     for _, row in pairs(stationtable.children) do
                         if row and row.valid and row.visible then

@@ -347,8 +347,8 @@ function tnp_action_stationselect_pin(player, gui)
     end
 
     if player.vehicle and player.vehicle.valid and player.vehicle.train then
-        tnp_gui_stationlist_build(player, player.vehicle.train)
-        tnp_gui_stationlist_search(player)
+        tnp_gui_stationlist_rebuild_all(player)
+        tnp_gui_stationlist_update(player)
     end
 end
 

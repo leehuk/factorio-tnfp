@@ -36,17 +36,31 @@ function tnp_handle_gui_switch(event)
     end
 end
 
+-- tnp_handle_gui_tab()
+--   Handles a gui tab being changed
+function tnp_handle_gui_tab(event)
+    local player = game.players[event.player_index]
+
+    if not player.valid or not player.vehicle or not player.vehicle.valid or not player.vehicle.train then
+        return
+    end
+
+    if event.element.name == "tnp-sl-tabs" then
+        tnp_gui_stationlist_update(player)
+    end
+end
+
 -- tnp_handle_gui_text()
 --   Handles text input via gui elements
 function tnp_handle_gui_text(event)
     local player = game.players[event.player_index]
 
-    if not player.valid then
+    if not player.valid or not player.vehicle or not player.vehicle.valid or not player.vehicle.train then
         return
     end
 
     if event.element.name == "tnp-sl-search-field" then
-        tnp_gui_stationlist_search(player, event.element)
+        tnp_gui_stationlist_update(player)
     end
 end
 
