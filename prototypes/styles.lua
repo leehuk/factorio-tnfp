@@ -1,3 +1,9 @@
+data.raw["gui-style"].default["tnp_sl_frame"] = {
+    type = "frame_style",
+    parent = "frame",
+    bottom_padding = 2
+}
+
 data.raw["gui-style"].default["tnp_sl_heading_flow"] = {
     type = "horizontal_flow_style",
     parent = "horizontal_flow",

@@ -15,7 +15,7 @@ function tnp_gui_stationlist(player, train)
         name = "tnp-sl-top",
         type = "frame",
         direction = "vertical",
-        style = "frame_without_footer"
+        style = "tnp_sl_frame"
     })
     gui_top.force_auto_center()
     tnp_state_player_set(player, 'gui', gui_top)
