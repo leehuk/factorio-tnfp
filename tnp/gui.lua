@@ -114,10 +114,6 @@ function tnp_gui_stationlist(player, train)
     })
     tnp_state_player_set(player, 'gui_stationsearch', gui_stationsearch)
 
-    if config['tnp-stationlist-focussearch'].value == true then
-        gui_stationsearch.focus()
-    end
-
     -- Station List Tabs
     local gui_tabs = gui_main.add({
         name = "tnp-sl-tabs",
@@ -203,6 +199,10 @@ function tnp_gui_stationlist(player, train)
     tnp_state_player_set(player, 'gui_stationtabletrain', gui_table_schedule)
 
     tnp_gui_stationlist_build(player, train)
+
+    if config['tnp-stationlist-focussearch'].value == true then
+        gui_stationsearch.focus()
+    end
 end
 
 -- tnp_gui_stationlist_collate()
