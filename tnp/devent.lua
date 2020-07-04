@@ -45,34 +45,24 @@ end
 -- devent_populate()
 --   Populates the dynamic event handling table during first load or upgrades
 function devent_populate()
+    local devents = {
+        gui_switch_state_changed = defines.events.on_gui_switch_state_changed,
+        gui_selected_tab_changed = defines.events.on_gui_selected_tab_changed,
+        player_cursor_stack_changed = defines.events.on_player_cursor_stack_changed
+    }
+
     if not global.dynamic_events then
         global.dynamic_events = {}
     end
 
-    if not global.dynamic_events["gui_selected_tab_changed"] then
-        global.dynamic_events["gui_selected_tab_changed"] = {
-            def = defines.events.on_gui_selected_tab_changed,
-            enabled = false
-        }
-    else
-        global.dynamic_events["gui_switch_state_changed"]["def"] = defines.events.on_gui_switch_state_changed
-    end
-
-    if not global.dynamic_events["gui_switch_state_changed"] then
-        global.dynamic_events["gui_switch_state_changed"] = {
-            def = defines.events.on_gui_switch_state_changed,
-            enabled = false
-        }
-    else
-        global.dynamic_events["gui_switch_state_changed"]["def"] = defines.events.on_gui_switch_state_changed
-    end
-
-    if not global.dynamic_events["player_cursor_stack_changed"] then
-        global.dynamic_events["player_cursor_stack_changed"] = {
-            def = defines.events.on_player_cursor_stack_changed,
-            enabled = false
-        }
-    else
-        global.dynamic_events["player_cursor_stack_changed"]["def"] = defines.events.on_player_cursor_stack_changed
+    for k, v in pairs(devents) do
+        if not global.dynamic_events[k] then
+            global.dynamic_events[k] = {
+                def = v,
+                enabled = false
+            }
+        else
+            global.dynamic_events[k].def = v
+        end
     end
 end
