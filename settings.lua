@@ -31,6 +31,7 @@ data:extend({
         order = "a[message]-b[target]",
         default_value = "safe",
         allowed_values = {
+            "ignore",
             "safe",
             "standard"
         }

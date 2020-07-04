@@ -56,7 +56,7 @@ function tnp_stop_danger(stop)
 
     -- LTN (Logistic Train Network)
     if stop.name == "logistic-train-stop" then
-        if tnp_state_ltnstop_get(stop, 'depot') then
+        if settings.global['tnp-trainstop-mod-behaviour'].value == "ignore" or tnp_state_ltnstop_get(stop, 'depot') then
             return true
         else
             return false
