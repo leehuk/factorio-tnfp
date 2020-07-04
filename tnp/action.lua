@@ -328,7 +328,7 @@ function tnp_action_stationselect_cancel(player)
 
     -- We're still tracking a request at this point we need to cancel, though theres no
     -- schedule to amend.
-    tnp_request_cancel(player, train, nil)
+    tnp_request_cancel(player, train, {"tnp_train_cancelled"})
 end
 
 -- tnp_action_stationselect_pin()
