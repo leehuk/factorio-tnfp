@@ -25,11 +25,6 @@ function tnp_request_cancel(player, train, message)
     end
 
     if train then
-        local dynamicstop = tnp_state_train_get(train, 'dynamicstop')
-        if dynamicstop then
-            tnp_dynamicstop_destroy(dynamicstop)
-        end
-
         tnp_state_train_delete(train, false)
     end
 end
@@ -99,33 +94,8 @@ function tnp_request_dispatch(player, target, train, supplymode)
     tnp_train_enact(train, false, schedule, nil, false)
 
     if not supplymode then
-        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", target.backer_name})
+        tnp_message(tnpdefines.loglevel.core, player, {"tnp_train_requested", tnp_stop_name(target)})
     end
-end
-
--- tnp_request_railtooltest()
---   Tests dispatching a train to a given location, looking for a path error.
-function tnp_request_railtooltest(player, target, train)
-    local config = settings.get_player_settings(player)
-
-    local redispatch = false
-    local dynamicstatus = tnpdefines.train.status.dispatched
-
-    if player.vehicle and player.vehicle.train then
-        redispatch = true
-        dynamicstatus = tnpdefines.train.status.redispatched
-    end
-
-    tnp_state_train_set(train, 'timeout_railtooltest', 2)
-    tnp_state_train_set(train, 'dynamicstatus', dynamicstatus)
-
-    if not redispatch then
-        tnp_state_train_set(train, 'timeout_arrival', config['tnp-train-arrival-timeout'].value)
-    end
-
-    local schedule = tnp_train_schedule_copyamend(player, train, target, dynamicstatus, true, false)
-    -- We force the train into manual mode first, to ensure we generate an on-the-path status
-    tnp_train_enact(train, false, schedule, true, false)
 end
 
 -- tnp_request_redispatch()

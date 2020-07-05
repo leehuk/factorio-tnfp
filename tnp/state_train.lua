@@ -1,7 +1,6 @@
 --[[
     State Table:
         dynamicstatus              = int, actual dispatching status
-        dynamicstop                = LuaElement, dynamic stop we're tracking
         expect_manualmode          = bool, marker to note a self-triggered event will fire for manual_mode
         expect_schedulechange      = bool, marker to note a self-triggered event will fire for a schedule change
         info                       = hash, stored information about a train we've modified such as schedule
@@ -12,7 +11,6 @@
         status                     = int, current dispatching status
         supplymode                 = bool, marker to note this train is a supply train
         timeout_arrival            = int, arrival timeout before cancelling the request
-        timeout_railtooltest       = int, timeout before we expect a state change for railtool testing
         train                      = LuaTrain, the train we're tracking
 ]]
 
@@ -22,8 +20,7 @@ tnpdefines.train = {
         dispatched          = 2,
         arrived             = 3,
         redispatched        = 4,
-        rearrived           = 5,
-        railtooltest        = 6
+        rearrived           = 5
     }
 }
 
@@ -41,10 +38,6 @@ function _tnp_state_train_prune()
                 tnp_request_cancel(data.player, nil, {"tnp_train_cancelled_invalid"})
             end
 
-            if data.dynamicstop then
-                tnp_dynamicstop_destroy(data.dynamicstop)
-            end
-
             global.train_data[id] = nil
         elseif not data.player or not data.player.valid then
             -- The player we were tracking is invalid -- but the trains ok.  We need to cancel
@@ -59,10 +52,6 @@ function _tnp_state_train_prune()
             end
 
             data.train.manual_mode = false
-
-            if data.dynamicstop then
-                tnp_dynamicstop_destroy(data.dynamicstop)
-            end
 
             global.train_data[id] = nil
         end
@@ -158,7 +147,6 @@ end
 function tnp_state_train_timeout()
     local trains = {
         arrival = {},
-        railtooltest = {}
     }
 
     for id, data in pairs(global.train_data) do
@@ -168,13 +156,6 @@ function tnp_state_train_timeout()
                 data.timeout_arrival = data.timeout_arrival - 1
                 if data.timeout_arrival <= 0 then
                     table.insert(trains.arrival, data.train)
-                end
-            end
-
-            if data.timeout_railtooltest and data.timeout_railtooltest >= 0 then
-                data.timeout_railtooltest = data.timeout_railtooltest - 1
-                if data.timeout_railtooltest <= 0 then
-                    table.insert(trains.railtooltest, data.train)
                 end
             end
         end

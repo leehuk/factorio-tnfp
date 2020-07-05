@@ -288,7 +288,6 @@ function tnp_handle_tick_prune(event)
     _tnp_state_gui_prune()
     _tnp_state_player_prune()
     _tnp_state_train_prune()
-    _tnp_state_dynamicstop_prune()
 end
 
 -- tnp_handle_tick_timeout()

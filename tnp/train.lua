@@ -21,19 +21,13 @@ end
 -- tnp_train_destinationstring()
 --   Looks up a destination string for a train with validity checks
 function tnp_train_destinationstring(train)
-    local target = "?"
+    local target = tnp_state_train_get(train, 'station')
 
-    if not train then
-        return target
+    if not train or not train.valid or not target or not target.valid then
+        return "?"
     end
 
-    local station = tnp_state_train_get(train, 'station')
-
-    if station and station.valid then
-        target = station.backer_name
-    end
-
-    return target
+    return tnp_stop_name(target)
 end
 
 -- tnp_train_enact()
@@ -242,12 +236,15 @@ function tnp_train_schedule_copy(train)
 end
 
 -- tnp_train_schedule_copyamend()
---   Returns a copy of the trains schedule, amended to add the given station
-function tnp_train_schedule_copyamend(player, train, station, status, temporary, supplymode)
+--   Returns a copy of the trains schedule, amended to add the given target
+function tnp_train_schedule_copyamend(player, train, target, status, temporary, supplymode)
     local config = settings.get_player_settings(player)
 
     local schedule = tnp_train_schedule_copy(train)
-    local schedule_found = tnp_train_schedule_check(schedule, station.backer_name)
+    local schedule_found = false
+    if target.type == "train-stop" and tnp_train_schedule_check(schedule, target.backer_name) then
+        schedule_found = true
+    end
 
     if not schedule then
         schedule = {}
@@ -256,9 +253,14 @@ function tnp_train_schedule_copyamend(player, train, station, status, temporary,
 
     if schedule_found == false then
         local record = {
-            station = station.backer_name,
             temporary = temporary
         }
+
+        if target.type == "train-stop" then
+            record['station'] = target.backer_name
+        else
+            record['rail'] = target
+        end
 
         if supplymode then
             record['wait_conditions'] = {{

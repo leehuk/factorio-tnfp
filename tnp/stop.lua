@@ -158,3 +158,17 @@ function tnp_stop_getsupply(player)
     return tnp_stops
 
 end
+
+-- tnp_stop_name()
+--   Returns the name of a stop or creates one based off locations for rails
+function tnp_stop_name(target)
+    if not target or not target.valid then
+        return "?"
+    end
+
+    if target.type == "straight-rail" then
+        return "[" .. target.position.x .. "," .. target.position.y .. "]"
+    else
+        return target.backer_name
+    end
+end

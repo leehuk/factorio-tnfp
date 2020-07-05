@@ -5,7 +5,6 @@ require('tnp/action')
 require('tnp/action_trainstate')
 require('tnp/devent')
 require('tnp/draw')
-require('tnp/dynamicstop')
 require('tnp/event')
 require('tnp/direction')
 require('tnp/gui')
@@ -13,7 +12,6 @@ require('tnp/math')
 require('tnp/message')
 require('tnp/misc')
 require('tnp/request')
-require('tnp/state_dynamicstop')
 require('tnp/state_gui')
 require('tnp/state_ltnstop')
 require('tnp/state_player')
@@ -70,7 +68,6 @@ script.on_init(function()
 
     devent_populate()
 
-    global.dynamicstop_data = global.dynamicstop_data or {}
     global.gui_data = global.gui_data or {}
     global.ltnstop_data = global.ltnstop_data or {}
     global.player_data = global.player_data or {}
@@ -104,7 +101,6 @@ script.on_configuration_changed(function(event)
     if tonumber(oldv[1]) <= 0 and tonumber(oldv[2]) < 9 then
         devent_populate()
 
-        global.dynamicstop_data = global.dynamicstop_data or {}
         global.gui_data = global.gui_data or {}
         global.ltnstop_data = global.ltnstop_data or {}
         global.player_data = global.player_data or {}
@@ -123,18 +119,6 @@ script.on_configuration_changed(function(event)
                 tnp_request_cancel(data.player, data.train, nil)
             end
         end
-
-        for id, data in pairs(global.dynamicstop_data) do
-            if data.dynamicstop and data.dynamicstop.valid then
-                data.dynamicstop.destroy()
-            end
-
-            if data.altstop and data.altstop.valid then
-                data.altstop.destroy()
-            end
-        end
-
-        global.dynamicstop_data = {}
     end
 
     -- Old version is < 0.9.2
@@ -162,6 +146,23 @@ script.on_configuration_changed(function(event)
             _tnp_state_playerprefs_prune()
 
             global.stationpins_data = nil
+        end
+    end
+
+    -- Old version is < 0.11.1
+    if tonumber(oldv[1]) <= 0 and (tonumber(oldv[2]) < 11 or (tonumber(oldv[2]) == 11 and tonumber(oldv[3]) < 1)) then
+        if global.dynamicstop_data then
+            for id, data in pairs(global.dynamicstop_data) do
+                if data.dynamicstop and data.dynamicstop.valid then
+                    data.dynamicstop.destroy()
+                end
+
+                if data.altstop and data.altstop.valid then
+                    data.altstop.destroy()
+                end
+            end
+
+            global.dynamicstop_data = nil
         end
     end
 end)
