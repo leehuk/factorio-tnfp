@@ -1,3 +1,12 @@
+Version: 0.11.0
+Date: 2020-07-04
+  Changes:
+    - Update stationselect gui styling to be closer to factorio-0.18.  Now uses
+      a draggable frame with standard gui styles where possible, with station
+      lists inside tabs
+    - Extend 'Modded Train Stop Dispatch Behaviour' setting to add an 'Ignore'
+      option, which makes all modded train stops invalid for dispatch
+---------------------------------------------------------------------------------------------------
 Version: 0.10.6
 Date: 2020-06-03
   Changes:
