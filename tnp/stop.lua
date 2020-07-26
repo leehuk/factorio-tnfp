@@ -80,10 +80,12 @@ function tnp_stop_find(player)
     --   - Any train station with a TNfP train stopped
     --   - A TNfP station without a train
     --   - A normal station (non-dangerous) without a train
+    --   - An LTN station
 
     local valid_stops_train = {}
     local valid_stops_tnp = {}
     local valid_stops_std = {}
+    local valid_stops_ltn = {}
 
     local entities = player.surface.find_entities_filtered({
         area = tnp_math_postoarea(player.position, config['tnp-train-search-radius'].value),
@@ -96,14 +98,22 @@ function tnp_stop_find(player)
             if train then
                 -- Disallow train stations blocked by non-TNfP trains
                 if tnp_train_check(player, train) then
-                    table.insert(valid_stops_train, ent)
+                    if ent.name == "logistic-train-stop" then
+                        table.insert(valid_stops_ltn, ent)
+                    else
+                        table.insert(valid_stops_train, ent)
+                    end
                 end
             else
                 local is_tnp = tnp_stop_check(ent)
                 if is_tnp.tnp == true or is_tnp.home == true then
                     table.insert(valid_stops_tnp, ent)
                 elseif tnp_stop_danger(ent) == false then
-                    table.insert(valid_stops_std, ent)
+                    if ent.name == "logistic-train-stop" then
+                        table.insert(valid_stops_ltn, ent)
+                    else
+                        table.insert(valid_stops_std, ent)
+                    end
                 end
             end
         end
@@ -115,6 +125,8 @@ function tnp_stop_find(player)
         return tnp_direction_closest(player, valid_stops_tnp)
     elseif #valid_stops_std > 0 then
         return tnp_direction_closest(player, valid_stops_std)
+    elseif #valid_stops_ltn > 0 then
+        return tnp_direction_closest(player, valid_stops_ltn)
     end
 
     return nil

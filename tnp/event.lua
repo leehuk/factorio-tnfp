@@ -103,7 +103,7 @@ function tnp_handle_ltn_stops(event)
         tnp_state_ltnstop_destroy()
         for _, ltndata in pairs(event.logistic_train_stops) do
             -- We are currently only tracking depot stops
-            if ltndata['isDepot'] then
+            if ltndata['isDepot'] or ltndata['is_depot'] then
                 tnp_state_ltnstop_set(ltndata['entity'], 'depot', true)
             end
         end
