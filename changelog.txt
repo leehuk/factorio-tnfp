@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.11.1
+Date: 2020-07-26
+  Changes:
+    - Reimplement railtool dynamic stops using native 0.18 functionality for
+      scheduling to a rail
+    - Prioritise regular train stops above LTN stops for dispatch
+---------------------------------------------------------------------------------------------------
 Version: 0.11.0
 Date: 2020-07-04
   Changes:
