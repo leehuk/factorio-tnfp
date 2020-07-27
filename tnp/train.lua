@@ -242,8 +242,8 @@ function tnp_train_schedule_copyamend(player, train, target, status, temporary, 
 
     local schedule = tnp_train_schedule_copy(train)
     local schedule_found = false
-    if target.type == "train-stop" and tnp_train_schedule_check(schedule, target.backer_name) then
-        schedule_found = true
+    if target.type == "train-stop" then
+        schedule_found = tnp_train_schedule_check(schedule, target.backer_name)
     end
 
     if not schedule then
