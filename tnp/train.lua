@@ -274,10 +274,33 @@ function tnp_train_schedule_copyamend(player, train, target, status, temporary, 
                 ticks = config['tnp-train-boarding-timeout'].value*60
             }}
         elseif status == tnpdefines.train.status.redispatched then
-            record['wait_conditions'] = {{
-                type="passenger_not_present",
-                compare_type = "or"
-            }}
+            if player and player.valid and tnp_state_playerprefs_get(player, 'redispatch_circuit') == true then
+                record['wait_conditions'] = {
+                    {
+                        type = "circuit",
+                        compare_type = "or",
+                        condition = {
+                            comparator = "=",
+                            first_signal = { type = "virtual", name = "signal-green" },
+                            constant = 1
+                        }
+                    },
+                    {
+                        type = "circuit",
+                        compare_type = "or",
+                        condition = {
+                            comparator = "=",
+                            first_signal = { type = "virtual", name = "signal-red" },
+                            constant = 0
+                        }
+                    }
+                }
+            else
+                record['wait_conditions'] = {{
+                    type="passenger_not_present",
+                    compare_type = "or"
+                }}
+            end
         end
 
         table.insert(schedule.records, record)

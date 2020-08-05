@@ -1,5 +1,6 @@
 --[[
     State Table:
+        redispatch_circuit  - bool, marker to use circuit condition dispatch
         keep_position   - bool, marker to keep position on arrival after redispatch
         player          - LuaPlayer, player we're tracking preferences for
         stationpins     - LuaElement array, array of stations that are pinned
@@ -12,7 +13,7 @@ function _tnp_state_playerprefs_prune()
         if not ent.player.valid then
             global.playerprefs_data[id] = nil
         else
-            if not ent.stationpins and ent.keep_position == nil then
+            if not ent.stationpins and ent.keep_position == nil and ent.redispatch_circuit == nil then
                 global.playerprefs_data[id] = nil
             else
                 if ent.stationpins then

@@ -3,6 +3,7 @@ tnpdefines = {}
 require('util')
 require('tnp/action')
 require('tnp/action_trainstate')
+require('tnp/commands')
 require('tnp/devent')
 require('tnp/draw')
 require('tnp/event')
@@ -58,6 +59,9 @@ script.on_event("tnp-handle-railtool-supply", tnp_handle_input)
 script.on_event("tnp-handle-railtool-supply-next", tnp_handle_input)
 script.on_event("tnp-handle-request", tnp_handle_input)
 script.on_event("tnp-handle-train-manual", tnp_handle_input)
+
+-- Command Handling
+commands.add_command("tnp-toggle-redispatch-circuit", {"tnp_command_toggle_redispatch_circuit"}, tnp_command_toggle_redispatch_circuit)
 
 -- LTN Handling
 script.on_init(function()
