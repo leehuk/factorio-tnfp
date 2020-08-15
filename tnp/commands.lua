@@ -10,12 +10,11 @@ function tnp_command_toggle_redispatch_circuit(event)
         return
     end
 
-    local state = tnp_state_playerprefs_get(player, 'redispatch_circuit')
-    if not state or state == false then
-        tnp_state_playerprefs_set(player, 'redispatch_circuit', true)
-        player.print({"tnp_command_toggle_redispatch_circuit_enabled"})
-    else
-        tnp_state_playerprefs_delete(player, 'redispatch_circuit')
+    if global.prefs_data['redispatch_circuit'] == true then
+        global.prefs_data['redispatch_circuit'] = nil
         player.print({"tnp_command_toggle_redispatch_circuit_disabled"})
+    else
+        global.prefs_data['redispatch_circuit'] = true
+        player.print({"tnp_command_toggle_redispatch_circuit_enabled"})
     end
 end

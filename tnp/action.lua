@@ -236,6 +236,9 @@ function tnp_action_player_train(player, train)
                 -- The player requested the train waits somewhere for them in manual mode, but jumped out before
                 -- we arrived.  For qol, presume the train should continue -- but notify them.
                 tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_continue", tnp_train_destinationstring(train)})
+            elseif global.prefs_data['redispatch_circuit'] then
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_continue", tnp_train_destinationstring(train)})
+                tnp_request_cancel(player, nil, nil)
             else
                 tnp_train_enact(train, true, nil, nil, nil)
                 tnp_request_cancel(player, train, {"tnp_train_complete_resume"})
@@ -244,6 +247,9 @@ function tnp_action_player_train(player, train)
             if tnp_state_train_get(train, 'keep_schedule') then
                 tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_remain", tnp_train_destinationstring(train)})
                 tnp_request_cancel(player, train, nil)
+            elseif global.prefs_data['redispatch_circuit'] then
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_resume"})
+                tnp_request_cancel(player, nil, nil)
             else
                 tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_resume"})
                 tnp_train_enact(train, true, nil, nil, nil)

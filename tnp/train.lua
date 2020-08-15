@@ -274,7 +274,7 @@ function tnp_train_schedule_copyamend(player, train, target, status, temporary, 
                 ticks = config['tnp-train-boarding-timeout'].value*60
             }}
         elseif status == tnpdefines.train.status.redispatched then
-            if player and player.valid and tnp_state_playerprefs_get(player, 'redispatch_circuit') == true then
+            if player and player.valid and global.prefs_data['redispatch_circuit'] == true then
                 record['wait_conditions'] = {
                     {
                         type = "circuit",
@@ -286,6 +286,10 @@ function tnp_train_schedule_copyamend(player, train, target, status, temporary, 
                         }
                     },
                     {
+                        type="passenger_not_present",
+                        compare_type = "and"
+                    },
+                    {
                         type = "circuit",
                         compare_type = "or",
                         condition = {
@@ -293,6 +297,10 @@ function tnp_train_schedule_copyamend(player, train, target, status, temporary, 
                             first_signal = { type = "virtual", name = "signal-red" },
                             constant = 0
                         }
+                    },
+                    {
+                        type="passenger_not_present",
+                        compare_type = "and"
                     }
                 }
             else

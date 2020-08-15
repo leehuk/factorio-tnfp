@@ -76,6 +76,7 @@ script.on_init(function()
     global.ltnstop_data = global.ltnstop_data or {}
     global.player_data = global.player_data or {}
     global.playerprefs_data = global.playerprefs_data or {}
+    global.prefs_data = global.prefs_data or {}
     global.train_data = global.train_data or {}
 end)
 
@@ -169,4 +170,10 @@ script.on_configuration_changed(function(event)
             global.dynamicstop_data = nil
         end
     end
+
+    -- Old version is < 0.11.4
+    if tonumber(oldv[1]) <= 0 and (tonumber(oldv[2]) < 11 or (tonumber(oldv[2]) == 11 and tonumber(oldv[3]) < 4)) then
+        global.prefs_data = {}
+    end
+
 end)
