@@ -268,11 +268,44 @@ function tnp_train_schedule_copyamend(player, train, target, status, temporary, 
                 compare_type = "or"
             }}
         elseif status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
-            record['wait_conditions'] = {{
-                type = "time",
-                compare_type = "or",
-                ticks = config['tnp-train-boarding-timeout'].value*60
-            }}
+            if global.prefs_data['redispatch_circuit'] == true then
+                record['wait_conditions'] = {
+                    {
+                        type = "circuit",
+                        compare_type = "or",
+                        condition = {
+                            comparator = "=",
+                            first_signal = { type = "virtual", name = "signal-green" },
+                            constant = 1
+                        }
+                    },
+                    {
+                        type = "time",
+                        compare_type = "and",
+                        ticks = config['tnp-train-boarding-timeout'].value*60
+                    },
+                    {
+                        type = "circuit",
+                        compare_type = "or",
+                        condition = {
+                            comparator = "=",
+                            first_signal = { type = "virtual", name = "signal-red" },
+                            constant = 0
+                        }
+                    },
+                    {
+                        type = "time",
+                        compare_type = "and",
+                        ticks = config['tnp-train-boarding-timeout'].value*60
+                    }
+                }
+            else
+                record['wait_conditions'] = {{
+                    type = "time",
+                    compare_type = "or",
+                    ticks = config['tnp-train-boarding-timeout'].value*60
+                }}
+            end
         elseif status == tnpdefines.train.status.redispatched then
             if player and player.valid and global.prefs_data['redispatch_circuit'] == true then
                 record['wait_conditions'] = {
