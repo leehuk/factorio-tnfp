@@ -267,7 +267,7 @@ function tnp_action_railtool(player, item)
         end
     end
 
-    if not player.clean_cursor() then
+    if not player.clear_cursor() then
         tpn_message_flytext(player, player.position, {"tnp_railtool_error_clear"})
         return
     end
