@@ -1,11 +1,11 @@
 {
     "name": "TrainNetworkForPlayers",
     "title": "Train Network for Players",
-    "version": "0.11.2",
-    "factorio_version": "0.18",
-    "date": "2020-07-27",
+    "version": "0.11.5",
+    "factorio_version": "1.0",
+    "date": "2020-12-15",
     "author": "leeh",
     "homepage": "https://leehuk.github.io/factorio-tnfp/",
     "description": "",
-    "dependencies": ["base >= 0.17.69", "? LogisticTrainNetwork"]
+    "dependencies": ["base >= 1.0.0", "? LogisticTrainNetwork"]
   }
