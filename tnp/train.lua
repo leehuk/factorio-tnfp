@@ -214,6 +214,7 @@ function tnp_train_schedule_copy(train)
         if not record.temporary or record.temporary == false then
             table.insert(schedule.records, {
                 station = record.station,
+                rail = record.rail,
                 wait_conditions = util.table.deepcopy(record.wait_conditions)
             })
         end
