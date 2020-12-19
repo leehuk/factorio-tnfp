@@ -78,7 +78,7 @@ data:extend({
         setting_type = "runtime-per-user",
         order = "b[train]-b[boarding]-b[timeout]",
         default_value = 15,
-        minimum_value = 1,
+        minimum_value = 0,
         maximum_value = 120
     },
     {
