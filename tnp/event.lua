@@ -340,14 +340,27 @@ end
 -- tnp_handle_train_schedulechange()
 --   Handles a trains schedule being changed
 function tnp_handle_train_schedulechange(event)
+    local player = nil
+
+    if event.player_index and game.players[event.player_index] and game.players[event.player_index].valid then
+        player = game.players[event.player_index]
+    end
+
+    -- Check for overriding vanilla temporary stop conditions
+    if player and player.vehicle and #event.train.passengers > 0 then
+        for _, passenger in pairs(event.train.passengers) do
+            if player.index == passenger.index then
+                local config = settings.get_player_settings(player)
+                if config['tnp-override-vanilla-wait'].value then
+                    tnp_action_train_vanillatemp(event.train, player)
+                end
+            end
+        end
+    end
+
     -- A train we're not tracking
     if not tnp_state_train_query(event.train) then
         return
-    end
-
-    local player = nil
-    if event.player_index and game.players[event.player_index] then
-        player = game.players[event.player_index]
     end
 
     tnp_action_train_schedulechange(event.train, player)

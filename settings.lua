@@ -99,5 +99,12 @@ data:extend({
         setting_type = "runtime-per-user",
         order = "c[stationlist]-b[focussearch]",
         default_value = false
+    },
+    {
+        name = "tnp-override-vanilla-wait",
+        type = "bool-setting",
+        setting_type = "runtime-per-user",
+        order = "d[override]-a[vanillawait]",
+        default_value = false
     }
 })

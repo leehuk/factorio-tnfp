@@ -455,6 +455,45 @@ function tnp_action_train_statechange(train)
     tnp_action_trainstate(player, train)
 end
 
+-- tnp_action_train_vanillatemp()
+--   Determines if a vanilla temporary stop was added that needs to be overridden
+function tnp_action_train_vanillatemp(train, player)
+    if not train.valid or not player.valid or not train.schedule or not train.schedule.records or #train.schedule.records == 0 then
+        return
+    end
+
+    -- In 1.1.6 temporary stops fire two schedule changed events, the first to add the temporary stop
+    -- and the second to add its wait conditions.  We only want to override vanilla temporary stops
+    -- so we check that we have wait conditions (ignoring the first event), and those wait conditions
+    -- match vanillas exactly with a single condition of time over 5s/300 ticks
+    local current = train.schedule.current
+    local record = train.schedule.records[current]
+    if record.station or not record.rail or not record.temporary or not record.wait_conditions or #record.wait_conditions > 1 then
+        return
+    end
+
+    if record.wait_conditions[1].type == "time" and record.wait_conditions[1].ticks == 300 then
+        local schedule = util.table.deepcopy(train.schedule)
+        schedule.records[current].wait_conditions[1].type = "passenger_not_present"
+        train.schedule = schedule
+    -- A bit of nicety.  If we're overriding wait conditions and a second temporary stop is added
+    -- then presume the player wants to depart there now instead -- so validate thats also a vanilla
+    -- temporary stop, then adjust the schedule to drop our current temporary stop
+    elseif record.wait_conditions[1].type == "passenger_not_present" and #train.schedule.records >= current+1 then
+        local recordn = train.schedule.records[current+1]
+        if recordn.station or not recordn.rail or not recordn.temporary or not recordn.wait_conditions or #recordn.wait_conditions > 1 then
+            return
+        end
+
+        if recordn.wait_conditions[1].type == "time" and recordn.wait_conditions[1].ticks == 300 then
+            local schedule = util.table.deepcopy(train.schedule)
+            table.remove(schedule.records, current)
+            schedule.records[current].wait_conditions[1].type = "passenger_not_present"
+            train.schedule = schedule
+        end
+    end
+end
+
 -- tnp_action_timeout()
 --   Loops through trains and applies any timeout actions for dispatched trains.
 function tnp_action_timeout()
