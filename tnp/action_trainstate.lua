@@ -44,7 +44,7 @@ function tnp_action_trainstate(player, train)
         local target = tnp_state_train_get(train, 'station')
 
         -- Destination stop has a limit that if full.
-        if target.trains_count == target.trains_limit then
+        if target.type == "train-stop" and target.trains_count == target.trains_limit then
             tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_destination_full"})
 
         -- If we're actively dispatching the train, we need to cancel it and restore its original schedule.
