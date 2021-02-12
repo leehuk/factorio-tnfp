@@ -1,4 +1,30 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.12.3
+Date: 2020-02-12
+  Changes:
+    - Fix error when trains get a no path event and destinations now invalid
+---------------------------------------------------------------------------------------------------
+Version: 0.12.2
+Date: 2020-12-21
+  Changes:
+    - Fix error when a train can't path to a rail target
+---------------------------------------------------------------------------------------------------
+Version: 0.12.1
+Date: 2020-12-19
+  Changes:
+    - Add new per-player setting to override vanilla temporary stops with a
+      wait condition of 'Passenger Not Present'
+      - If a second temporary stop is added that will automatically replace
+        the current temporary stop
+    - Allow boarding timeout setting to be 0, which then uses a wait
+      condition of 'Passenger Present'
+    - Fix a crash when cloning train schedules with rail targets
+---------------------------------------------------------------------------------------------------
+Version: 0.12.0
+Date: 2020-12-12
+  Changes:
+    - Factorio 1.1 support - Pull Request from kryojenik
+---------------------------------------------------------------------------------------------------
 Version: 0.11.5
 Date: 2020-12-15
   Changes:

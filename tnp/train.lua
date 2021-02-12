@@ -269,11 +269,18 @@ function tnp_train_schedule_copyamend(player, train, target, status, temporary, 
                 compare_type = "or"
             }}
         elseif status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
-            record['wait_conditions'] = {{
-                type = "time",
-                compare_type = "or",
-                ticks = config['tnp-train-boarding-timeout'].value*60
-            }}
+            if config['tnp-train-boarding-timeout'].value == 0 then
+                record['wait_conditions'] = {{
+                    type = "passenger_present",
+                    compare_type = "or"
+                }}
+            else
+                record['wait_conditions'] = {{
+                    type = "time",
+                    compare_type = "or",
+                    ticks = config['tnp-train-boarding-timeout'].value*60
+                }}
+            end
         elseif status == tnpdefines.train.status.redispatched then
             record['wait_conditions'] = {{
                 type="passenger_not_present",

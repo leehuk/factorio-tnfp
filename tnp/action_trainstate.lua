@@ -41,8 +41,20 @@ function tnp_action_trainstate(player, train)
 
     elseif train.state == defines.train_state.no_path then
         -- Train has no path.
+        local target = tnp_state_train_get(train, 'station')
+
+        if not target or not target.valid then
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_request_cancel_supply(player, train, supplymode, {"tnp_train_cancelled_invalidstation"})
+            return
+        end
+
+        -- Destination stop has a limit that if full.
+        if target.type == "train-stop" and target.trains_count == target.trains_limit then
+            tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_destination_full"})
+
         -- If we're actively dispatching the train, we need to cancel it and restore its original schedule.
-        if status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
+        elseif status == tnpdefines.train.status.dispatching or status == tnpdefines.train.status.dispatched then
             tnp_train_enact(train, true, nil, nil, false)
             tnp_request_cancel_supply(player, train, supplymode, {"tnp_train_cancelled_nopath"})
 

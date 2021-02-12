@@ -78,7 +78,7 @@ data:extend({
         setting_type = "runtime-per-user",
         order = "b[train]-b[boarding]-b[timeout]",
         default_value = 15,
-        minimum_value = 1,
+        minimum_value = 0,
         maximum_value = 120
     },
     {
@@ -98,6 +98,13 @@ data:extend({
         type = "bool-setting",
         setting_type = "runtime-per-user",
         order = "c[stationlist]-b[focussearch]",
+        default_value = false
+    },
+    {
+        name = "tnp-override-vanilla-wait",
+        type = "bool-setting",
+        setting_type = "runtime-per-user",
+        order = "d[override]-a[vanillawait]",
         default_value = false
     }
 })
