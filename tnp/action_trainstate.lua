@@ -43,6 +43,12 @@ function tnp_action_trainstate(player, train)
         -- Train has no path.
         local target = tnp_state_train_get(train, 'station')
 
+        if not target or not target.valid then
+            tnp_train_enact(train, true, nil, nil, nil)
+            tnp_request_cancel_supply(player, train, supplymode, {"tnp_train_cancelled_invalidstation"})
+            return
+        end
+
         -- Destination stop has a limit that if full.
         if target.type == "train-stop" and target.trains_count == target.trains_limit then
             tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_status_destination_full"})
