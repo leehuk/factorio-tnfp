@@ -231,14 +231,16 @@ function tnp_action_player_train(player, train)
             tnp_request_cancel(player, train, {"tnp_train_cancelled"})
         elseif status == tnpdefines.train.status.redispatched then
             if tnp_state_train_get(train, 'keep_schedule') then
-                tnp_request_cancel(player, train, {"tnp_train_complete_continue", tnp_train_destinationstring(train)})
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_continue", tnp_train_destinationstring(train)})
+                tnp_request_cancel(player, train, nil)
             elseif tnp_state_train_get(train, 'keep_position') then
                 -- The player requested the train waits somewhere for them in manual mode, but jumped out before
                 -- we arrived.  For qol, presume the train should continue -- but notify them.
                 tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_continue", tnp_train_destinationstring(train)})
             else
                 tnp_train_enact(train, true, nil, nil, nil)
-                tnp_request_cancel(player, train, {"tnp_train_complete_resume"})
+                tnp_message(tnpdefines.loglevel.detailed, player, {"tnp_train_complete_resume"})
+                tnp_request_cancel(player, train, nil)
             end
         elseif status == tnpdefines.train.status.rearrived then
             if tnp_state_train_get(train, 'keep_schedule') then
