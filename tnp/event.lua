@@ -151,16 +151,6 @@ function tnp_handle_player_cursor_stack_changed(event)
     end
 end
 
--- tnp_handle_player_dropped()
---   Handles a player dropping an object
-function tnp_handle_player_droppeditem(event)
-    if event.entity and event.entity.stack and event.entity.stack.valid and event.entity.stack.valid_for_read then
-        if event.entity.stack.name == "tnp-railtool" or event.entity.stack.name == "tnp-railtool-supply" then
-            event.entity.stack.clear()
-        end
-    end
-end
-
 -- tnp_handle_railtool()
 --   Handles a request to provide a railtool
 function tnp_handle_railtool(event, shortcut, openmap)

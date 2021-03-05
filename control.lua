@@ -30,7 +30,6 @@ script.on_nth_tick(300, tnp_handle_tick_prune)
 
 -- Player Events
 script.on_event(defines.events.on_player_driving_changed_state, tnp_handle_player_vehicle)
-script.on_event(defines.events.on_player_dropped_item, tnp_handle_player_droppeditem)
 --script.on_event(defines.events.on_player_died, tnp_handle_player_exit)
 --script.on_event(defines.events.on_player_kicked, tnp_handle_player_exit)
 --script.on_event(defines.events.on_player_left_game, tnp_handle_player_exit)

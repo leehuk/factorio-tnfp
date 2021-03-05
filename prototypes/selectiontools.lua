@@ -3,7 +3,8 @@ data:extend({
         name = "tnp-railtool",
         type = "selection-tool",
         flags = {
-            "hidden"
+            "hidden",
+            "only-in-cursor"
         },
         icon = "__TrainNetworkForPlayers__/graphics/icons/railtool-32.png",
         icon_size = 32,
@@ -49,7 +50,8 @@ data:extend({
         name = "tnp-railtool-supply",
         type = "selection-tool",
         flags = {
-            "hidden"
+            "hidden",
+            "only-in-cursor"
         },
         icon = "__TrainNetworkForPlayers__/graphics/icons/railtool-32.png",
         icon_size = 32,
