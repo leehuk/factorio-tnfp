@@ -152,7 +152,7 @@ function tnp_state_train_timeout()
     for id, data in pairs(global.train_data) do
         -- Exclude any trains pending a prune, or without a timeout
         if data.train.valid then
-            if data.timeout_arrival and data.timeout_arrival >= 0 then
+            if data.timeout_arrival and data.timeout_arrival > 0 then
                 data.timeout_arrival = data.timeout_arrival - 1
                 if data.timeout_arrival <= 0 then
                     table.insert(trains.arrival, data.train)
