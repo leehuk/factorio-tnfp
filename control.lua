@@ -21,6 +21,7 @@ require('tnp/stop')
 require('tnp/supplytrain')
 require('tnp/train')
 
+
 -- Event Handling
 -----------------
 
@@ -46,6 +47,7 @@ script.on_event(defines.events.on_lua_shortcut, tnp_handle_shortcut)
 -- Train Events
 script.on_event(defines.events.on_train_changed_state, tnp_handle_train_statechange)
 script.on_event(defines.events.on_train_schedule_changed, tnp_handle_train_schedulechange)
+script.on_event(defines.events.on_train_created, tnp_handle_train_idchange)
 
 -- Selection Tool Events
 script.on_event(defines.events.on_player_alt_selected_area, tnp_handle_selectiontool_alt)

@@ -314,6 +314,52 @@ function tnp_handle_player_vehicle(event)
     tnp_action_player_train(player, vehicle.train)
 end
 
+-- tnp_handle_train_idchange()
+--   Handles a trains id being changed
+function tnp_handle_train_idchange(event)
+    local train = event.train
+    local old_id = nil
+
+    -- No ids means its a new train we can't be tracking, but validate we're not already tracking it too
+    if not train.valid or not(event.old_train_id_1 or event.old_train_id_2) or global.train_data[train.id] then
+        return
+    end
+    -- Validate we're tracking at least one, but not both trains as we can't merge requests
+    if event.old_train_id_1 and global.train_data[event.old_train_id_1] and event.old_train_id_2 and global.train_data[event.old_train_id_2] then
+        return
+    elseif event.old_train_id_1 and global.train_data[event.old_train_id_1] then
+        old_id = event.old_train_id_1
+    elseif event.old_train_id_2 and global.train_data[event.old_train_id_2] then
+        old_id = event.old_train_id_2
+    else
+        return
+    end
+
+    -- VehicleWagon2 check.  If the trains being split into a loco part and a VW2 part, we want the loco part
+    -- and there'll be a second event fired for that
+    if game.active_mods["VehicleWagon2"] then
+        if #train.locomotives.front_movers == 0 and #train.locomotives.back_movers == 0 and #train.cargo_wagons == 1 then
+            return
+        end
+    end
+
+    -- Copy the data over to the new train id, and clear the old id
+    global.train_data[train.id] = util.table.deepcopy(global.train_data[old_id])
+    global.train_data[train.id]['train'] = train
+    global.train_data[old_id] = nil
+
+    local tplayer = global.train_data[train.id]['player']
+    if not tplayer.valid then
+        return
+    end
+
+    if not global.player_data[tplayer.index] or not global.player_data[tplayer.index]['train'] then
+        return
+    end
+
+    global.player_data[tplayer.index]['train'] = train
+end
+
 -- tnp_handle_train_manual()
 --   Handles a player requesting a train is switched to manual mode
 function tnp_handle_train_manual(event)
