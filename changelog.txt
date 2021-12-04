@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.12.4
+Date: 2021-12-04
+  Changes:
+    - add support for tracking train id changes with checks for the Vehicle Wagon 2
+      loading/unloading behaviour
+    - fix logic when arrival timeout was set to zero via PR from Highlander37
+---------------------------------------------------------------------------------------------------
 Version: 0.12.3
 Date: 2020-02-12
   Changes:
