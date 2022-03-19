@@ -58,8 +58,17 @@ end
 --   Displays a speechbubble above the player
 function tnp_speechbubble(player, message)
     local bubble = tnp_state_player_get(player, 'speechbubble')
-    if bubble and bubble.valid then
-        bubble.destroy()
+    if bubble then
+        if bubble.valid then
+            bubble.destroy()
+        end
+
+        tnp_state_player_delete(player, 'speechbubble')
+    end
+
+    if not player.character or player.render_mode ~= defines.render_mode.game then
+        player.print(message)
+        return
     end
 
     bubble = player.surface.create_entity({
