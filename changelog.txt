@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.12.5
+Date: 2022-03-19
+  Changes:
+    - speech bubbles for supply trains are now console messages when outside game
+      view or the player has no character
+    - fixes error when player has no character
+---------------------------------------------------------------------------------------------------
 Version: 0.12.4
 Date: 2021-12-04
   Changes:
