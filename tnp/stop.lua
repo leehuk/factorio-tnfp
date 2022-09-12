@@ -14,22 +14,16 @@ function tnp_stop_check(stop)
         return result
     end
 
-    local signals = stop.get_merged_signals(defines.circuit_connector_id.combinator_input)
-    if signals then
-        for _, signal in pairs(signals) do
-            if signal.signal.type == "virtual" then
-                if signal.signal.name == "tnp-station" then
-                    result.tnp = true
-                end
-                if signal.signal.name == "tnp-station-home" then
-                    result.home = true
-                end
-                if signal.signal.name == "tnp-station-supply" then
-                    result.supply = true
-                    result.supplyidx = signal.count
-                end
-            end
-        end
+    if stop.get_merged_signal({name="tnp-station",type="virtual"}, defines.circuit_connector_id.combinator_input) ~= 0 then
+        result.tnp = true
+    end
+    if stop.get_merged_signal({name="tnp-station-home",type="virtual"}, defines.circuit_connector_id.combinator_input) ~= 0 then
+        result.home = true
+    end
+    local supplyidx = stop.get_merged_signal({name="tnp-station-supply",type="virtual"}, defines.circuit_connector_id.combinator_input)
+    if supplyidx ~= 0 then
+        result.supply = true
+        result.supplyidx = supplyidx
     end
 
     return result
