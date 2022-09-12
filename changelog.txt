@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.12.6
+Date: 2022-09-12
+  Changes:
+    - allow manual mode key to toggle between auto/manual, not just manual
+    - optimise handling of circuit network signals when looking for train stops
+---------------------------------------------------------------------------------------------------
 Version: 0.12.5
 Date: 2022-03-19
   Changes:
